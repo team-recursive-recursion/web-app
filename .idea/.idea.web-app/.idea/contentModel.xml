@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$PROJECT_DIR$" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="web-app.sln" t="IncludeFlat" />
+      <e p="WebApplication" t="IncludeRecursive">
+        <e p=".gitignore" t="Include" />
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="ClientApp" t="Include">
+          <e p="app" t="Include">
+            <e p="app.browser.module.ts" t="Include" />
+            <e p="app.server.module.ts" t="Include" />
+            <e p="app.shared.module.ts" t="Include" />
+            <e p="components" t="Include">
+              <e p="app" t="Include">
+                <e p="app.component.css" t="Include" />
+                <e p="app.component.html" t="Include" />
+                <e p="app.component.ts" t="Include" />
+              </e>
+              <e p="counter" t="Include">
+                <e p="counter.component.html" t="Include" />
+                <e p="counter.component.spec.ts" t="Include" />
+                <e p="counter.component.ts" t="Include" />
+              </e>
+              <e p="fetchdata" t="Include">
+                <e p="fetchdata.component.html" t="Include" />
+                <e p="fetchdata.component.ts" t="Include" />
+              </e>
+              <e p="home" t="Include">
+                <e p="home.component.html" t="Include" />
+                <e p="home.component.ts" t="Include" />
+              </e>
+              <e p="navmenu" t="Include">
+                <e p="navmenu.component.css" t="Include" />
+                <e p="navmenu.component.html" t="Include" />
+                <e p="navmenu.component.ts" t="Include" />
+              </e>
+            </e>
+          </e>
+          <e p="boot.browser.ts" t="Include" />
+          <e p="boot.server.ts" t="Include" />
+          <e p="dist" t="Include">
+            <e p="89889688147bd7575d6327160d64e760.svg" t="Include" />
+            <e p="main-server.js" t="Include" />
+            <e p="vendor.js" t="Include" />
+          </e>
+          <e p="test" t="Include">
+            <e p="boot-tests.ts" t="Include" />
+            <e p="karma.conf.js" t="Include" />
+          </e>
+        </e>
+        <e p="Controllers" t="Include">
+          <e p="HomeController.cs" t="Include" />
+          <e p="SampleDataController.cs" t="Include" />
+        </e>
+        <e p="npm-shrinkwrap.json" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp2.0" t="Include">
+              <e p="WebApplication.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="package.json" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="Startup.cs" t="Include" />
+        <e p="tsconfig.json" t="Include" />
+        <e p="Views" t="Include">
+          <e p="_ViewImports.cshtml" t="Include" />
+          <e p="_ViewStart.cshtml" t="Include" />
+          <e p="home" t="Include">
+            <e p="Index.cshtml" t="Include" />
+          </e>
+          <e p="Shared" t="Include">
+            <e p="_Layout.cshtml" t="Include" />
+            <e p="Error.cshtml" t="Include" />
+          </e>
+        </e>
+        <e p="WebApplication.csproj" t="IncludeRecursive" />
+        <e p="webpack.config.js" t="Include" />
+        <e p="webpack.config.vendor.js" t="Include" />
+        <e p="wwwroot" t="Include">
+          <e p="dist" t="Include">
+            <e p="89889688147bd7575d6327160d64e760.svg" t="Include" />
+            <e p="main-client.js" t="Include" />
+            <e p="main-client.js.map" t="Include" />
+            <e p="vendor-manifest.json" t="Include" />
+            <e p="vendor.css" t="Include" />
+            <e p="vendor.js" t="Include" />
+          </e>
+          <e p="favicon.ico" t="Include" />
+        </e>
+      </e>
+    </e>
+    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.1771325527.00" t="ExcludeRecursive" />
+  </component>
+</project>
