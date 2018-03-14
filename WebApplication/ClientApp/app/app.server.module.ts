@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
-import { AppModuleShared } from './app.shared.module';
+import { AppModuleShared } from './app.module';
 import { AppComponent } from './components/app/app.component';
 
 @NgModule({
