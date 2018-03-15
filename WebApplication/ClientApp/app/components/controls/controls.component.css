@@ -1,1 +1,7 @@
-/* Nothing to see here */
+div.controls {
+    background-color: #FDFDFD;
+    padding: 5px;
+    border-right: 1px solid #DDDDDD;
+    height: 100%;
+    float: left;
+}
