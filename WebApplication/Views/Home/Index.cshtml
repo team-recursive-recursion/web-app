@@ -5,6 +5,49 @@
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
 <script src="~/dist/vendor.js" asp-append-version="true"></script>
+
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
+    <script>
+
+        // This example creates a simple polygon representing the Bermuda Triangle.
+
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 20,
+                    center: { lat: -25.658712, lng: 28.140347 },
+                    mapTypeId: 'satellite'
+                });
+
+            // Define the LatLng coordinates for the polygon's path.
+            var triangleCoords = [
+                { lat: -25.658574, lng: 28.140347 },
+                { lat: -25.658850, lng: 28.140371 },
+                { lat: -25.658722, lng: 28.140085 },
+                { lat: -25.658574, lng: 28.140347 }
+            ];
+
+            // Construct the polygon.
+            var bermudaTriangle = new google.maps.Polygon({
+                paths: triangleCoords,
+                strokeColor: '#BADA55',
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                fillColor: '#BADA55',
+                fillOpacity: 0.4,
+                draggable: true,
+                editable: true
+
+            });
+
+            bermudaTriangle.setMap(map);
+        }
+
+        window.onload = initMap();
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
+    </script>
+
 }
