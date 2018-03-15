@@ -4,4 +4,5 @@ div.controls {
     border-right: 1px solid #DDDDDD;
     height: 100%;
     float: left;
+    text-align: center;
 }
