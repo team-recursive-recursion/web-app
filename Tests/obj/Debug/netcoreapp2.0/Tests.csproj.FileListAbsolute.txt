@@ -1,0 +1,15 @@
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/xunit.runner.reporters.netcoreapp10.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/xunit.runner.utility.netcoreapp10.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Tests.deps.json
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Tests.runtimeconfig.json
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Tests.runtimeconfig.dev.json
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Tests.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Tests.pdb
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Mapper Api.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/bin/Debug/netcoreapp2.0/Mapper Api.pdb
+/Users/ebendutoit/Dev/cos/web-app/Tests/obj/Debug/netcoreapp2.0/Tests.csproj.CoreCompileInputs.cache
+/Users/ebendutoit/Dev/cos/web-app/Tests/obj/Debug/netcoreapp2.0/Tests.AssemblyInfoInputs.cache
+/Users/ebendutoit/Dev/cos/web-app/Tests/obj/Debug/netcoreapp2.0/Tests.AssemblyInfo.cs
+/Users/ebendutoit/Dev/cos/web-app/Tests/obj/Debug/netcoreapp2.0/Tests.dll
+/Users/ebendutoit/Dev/cos/web-app/Tests/obj/Debug/netcoreapp2.0/Tests.pdb
