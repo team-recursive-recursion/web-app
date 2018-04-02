@@ -20,6 +20,20 @@
                     mapTypeId: 'satellite'
                 });
 
+            poly = new google.maps.Polygon({
+                strokeColor: '#BADA55',
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                fillColor: '#BADA55',
+                fillOpacity: 0.4,
+                draggable: true,
+                editable: true
+            });
+            poly.setMap(map);
+            
+            map.addListener('click', addLatLng);
+
+            /*
             // Define the LatLng coordinates for the polygon's path.
             var triangleCoords = [
                 { lat: -25.658574, lng: 28.140347 },
@@ -27,7 +41,7 @@
                 { lat: -25.658722, lng: 28.140085 },
                 { lat: -25.658574, lng: 28.140347 }
             ];
-
+            
             // Construct the polygon.
             var bermudaTriangle = new google.maps.Polygon({
                 paths: triangleCoords,
@@ -40,14 +54,40 @@
                 editable: true
 
             });
+            
 
             bermudaTriangle.setMap(map);
+            */
+
+        }
+
+        function addLatLng(event) {
+            var path = poly.getPath();
+
+            // Because path is an MVCArray, we can simply append a new coordinate
+            // and it will automatically appear.
+            path.push(event.latLng);
+
+            // Add a new marker at the new plotted point on the polyline.
+            var marker = new google.maps.Marker({
+                position: event.latLng,
+                title: '#' + path.getLength(),
+                map: map
+            });
+        }
+
+        function placeMarkerAndPanTo(latLng, map) {
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map
+            });
+            map.panTo(latLng);
         }
 
         window.onload = initMap();
     </script>
     <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap&libraries=drawing">
     </script>
 
 }
