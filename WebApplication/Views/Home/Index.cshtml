@@ -9,15 +9,19 @@
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
     <script>
-
+        var map;
+        var drag = true;
         // This example creates a simple polygon representing the Bermuda Triangle.
+        var polygon = [];
+        var multiPolygons = [];
 
         function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'),
+            map = new google.maps.Map(document.getElementById('map'),
                 {
                     zoom: 20,
                     center: { lat: -25.658712, lng: 28.140347 },
-                    mapTypeId: 'satellite'
+                    mapTypeId: 'satellite',
+                    panControl: false,
                 });
 
             poly = new google.maps.Polygon({
@@ -30,34 +34,8 @@
                 editable: true
             });
             poly.setMap(map);
-            
+
             map.addListener('click', addLatLng);
-
-            /*
-            // Define the LatLng coordinates for the polygon's path.
-            var triangleCoords = [
-                { lat: -25.658574, lng: 28.140347 },
-                { lat: -25.658850, lng: 28.140371 },
-                { lat: -25.658722, lng: 28.140085 },
-                { lat: -25.658574, lng: 28.140347 }
-            ];
-            
-            // Construct the polygon.
-            var bermudaTriangle = new google.maps.Polygon({
-                paths: triangleCoords,
-                strokeColor: '#BADA55',
-                strokeOpacity: 1,
-                strokeWeight: 5,
-                fillColor: '#BADA55',
-                fillOpacity: 0.4,
-                draggable: true,
-                editable: true
-
-            });
-            
-
-            bermudaTriangle.setMap(map);
-            */
 
         }
 
@@ -67,21 +45,33 @@
             // Because path is an MVCArray, we can simply append a new coordinate
             // and it will automatically appear.
             path.push(event.latLng);
-
+            polygon.push(event.latLng);
             // Add a new marker at the new plotted point on the polyline.
-            var marker = new google.maps.Marker({
+            var marker = new google.maps.Polygon({
                 position: event.latLng,
                 title: '#' + path.getLength(),
                 map: map
             });
         }
 
-        function placeMarkerAndPanTo(latLng, map) {
-            var marker = new google.maps.Marker({
-                position: latLng,
-                map: map
+        function savePolygon() {
+            multiPolygons.push(polygon);
+
+            poly = new google.maps.Polygon({
+                strokeColor: '#BADA55',
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                fillColor: '#BADA55',
+                fillOpacity: 0.4,
+                draggable: true,
+                editable: true
             });
-            map.panTo(latLng);
+            poly.setMap(map);
+        }
+
+        function toggleDraggable() {
+            drag = !drag;
+            map.setOptions({ draggable: drag });
         }
 
         window.onload = initMap();
