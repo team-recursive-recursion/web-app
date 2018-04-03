@@ -11,9 +11,7 @@
     <script>
         var map;
         var drag = true;
-
         var path;
-
         var polygon = [];
         var multiPolygons = [];
 
@@ -83,14 +81,16 @@
             for (var i = 0; i < multiPolygons.length; i++) {
                 display += "index: " + i + " " + multiPolygons[i] + '\n';
             }
-            for (var j = 0; j < polygon.length; j++) {
-                temp += polygon[j] + ",";
+            if (polygon.length !== 0) {
+                for (var j = 0; j < polygon.length; j++) {
+                    temp += polygon[j] + ",";
+                }
+                display += "index: " + i + " " + temp + '\n';
             }
-            display += "index: " + i + " " + temp + '\n';
             //window.alert(display);
             console.log(display);
         }
-        
+
         function showCurrentCoordinate() {
             var display = "";
             for (var i = 0; i < polygon.length; i++) {
