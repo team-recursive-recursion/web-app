@@ -103,7 +103,7 @@
         function changePolyType() {
             var courseTypeSelector = document.getElementById("courseType");
             var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
-            window.alert(colour);
+            
             poly.setOptions({strokeColor: colour ,fillColor: colour});
         }
 
