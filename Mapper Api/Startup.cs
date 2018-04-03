@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,10 +25,7 @@ namespace Mapper_Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            //transienr meh all the time
             services.AddScoped<GolfCourseService>();
-            // scoped only when needed
-            
             
             var connectionString = Configuration.GetConnectionString("MapperContext");
             services.AddEntityFrameworkNpgsql().AddDbContext<CourseDb>(options => options.UseNpgsql(connectionString)); 

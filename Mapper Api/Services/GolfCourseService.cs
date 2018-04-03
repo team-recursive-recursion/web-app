@@ -1,9 +1,10 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Mapper_Api.Context;
+ using GeoJSON.Net.Contrib.Wkb;
+ using Mapper_Api.Context;
 using Mapper_Api.Models;
 using Newtonsoft.Json;
 using SQLitePCL;
@@ -48,10 +49,9 @@ namespace Mapper_Api.Services
         {
             GeoJSON.Net.Geometry.Polygon polygon =
                 JsonConvert.DeserializeObject<GeoJSON.Net.Geometry.Polygon>(geoJSONString);
-
             var coursePolygon = new CoursePolygon
             {
-                Polygon = polygon,
+                PolygonRaw = polygon.ToWkb(),
                 CourseId = courseId,
                 PolygonId = Guid.NewGuid(),
                 Type = polygonType
@@ -110,6 +110,11 @@ namespace Mapper_Api.Services
         public IQueryable<GolfCourse> GetGolfCourses()
         {
             return db.GolfCourses;
+        }
+
+        public IQueryable<CoursePolygon> GetGolfPolygons()
+        {
+            return db.CoursePolygons;
         }
     }
 }

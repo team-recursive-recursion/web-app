@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace Mapper_Api
 
         private static async Task RunAsync(string[] args)
         {
-            var env = Environment.GetEnvironmentVariable("Development");
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             var serviceProvider = new ServiceCollection()
                 .AddLogging()

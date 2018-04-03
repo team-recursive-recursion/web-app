@@ -17,22 +17,19 @@ namespace Mapper_Api.Context
         {
             modelBuilder.Entity<GolfCourse>()
                 .Property(b => b.CreatedAt)
-                .HasDefaultValueSql("getdate()");
+                .HasDefaultValueSql("now()");
 
             modelBuilder.Entity<GolfCourse>()
                 .Property(b => b.UpdatedAt)
-                .HasDefaultValueSql("getdate()");
+                .HasDefaultValueSql("now()");
             
             modelBuilder.Entity<CoursePolygon>()
                 .Property(b => b.CreatedAt)
-                .HasDefaultValueSql("getdate()");
+                .HasDefaultValueSql("now()");
 
             modelBuilder.Entity<CoursePolygon>()
                 .Property(b => b.UpdatedAt)
-                .HasDefaultValueSql("getdate()");
-            
-//            modelBuilder.Entity<CoursePolygon>()
-//                .Property(b => b.Polygon).
+                .HasDefaultValueSql("now()");
         }
     }
 }
