@@ -11,4 +11,30 @@
     <button type="button" class="btn btn-default">Save Course</button>
     <br>
     <button type="button" class="btn btn-default">Load Course</button>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <label>Map Options</label>
+    <br>
+    <button onclick="newPolygon()" type="button" class="btn btn-default">New Polygon</button>
+    <br>
+    <br>
+    <label>Select Terrain Type:</label>
+    <select id="courseType" onchange="changePolyType();">
+        <option value="#BADA55">Green</option>
+        <option value="#73A15D">Fairway</option>
+        <option value="#C2B280">Bunker</option>
+        <option value="#336699">Water Hazard</option>
+    </select>
+    <br>
+    <br>
+    <button onclick="toggleDraggable()" type="button" class="btn btn-default">Map Draggable</button>
+    <br>
+    <button onclick="showAllCoordinates()" type="button" class="btn btn-default">Show All Coordinates</button>
+
+    <br>
+    <button onclick="showCurrentCoordinate()" type="button" class="btn btn-default">Show Current Coordinates</button>
 </div>
