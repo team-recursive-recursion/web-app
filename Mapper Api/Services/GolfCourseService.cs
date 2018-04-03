@@ -1,24 +1,73 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
+using Mapper_Api.Context;
 using Mapper_Api.Models;
+using Newtonsoft.Json;
 using SQLitePCL;
 
 namespace Mapper_Api.Services
 {
     public class GolfCourseService
     {
-        public GolfCourseService()
+        private CourseDb db;
+
+        public GolfCourseService(CourseDb courseDb)
         {
+            this.db = courseDb;
         }
 
-        public async Task<GolfCourse> CreateGolfCourse(Guid ownerId, string courseName)
+        public async Task<GolfCourse> CreateGolfCourse(string courseName)
         {
-            throw new NotImplementedException("Create Golf Course");
+            GolfCourse course = new GolfCourse
+            {
+                CourseId = Guid.NewGuid(),
+                CourseName = courseName,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            ValidationContext validationContext = new ValidationContext(course);
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(course, validationContext, results, true))
+            {
+                throw new ArgumentException(results.First().ErrorMessage, results.First().MemberNames.FirstOrDefault());
+            }
+
+            db.GolfCourses.Add(course);
+
+            await db.SaveChangesAsync();
+
+            return course;
         }
 
-        public async Task<Polygon> CreatePolygon(Guid creatorId, Guid courseId, Polygon.PolygonTypes polygonType)
+        public async Task<CoursePolygon> CreatePolygon(Guid courseId, CoursePolygon.PolygonTypes polygonType,
+            string geoJSONString)
         {
-            throw new NotImplementedException("Crate Polygon");
+            GeoJSON.Net.Geometry.Polygon polygon =
+                JsonConvert.DeserializeObject<GeoJSON.Net.Geometry.Polygon>(geoJSONString);
+
+            var coursePolygon = new CoursePolygon
+            {
+                Polygon = polygon,
+                CourseId = courseId,
+                PolygonId = Guid.NewGuid(),
+                Type = polygonType
+            };
+            ValidationContext validationContext = new ValidationContext(coursePolygon);
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(coursePolygon, validationContext, results, true))
+            {
+                throw new ArgumentException(results.First().ErrorMessage, results.First().MemberNames.FirstOrDefault());
+            }
+
+            db.CoursePolygons.Add(coursePolygon);
+
+            await db.SaveChangesAsync();
+
+            return coursePolygon;
         }
 
         public async Task<Point> CreatePoint(Guid creatorId, Guid courseId, Point.PointTypes pointType)
@@ -31,7 +80,8 @@ namespace Mapper_Api.Services
             throw new NotImplementedException("Update Golf Course");
         }
 
-        public async Task<Polygon> UpdatePolygon(Guid creatorId, Guid courseId, Polygon.PolygonTypes polygonType)
+        public async Task<CoursePolygon> UpdatePolygon(Guid creatorId, Guid courseId,
+            CoursePolygon.PolygonTypes polygonType)
         {
             throw new NotImplementedException("Update Polygon");
         }
@@ -46,7 +96,8 @@ namespace Mapper_Api.Services
             throw new NotImplementedException("Remove Golf Course");
         }
 
-        public async Task<Polygon> RemovePolygon(Guid creatorId, Guid courseId, Polygon.PolygonTypes polygonType)
+        public async Task<CoursePolygon> RemovePolygon(Guid creatorId, Guid courseId,
+            CoursePolygon.PolygonTypes polygonType)
         {
             throw new NotImplementedException("Remove Polygon");
         }
@@ -54,6 +105,11 @@ namespace Mapper_Api.Services
         public async Task<Point> RemovePoint(Guid creatorId, Guid courseId, Point.PointTypes pointType)
         {
             throw new NotImplementedException("Remove Point");
+        }
+
+        public IQueryable<GolfCourse> GetGolfCourses()
+        {
+            return db.GolfCourses;
         }
     }
 }

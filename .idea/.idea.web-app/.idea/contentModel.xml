@@ -10,16 +10,25 @@
         <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="bundleconfig.json" t="Include" />
+        <e p="Context" t="Include">
+          <e p="CourseDb.cs" t="Include" />
+        </e>
         <e p="Controllers" t="Include">
+          <e p="GolfCourseController.cs" t="Include" />
           <e p="HomeController.cs" t="Include" />
         </e>
         <e p="Mapper Api.csproj" t="IncludeRecursive" />
+        <e p="Migrations" t="Include">
+          <e p="20180403114332_InitialCreate.cs" t="Include" />
+          <e p="20180403114332_InitialCreate.Designer.cs" t="Include" />
+          <e p="CourseDbModelSnapshot.cs" t="Include" />
+        </e>
         <e p="Models" t="Include">
+          <e p="CoursePoint.cs" t="Include" />
+          <e p="CoursePolygon.cs" t="Include" />
           <e p="ErrorViewModel.cs" t="Include" />
           <e p="GolfCourse.cs" t="Include" />
           <e p="Owner.cs" t="Include" />
-          <e p="Point.cs" t="Include" />
-          <e p="Polygon.cs" t="Include" />
           <e p="User.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive">
