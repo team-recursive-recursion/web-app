@@ -17,6 +17,7 @@
           <e p="GolfCourseController.cs" t="Include" />
           <e p="HomeController.cs" t="Include" />
         </e>
+        <e p="hosting.json" t="Include" />
         <e p="Mapper Api.csproj" t="IncludeRecursive" />
         <e p="Migrations" t="Include">
           <e p="20180403205458_InitialCreate.cs" t="Include" />
