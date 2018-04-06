@@ -14,6 +14,7 @@
         var path;
         var polygon = [];
         var multiPolygons = [];
+        var url;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'),
@@ -24,18 +25,34 @@
                     panControl: false,
                 });
             poly = new google.maps.Polygon({
-                strokeColor: '#BADA55',
+                strokeColor: '#463E3E',
                 strokeOpacity: 1,
                 strokeWeight: 5,
-                fillColor: '#BADA55',
+                fillColor: '#463E3E',
                 fillOpacity: 0.4,
                 draggable: true,
                 editable: true
             });
             poly.setMap(map);
+            
+            //$http.get(url).then(successCallback, errorCallback);
 
             map.addListener('click', addLatLng);
+
+            getServerURL();
         }
+        
+
+        
+        function getServerURL() {
+            url = prompt("Enter server URL:", "localhost:5001");
+        }       
+        
+        function saveMap() {
+                 
+            //$http.post(url, data).then(successCallback, errorCallback);
+
+        }        
 
         function addLatLng(event) {
             path = poly.getPath();
@@ -59,15 +76,18 @@
             }
 
             poly = new google.maps.Polygon({
-                strokeColor: '#BADA55',
+                strokeColor: '#463E3E',
                 strokeOpacity: 1,
                 strokeWeight: 5,
-                fillColor: '#BADA55',
+                fillColor: '#463E3E',
                 fillOpacity: 0.4,
                 draggable: true,
                 editable: true
             });
             poly.setMap(map);
+            
+            var courseTypeSelector = document.getElementById("courseType");
+            courseTypeSelector.selectedIndex = 0; 
         }
 
         function toggleDraggable() {
@@ -87,7 +107,6 @@
                 }
                 display += "index: " + i + " " + temp + '\n';
             }
-            //window.alert(display);
             console.log(display);
         }
 
@@ -96,7 +115,6 @@
             for (var i = 0; i < polygon.length; i++) {
                 display += "index: " + i + " " + polygon[i] + '\n';
             }
-            //window.alert(display);
             console.log(display);
         }
 
@@ -104,7 +122,7 @@
             var courseTypeSelector = document.getElementById("courseType");
             var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
             
-            poly.setOptions({strokeColor: colour ,fillColor: colour});
+            poly.setOptions({strokeColor: colour ,fillColor: colour, zIndex: courseTypeSelector.selectedIndex});
         }
 
         window.onload = initMap();
