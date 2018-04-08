@@ -15,6 +15,7 @@
         var polygon = [];
         var multiPolygons = [];
         var url;
+        var poly;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'),
@@ -22,7 +23,7 @@
                     zoom: 20,
                     center: { lat: -25.658712, lng: 28.140347 },
                     mapTypeId: 'satellite',
-                    panControl: false,
+                    panControl: false
                 });
             poly = new google.maps.Polygon({
                 strokeColor: '#463E3E',
@@ -31,6 +32,7 @@
                 fillColor: '#463E3E',
                 fillOpacity: 0.4,
                 draggable: true,
+                terrainType: 0,
                 editable: true
             });
             poly.setMap(map);
@@ -49,7 +51,9 @@
         }       
         
         function saveMap() {
-                 
+            // create json of the polygons
+            
+            
             //$http.post(url, data).then(successCallback, errorCallback);
 
         }        
@@ -60,10 +64,10 @@
             // and it will automatically appear.
             path.push(event.latLng);
             // Add a new polygon at the new plotted point on the polyline.
-            var point = new google.maps.Polygon({
-                position: event.latLng,
-                map: map
-            });
+ //           var point = new google.maps.Polygon({
+ //               position: event.latLng,
+  //              map: map
+  //          });
             polygon.push(event.latLng);
         }
 
@@ -82,6 +86,7 @@
                 fillColor: '#463E3E',
                 fillOpacity: 0.4,
                 draggable: true,
+                terrainType: 0,
                 editable: true
             });
             poly.setMap(map);
@@ -98,14 +103,15 @@
         function showAllCoordinates() {
             var display = "";
             var temp = "";
-            for (var i = 0; i < multiPolygons.length; i++) {
-                display += "index: " + i + " " + multiPolygons[i] + '\n';
+            var i;
+            for (i = 0; i < multiPolygons.length; i++) {
+                display += "index: " + i + " " + multiPolygons[i] + '\n\n';
             }
             if (polygon.length !== 0) {
                 for (var j = 0; j < polygon.length; j++) {
                     temp += polygon[j] + ",";
                 }
-                display += "index: " + i + " " + temp + '\n';
+                display += "index: " + i + " " + temp + '\n\n';
             }
             console.log(display);
         }
@@ -122,7 +128,7 @@
             var courseTypeSelector = document.getElementById("courseType");
             var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
             
-            poly.setOptions({strokeColor: colour ,fillColor: colour, zIndex: courseTypeSelector.selectedIndex});
+            poly.setOptions({strokeColor: colour ,fillColor: colour, zIndex: courseTypeSelector.selectedIndex, terrainType: courseTypeSelector.selectedIndex});
         }
 
         window.onload = initMap();
