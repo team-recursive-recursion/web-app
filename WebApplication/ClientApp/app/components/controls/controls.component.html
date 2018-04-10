@@ -1,40 +1,52 @@
 <div class='controls'>
-    <span style="font-size:small;font-color:grey">
-        Controls are only for demo purposes
-    </span>
     <br>
     <div style="text-align: left">
         <label>Course Name:</label>
         <input type="text" class="form-control" value="Default Course">
     </div>
     <br>
-    <button type="button" class="btn btn-default">Save Course</button>
+    <button type="button" class="btn btn-default" id="saveCourse">Save Course</button>
     <br>
-    <button type="button" class="btn btn-default">Load Course</button>
-    <br>
-    <br>
+    <button type="button" class="btn btn-default" id="loadCourse">Load Course</button>
     <br>
     <br>
     <br>
     <br>
-    <label>Map Options</label>
-    <br>
-    <button onclick="newPolygon()" type="button" class="btn btn-default">New Polygon</button>
     <br>
     <br>
-    <label>Select Terrain Type:</label>
+    <div style="text-align: left">
+        <label>Polygon Options</label>
+    </div>
+    <br>
+    <button onclick="newPolygon()" type="button" class="btn btn-default">Save Polygon</button>
+    <br>
+    <span style="font-size:small;font-color:grey">
+        Select Current Polygon Type:
+    </span>
+    <br>
+    <!-- Could remove the value, and store an array with the values in it. 
+    Then by using the index of the select to determine the colour. -->
     <select id="courseType" onchange="changePolyType();">
-        <option value="#BADA55">Green</option>
+        <option value="#463E3E">Rough</option>
         <option value="#73A15D">Fairway</option>
+        <option value="#BADA55">Green</option>
         <option value="#C2B280">Bunker</option>
         <option value="#336699">Water Hazard</option>
     </select>
     <br>
     <br>
+    <div style="text-align: left">
+        <label>Map Options</label>
+    </div>
+    <br>
     <button onclick="toggleDraggable()" type="button" class="btn btn-default">Map Draggable</button>
     <br>
+    <br>
+    <span style="font-size:small;font-color:grey">
+        Controls are only for demo purposes
+    </span>
+    <br>
     <button onclick="showAllCoordinates()" type="button" class="btn btn-default">Show All Coordinates</button>
-
     <br>
     <button onclick="showCurrentCoordinate()" type="button" class="btn btn-default">Show Current Coordinates</button>
 </div>
