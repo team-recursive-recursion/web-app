@@ -5,6 +5,7 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="web-app.sln" t="IncludeFlat" />
       <e p="WebApplication" t="IncludeRecursive">
+        <e p=".angular-cli.json" t="Include" />
         <e p=".gitignore" t="Include" />
         <e p="appsettings.Development.json" t="Include" />
         <e p="appsettings.json" t="Include" />
@@ -12,26 +13,30 @@
         <e p="ClientApp" t="Include">
           <e p="app" t="Include">
             <e p="app.browser.module.ts" t="Include" />
+            <e p="app.module.ts" t="Include" />
             <e p="app.server.module.ts" t="Include" />
-            <e p="app.shared.module.ts" t="Include" />
             <e p="components" t="Include">
               <e p="app" t="Include">
                 <e p="app.component.css" t="Include" />
                 <e p="app.component.html" t="Include" />
                 <e p="app.component.ts" t="Include" />
               </e>
-              <e p="counter" t="Include">
-                <e p="counter.component.html" t="Include" />
-                <e p="counter.component.spec.ts" t="Include" />
-                <e p="counter.component.ts" t="Include" />
-              </e>
-              <e p="fetchdata" t="Include">
-                <e p="fetchdata.component.html" t="Include" />
-                <e p="fetchdata.component.ts" t="Include" />
+              <e p="controls" t="Include">
+                <e p="controls.component.css" t="Include" />
+                <e p="controls.component.html" t="Include" />
+                <e p="controls.component.spec.ts" t="Include" />
+                <e p="controls.component.ts" t="Include" />
               </e>
               <e p="home" t="Include">
+                <e p="home.component.css" t="Include" />
                 <e p="home.component.html" t="Include" />
                 <e p="home.component.ts" t="Include" />
+              </e>
+              <e p="mapper" t="Include">
+                <e p="mapper.component.css" t="Include" />
+                <e p="mapper.component.html" t="Include" />
+                <e p="mapper.component.spec.ts" t="Include" />
+                <e p="mapper.component.ts" t="Include" />
               </e>
               <e p="navmenu" t="Include">
                 <e p="navmenu.component.css" t="Include" />
@@ -92,9 +97,12 @@
             <e p="vendor.js" t="Include" />
           </e>
           <e p="favicon.ico" t="Include" />
+          <e p="Scripts" t="Include">
+            <e p="mapper-api.js" t="Include" />
+          </e>
         </e>
       </e>
     </e>
-    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.1771325527.00" t="ExcludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.532755672.00" t="ExcludeRecursive" />
   </component>
 </project>
