@@ -5,10 +5,19 @@
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
 <script src="~/dist/vendor.js" asp-append-version="true"></script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
+</script>
+<script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="Scripts/mapper-api.js"></script>
 
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
     <script>
+
         var map;
         var drag = true;
         var path;
@@ -16,6 +25,19 @@
         var multiPolygons = [];
         var url;
         var poly;
+
+        function setupAPI() {
+            $("#saveCourse").on("click",
+                function() {
+                    api.createCourse($("#courseName").val(),
+                        function(result) {
+                            alert(JSON.stringify(result));
+                        }
+                    );
+                }
+            );
+        }
+
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'),
@@ -36,27 +58,25 @@
                 editable: true
             });
             poly.setMap(map);
-            
+
             //$http.get(url).then(successCallback, errorCallback);
 
             map.addListener('click', addLatLng);
 
             getServerURL();
         }
-        
 
-        
+
         function getServerURL() {
             url = prompt("Enter server URL:", "localhost:5001");
-        }       
-        
+            api.url = url;
+        }
+
         function saveMap() {
             // create json of the polygons
-            
-            
-            //$http.post(url, data).then(successCallback, errorCallback);
 
-        }        
+            //$http.post(url, data).then(successCallback, errorCallback);
+        }
 
         function addLatLng(event) {
             path = poly.getPath();
@@ -64,10 +84,10 @@
             // and it will automatically appear.
             path.push(event.latLng);
             // Add a new polygon at the new plotted point on the polyline.
- //           var point = new google.maps.Polygon({
- //               position: event.latLng,
-  //              map: map
-  //          });
+            //           var point = new google.maps.Polygon({
+            //               position: event.latLng,
+            //              map: map
+            //          });
             polygon.push(event.latLng);
         }
 
@@ -90,9 +110,9 @@
                 editable: true
             });
             poly.setMap(map);
-            
+
             var courseTypeSelector = document.getElementById("courseType");
-            courseTypeSelector.selectedIndex = 0; 
+            courseTypeSelector.selectedIndex = 0;
         }
 
         function toggleDraggable() {
@@ -127,14 +147,18 @@
         function changePolyType() {
             var courseTypeSelector = document.getElementById("courseType");
             var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
-            
-            poly.setOptions({strokeColor: colour ,fillColor: colour, zIndex: courseTypeSelector.selectedIndex, terrainType: courseTypeSelector.selectedIndex});
+
+            poly.setOptions({
+                strokeColor: colour,
+                fillColor: colour,
+                zIndex: courseTypeSelector.selectedIndex,
+                terrainType: courseTypeSelector.selectedIndex
+            });
         }
 
+        window.onload = setupAPI();
         window.onload = initMap();
     </script>
-    <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
-    </script>
+
 
 }
