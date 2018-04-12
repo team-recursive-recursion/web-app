@@ -5,7 +5,7 @@ var api = function () {
 
 api.getPolygons = function (courseName, callback) {
     $.get("http://" + this.url + "/golfCourse/GetPolygons?courseId=" + 
-        api.courseId,
+        courseName,
         function(data, status) {
             alert("Data: " + data + "\n" + status);
             if (status) {
