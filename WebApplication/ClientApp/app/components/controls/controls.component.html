@@ -1,21 +1,27 @@
 <div class='controls'>
-    <br>
     <div style="text-align: left">
         <h4>Course Name:</h4>
-        <input type="text" class="form-control" value="Default Course">
+        <input type="text" class="form-control" value="Default Course" 
+            id="courseName">
     </div>
+    <button type="button" class="btn btn-default" id="createCourse">
+        Create Course</button>
     <br>
-    <button type="button" class="btn btn-default" id="saveCourse">Save Course</button>
+    <div style="text-align: left">
+        <h4>Course ID:</h4>
+        <input type="text" class="form-control" value="" id="courseId">
+    </div>
+    <button type="button" class="btn btn-default" id="loadCourse">
+        Load Course</button>
     <br>
-    <button type="button" class="btn btn-default" id="loadCourse">Load Course</button>
-    <br>
+    <button type="button" class="btn btn-default" id="saveCourse">
+        Save Course</button>
     <br>
     <div style="text-align: left">
         <h4>Polygon Options:</h4>
     </div>
-    <br>
-    <button onclick="newPolygon()" type="button" class="btn btn-default">Save Polygon</button>
-    <br>
+    <button onclick="newPolygon()" type="button" class="btn btn-default">
+        Save Polygon</button>
     <br>
     <span style="font-size:small;font-color:grey">
         Select Current Polygon Type:
@@ -36,19 +42,23 @@
         <h4>Map Options:</h4>
     </div>
     <br>
-    <button onclick="toggleDraggable()" type="button" class="btn btn-default">Map Draggable</button>
+    <button onclick="toggleDraggable()" type="button" class="btn btn-default">
+        Map Draggable</button>
     <br>
     <br>
     <span style="font-size:small;font-color:grey">
         Controls are only for demo purposes
     </span>
     <br>
-    <button onclick="showAllCoordinates()" type="button" class="btn btn-default">Show All Coordinates</button>
+    <button onclick="showAllCoordinates()" type="button" 
+        class="btn btn-default">Show All Coordinates</button>
     <br>
     <br>
-    <button onclick="showCurrentCoordinate()" type="button" class="btn btn-default">Show Current Coordinates</button>
+    <button onclick="showCurrentCoordinate()" type="button" 
+        class="btn btn-default">Show Current Coordinates</button>
     <br>
     <br>
-    <button onclick="resetMap()" type="button" class="btn btn-default">Reset Map</button>
+    <button onclick="resetMap()" type="button" 
+        class="btn btn-default">Reset Map</button>
     
 </div>

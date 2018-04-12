@@ -27,7 +27,6 @@
         var addedPolygons = [];
 
         var url;
-        var courseId = "3428bb12-3c87-4c4c-951f-311eca2d5d38";
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'),
@@ -48,20 +47,48 @@
         function getServerURL() {
             url = prompt("Enter server URL:", "localhost:5001");
             api.url = url;
-            api.courseId = "3428bb12-3c87-4c4c-951f-311eca2d5d38";
         }
 
         function setupAPI() {
-            // Call saveCourse() and send the current Polygons
-            // on the map to the API to save
-            $("#saveCourse").on("click", saveCourse);
+            // Clicking on 'Save Course' all saveCourse() and send 
+            // the current Polygons on the map to the API to save
+            $("#saveCourse").on("click", 
+                function() {
+                    
+                    saveCourse($("#courseId").val());
+                }
+            );
 
-            // Call getCourse() and init the Map with Polygons
-            // from the returned data of the API
+            // Clicking on 'Load Course' will call getCourse() and init
+            // the Map with Polygons from the returned data of the API
             $("#loadCourse").on("click", 
                 function() {
-                    api.getPolygons(courseId, getCourse);
-                });
+                    api.getPolygons($("#courseId").val(),
+                        getCourse
+                    );
+                }
+            );
+
+            // Clicking on 'Create Course' will create a course, and return
+            // the courseId.
+            $("#createCourse").on("click",
+                function() {
+                    api.createCourse($("#courseName").val(),
+                        function(result) {
+                            if (result == null || 
+                                typeof result == "undefined") {
+
+                                error("Failed to create course -> " +
+                                "courseName: " + $("#courseName").val());
+                            } else {
+                                success("Course created -> courseId: " + 
+                                result.courseId);
+                            }
+                        }
+
+                    );
+                }
+            );
         };
 
         function error(e) {
@@ -72,7 +99,11 @@
             console.log("Success: " + s);
         }
 
-        function saveCourse() {
+        function notify(n) {
+            console.log("Notification:\n" + n);
+        }
+
+        function saveCourse(_courseId) {
             if (multiPolygons.length == 0) {
                 error("Failed to save course -> No polygons drawn on the map");
                 return;
@@ -95,14 +126,14 @@
                 geoJson["coordinates"][0].push([polygonLngLat[0].lng(),
                     polygonLngLat[0].lat()]);
                 
-                strings = JSON.stringify(geoJson);
-                api.addPolygon(api.courseId, strings, 
+                var stringifyGeoJson = JSON.stringify(geoJson);
+                api.addPolygon(_courseId, stringifyGeoJson, 
                     multiPolygons[i].terrainType, 
                     function (data) {
                         if (data == null || typeof data == "undefined") {
-                            error("Failed to add Polygons to course.");
+                            error("Failed to add Polygon "+i+" to course.");
                         } else {
-                            success("Polygons was added to the course.");
+                            success("Polygon "+i+" was added to the course.");
                         }
                     }
                 );
@@ -130,6 +161,8 @@
                 var temp = createPolygon(false, data[i].type);
                 temp.setOptions({ paths: polyCoords });
                 temp.setMap(map);
+
+                multiPolygons.push(temp);
             }
             poly.setMap(null);
 
@@ -192,7 +225,7 @@
                 }
                 display += "index: " + i + " " + temp + '\n\n';
             }
-            console.log(display);
+            notify(display);
         }
 
         function showCurrentCoordinate() {
@@ -200,7 +233,7 @@
             for (var i = 0; i < polygon.length; i++) {
                 display += "index: " + i + " " + polygon[i] + '\n';
             }
-            console.log(display);
+            notify(display);
         }
 
         function changePolyType() {
@@ -235,19 +268,16 @@
         }
 
         function resetMap() {
-            if (multiPolygons != null || typeof multiPolygons == 'undefined') {
+            if (multiPolygons != []) {
                 for (var i = 0; i < multiPolygons.length; ++i) {
                     multiPolygons[i].setMap(null);
                 }
             }
             multiPolygons = [];
             poly.setMap(null);
+            poly = null;
             poly = defaultPolygon();
+            poly.setMap(map);
         }
-       
-//        window.onload = setupAPI();
-//        window.onload = initMap();
     </script>
-
-
 }
