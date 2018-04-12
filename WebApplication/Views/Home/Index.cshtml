@@ -4,7 +4,6 @@
 
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
-<script src="~/dist/vendor.js" asp-append-version="true"></script>
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
 </script>
@@ -13,6 +12,7 @@
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
 <script src="Scripts/mapper-api.js"></script>
+<script src="~/dist/vendor.js" asp-append-version="true"></script>
 
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
@@ -23,20 +23,70 @@
         var path;
         var polygon = [];
         var multiPolygons = [];
-        var url;
         var poly;
+        var addedPolygons = [];
+
+        var url;
+        var courseId = "3428bb12-3c87-4c4c-951f-311eca2d5d38";
+        var apiPolygons;
+        var geoJson;
+        var tempPolys;
+        var paths;
+        var coordinates;
 
         function setupAPI() {
             $("#saveCourse").on("click",
                 function() {
-                    api.createCourse($("#courseName").val(),
+                    //create a new course
+/*                    api.createCourse($("#courseName").val(),
                         function(result) {
-                            alert(JSON.stringify(result));
+                            console.log(JSON.stringify(result));
+                        }
+                    ); 
+*/
+                    //save the polygons to the course
+                    for (var i = 0; i < multiPolygons.length; ++i) {
+                        tempPolys = multiPolygons[i];
+                        geoJson = 
+                        {
+                            "type": "Polygon",
+                            "coordinates": []
+                        }
+
+                        paths  = [];
+                        paths = tempPolys.getPath().getArray();
+                        coordinates = [];
+
+                        for (var j = 0; j < paths.length; ++j) {
+                            coordinates.push([paths[j].lng(), paths[j].lat()]);
+                        }
+                        var coord = [];
+                        coord.push(coordinates);
+                        geoJson["coordinates"].push(coord);
+
+                        
+
+                        api.addPolygon(api.courseId, geoJson, 
+                            multiPolygons[i].terrainType, 
+                            function (status) {
+                                alert(status);
+                            }
+                        );
+
+                    }
+                }
+            );
+
+            $("#loadCourse").on("click",
+                function() {
+                    api.getPolygons(courseId,
+                        function(result) {
+                            apiPolygons = result;
                         }
                     );
                 }
             );
-        }
+        };
 
 
         function initMap() {
@@ -70,12 +120,46 @@
         function getServerURL() {
             url = prompt("Enter server URL:", "localhost:5001");
             api.url = url;
+            api.courseId = "3428bb12-3c87-4c4c-951f-311eca2d5d38";
         }
 
-        function saveMap() {
-            // create json of the polygons
+        function getColor(data) {
+            switch (data) {
+                case 0: return '#463E3E';
+                case 1: return '#73A15D';
+                case 2: return '#BADA55';
+                case 3: return '#C2B280';
+                case 4: return '#336699';
+            }
+        }
 
-            //$http.post(url, data).then(successCallback, errorCallback);
+        function createCourse(data) {
+            multiPolygons = [];
+
+            for (var i = 0; i < data.length; ++i) {
+                var dataCoords = data[i].polygon.coordinates[0];
+                var polyCoords = [];
+
+                for (var j = 0; j < dataCoords.length; ++j) {
+                    polyCoords.push(new google.maps.LatLng(dataCoords[j][1], 
+                        dataCoords[j][0]));
+                }
+
+                var temp = new google.maps.Polygon({
+                    paths: polyCoords,
+                    strokeOpacity: 1,
+                    strokeWeight: 5,
+                    fillOpacity: 0.4,
+                    draggable: true,
+                    editable: true,
+
+                    // These are the properties unique per polygon
+                    terrainType: data[i].type,
+                    fillColor: getColor(data[i].type),
+                    strokeColor: getColor(data[i].type)
+                });
+                temp.setMap(map);
+            }
         }
 
         function addLatLng(event) {
@@ -92,9 +176,8 @@
         }
 
         function newPolygon() {
-
             if (path.length !== 0) {
-                multiPolygons.push(polygon);
+                multiPolygons.push(poly);
                 polygon = [];
                 path = [];
             }
@@ -146,7 +229,7 @@
 
         function changePolyType() {
             var courseTypeSelector = document.getElementById("courseType");
-            var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
+            var colour = getColor(courseTypeSelector.selectedIndex);
 
             poly.setOptions({
                 strokeColor: colour,
