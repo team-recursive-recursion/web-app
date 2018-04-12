@@ -246,9 +246,12 @@
             <e p="vendor.js" t="Include" />
           </e>
           <e p="favicon.ico" t="Include" />
+          <e p="Scripts" t="Include">
+            <e p="mapper-api.js" t="Include" />
+          </e>
         </e>
       </e>
     </e>
-    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.1771325527.00" t="ExcludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.532755672.00" t="ExcludeRecursive" />
   </component>
 </project>
