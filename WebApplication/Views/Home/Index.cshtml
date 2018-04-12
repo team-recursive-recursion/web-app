@@ -116,9 +116,8 @@
 
             map.addListener('click', addLatLng);
 
-            getServerURL();
+           // getServerURL();
         }
-
 
         function getServerURL() {
             url = prompt("Enter server URL:", "localhost:5001");
@@ -170,15 +169,11 @@
             // Because path is an MVCArray, we can simply append a new coordinate
             // and it will automatically appear.
             path.push(event.latLng);
-            // Add a new polygon at the new plotted point on the polyline.
-            //           var point = new google.maps.Polygon({
-            //               position: event.latLng,
-            //              map: map
-            //          });
             polygon.push(event.latLng);
         }
 
         function newPolygon() {
+            poly.setOptions({ editable: false, draggable: false, clickable: false });
             if (path.length !== 0) {
                 multiPolygons.push(poly);
                 polygon = [];
@@ -209,8 +204,7 @@
         function showAllCoordinates() {
             var display = "";
             var temp = "";
-            var i;
-            for (i = 0; i < multiPolygons.length; i++) {
+            for (var i = 0; i < multiPolygons.length; i++) {
                 display += "index: " + i + " " + multiPolygons[i] + '\n\n';
             }
             if (polygon.length !== 0) {
@@ -220,6 +214,7 @@
                 display += "index: " + i + " " + temp + '\n\n';
             }
             console.log(display);
+
         }
 
         function showCurrentCoordinate() {
@@ -242,6 +237,11 @@
             });
         }
 
+
+        function resetMap() {
+            initMap();
+        }
+       
         window.onload = setupAPI();
         window.onload = initMap();
     </script>
