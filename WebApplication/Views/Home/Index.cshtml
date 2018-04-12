@@ -68,11 +68,11 @@
  //               position: event.latLng,
   //              map: map
   //          });
-            polygon.push(event.latLng);
-        }
+            polygon.push(event.latLng);   
+        }   
 
         function newPolygon() {
-
+            poly.setOptions({ editable: false, draggable: false, clickable: false });
             if (path.length !== 0) {
                 multiPolygons.push(polygon);
                 polygon = [];
@@ -89,6 +89,7 @@
                 terrainType: 0,
                 editable: true
             });
+          //  poly.setoption({ editable: false, draggable: false, clickable: false });
             poly.setMap(map);
             
             var courseTypeSelector = document.getElementById("courseType");
@@ -114,6 +115,7 @@
                 display += "index: " + i + " " + temp + '\n\n';
             }
             console.log(display);
+          
         }
 
         function showCurrentCoordinate() {
