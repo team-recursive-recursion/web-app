@@ -36,40 +36,31 @@
                 editable: true
             });
             poly.setMap(map);
-            
+
             //$http.get(url).then(successCallback, errorCallback);
 
             map.addListener('click', addLatLng);
 
             getServerURL();
         }
-        
 
-        
         function getServerURL() {
             url = prompt("Enter server URL:", "localhost:5001");
-        }       
-        
+        }
+
         function saveMap() {
             // create json of the polygons
-            
-            
             //$http.post(url, data).then(successCallback, errorCallback);
 
-        }        
+        }
 
         function addLatLng(event) {
             path = poly.getPath();
             // Because path is an MVCArray, we can simply append a new coordinate
             // and it will automatically appear.
             path.push(event.latLng);
-            // Add a new polygon at the new plotted point on the polyline.
- //           var point = new google.maps.Polygon({
- //               position: event.latLng,
-  //              map: map
-  //          });
-            polygon.push(event.latLng);   
-        }   
+            polygon.push(event.latLng);
+        }
 
         function newPolygon() {
             poly.setOptions({ editable: false, draggable: false, clickable: false });
@@ -89,11 +80,10 @@
                 terrainType: 0,
                 editable: true
             });
-          //  poly.setoption({ editable: false, draggable: false, clickable: false });
             poly.setMap(map);
-            
+
             var courseTypeSelector = document.getElementById("courseType");
-            courseTypeSelector.selectedIndex = 0; 
+            courseTypeSelector.selectedIndex = 0;
         }
 
         function toggleDraggable() {
@@ -104,8 +94,7 @@
         function showAllCoordinates() {
             var display = "";
             var temp = "";
-            var i;
-            for (i = 0; i < multiPolygons.length; i++) {
+            for (var i = 0; i < multiPolygons.length; i++) {
                 display += "index: " + i + " " + multiPolygons[i] + '\n\n';
             }
             if (polygon.length !== 0) {
@@ -115,7 +104,7 @@
                 display += "index: " + i + " " + temp + '\n\n';
             }
             console.log(display);
-          
+
         }
 
         function showCurrentCoordinate() {
@@ -129,8 +118,13 @@
         function changePolyType() {
             var courseTypeSelector = document.getElementById("courseType");
             var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
-            
-            poly.setOptions({strokeColor: colour ,fillColor: colour, zIndex: courseTypeSelector.selectedIndex, terrainType: courseTypeSelector.selectedIndex});
+
+            poly.setOptions({
+                strokeColor: colour,
+                fillColor: colour,
+                zIndex: courseTypeSelector.selectedIndex,
+                terrainType: courseTypeSelector.selectedIndex
+            });
         }
 
         window.onload = initMap();
