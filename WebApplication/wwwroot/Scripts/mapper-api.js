@@ -3,16 +3,14 @@ var api = function () {
 //    this.courseId = "3428bb12-3c87-4c4c-951f-311eca2d5d38";
 };
 
-api.getPolygons = function (courseName, callback) {
+api.getPolygons = function (_courseID, _callback) {
     $.get("http://" + this.url + "/golfCourse/GetPolygons?courseId=" + 
-        courseName,
-        function(data, status) {
-            if (status) {
-                apiPolygons = data;
-                createCourse(data);
-            } else {
-                alert("Failed to load course.\ncourseId: " + api.courseId);
+        _courseID,
+        function(_data, status) {
+            if (_data == null || typeof _data == 'undefined') {
+                console.log("Failed to load course.\ncourseId: " + _courseId);
             }
+            _callback(_data);
         }
     );
 }
