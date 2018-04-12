@@ -52,7 +52,7 @@
                         {
                             "type": "Polygon",
                             "coordinates": [[]]
-                        }
+                        };
 
                         paths  = [];
                         paths = tempPolys.getPath().getArray();
@@ -63,19 +63,14 @@
                         }
                         geoJson["coordinates"][0].push([paths[0].lng(),
                             paths[0].lat()]);
-//                        var coord = [];
-//                        coord.push(coordinates);
-//                        geoJson["coordinates"].push(coord);
-
                         
                         strings = JSON.stringify(geoJson);
                         api.addPolygon(api.courseId, strings, 
                             multiPolygons[i].terrainType, 
                             function (status) {
-                                alert(status);
+//                                alert(status);
                             }
                         );
-
                     }
                 }
             );
@@ -111,12 +106,9 @@
                 editable: true
             });
             poly.setMap(map);
-
-            //$http.get(url).then(successCallback, errorCallback);
-
             map.addListener('click', addLatLng);
 
-           // getServerURL();
+            getServerURL();
         }
 
         function getServerURL() {
@@ -152,8 +144,9 @@
                     strokeOpacity: 1,
                     strokeWeight: 5,
                     fillOpacity: 0.4,
-                    draggable: true,
-                    editable: true,
+                    clickable: false,
+                    draggable: false,
+                    editable: false,
 
                     // These are the properties unique per polygon
                     terrainType: data[i].type,
@@ -162,18 +155,34 @@
                 });
                 temp.setMap(map);
             }
+
+            poly = new google.maps.Polygon({
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                fillOpacity: 0.4,
+                clickabel: true,
+                draggable: true,
+                editable: true,
+
+                // These are the properties unique per polygon
+                terrainType: 0,
+                fillColor: getColor(0),
+                strokeColor: getColor(0)
+            });
+            poly.setMap(map);
         }
 
         function addLatLng(event) {
             path = poly.getPath();
-            // Because path is an MVCArray, we can simply append a new coordinate
-            // and it will automatically appear.
+            // Because path is an MVCArray, we can simply append a new 
+            // coordinate and it will automatically appear.
             path.push(event.latLng);
             polygon.push(event.latLng);
         }
 
         function newPolygon() {
-            poly.setOptions({ editable: false, draggable: false, clickable: false });
+            poly.setOptions({ editable: false, draggable: false, 
+                clickable: false });
             if (path.length !== 0) {
                 multiPolygons.push(poly);
                 polygon = [];
@@ -243,7 +252,7 @@
         }
        
         window.onload = setupAPI();
-        window.onload = initMap();
+//        window.onload = initMap();
     </script>
 
 
