@@ -33,6 +33,7 @@
         var tempPolys;
         var paths;
         var coordinates;
+        var strings;
 
         function setupAPI() {
             $("#saveCourse").on("click",
@@ -50,23 +51,25 @@
                         geoJson = 
                         {
                             "type": "Polygon",
-                            "coordinates": []
+                            "coordinates": [[]]
                         }
 
                         paths  = [];
                         paths = tempPolys.getPath().getArray();
-                        coordinates = [];
 
                         for (var j = 0; j < paths.length; ++j) {
-                            coordinates.push([paths[j].lng(), paths[j].lat()]);
+                            geoJson["coordinates"][0].push([paths[j].lng(), 
+                                paths[j].lat()]);
                         }
-                        var coord = [];
-                        coord.push(coordinates);
-                        geoJson["coordinates"].push(coord);
+                        geoJson["coordinates"][0].push([paths[0].lng(),
+                            paths[0].lat()]);
+//                        var coord = [];
+//                        coord.push(coordinates);
+//                        geoJson["coordinates"].push(coord);
 
                         
-
-                        api.addPolygon(api.courseId, geoJson, 
+                        strings = JSON.stringify(geoJson);
+                        api.addPolygon(api.courseId, strings, 
                             multiPolygons[i].terrainType, 
                             function (status) {
                                 alert(status);
