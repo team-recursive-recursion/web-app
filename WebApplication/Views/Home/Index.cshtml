@@ -41,7 +41,7 @@
 
             map.addListener('click', addLatLng);
 
-            getServerURL();
+           // getServerURL();
         }
 
         function getServerURL() {
@@ -126,7 +126,11 @@
                 terrainType: courseTypeSelector.selectedIndex
             });
         }
-
+        
+        function resetMap() {
+            initMap();
+        }
+       
         window.onload = initMap();
     </script>
     <script async defer
