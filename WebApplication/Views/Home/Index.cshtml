@@ -271,13 +271,16 @@
                 }
             }
             multiPolygons = [];
+            if (poly == null || typeof poly == 'undefined') {
+                poly = defaultPolygon();
+            }
             poly.setMap(null);
             poly = null;
             poly = defaultPolygon();
             poly.setMap(map);
         }
     </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
+    </script>
 }
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
-</script>
