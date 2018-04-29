@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './components/login/login.component';
 import { ControlsComponent } from './components/controls/controls.component';
 import { MapperComponent } from './components/mapper/mapper.component';
 
@@ -15,6 +16,7 @@ import { MapperComponent } from './components/mapper/mapper.component';
         AppComponent,
         NavMenuComponent,
         HomeComponent,
+        LoginComponent,
         ControlsComponent,
         MapperComponent
     ],
