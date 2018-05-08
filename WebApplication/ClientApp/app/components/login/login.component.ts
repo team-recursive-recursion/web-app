@@ -8,26 +8,41 @@
 
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css']
+    styleUrls: ['./login.component.css'],
+    providers: [ApiService]
 })
 export class LoginComponent {
 
     email: string;
     password: string;
 
-    constructor(private router: Router) {
+    result: Object;
+
+    constructor(private router: Router, private api: ApiService) {
         this.email = "";
         this.password = "";
     }
 
     onSubmit() {
-        window.alert("Submitted");
-        // TODO verify login
-        this.router.navigateByUrl("/mapper");
+        // verify the user login details
+        // TODO hash and possibly salt password
+        this.api.getUsers()
+            .subscribe(
+                result => this.onRequestReceive(result),
+                error => console.error('Error: ' + error),
+                () => console.log("Login request complete")
+            );
+        //window.alert(this.result);
+        //this.router.navigateByUrl("/mapper");
+    }
+
+    onRequestReceive(object: Object) {
+        window.alert(object);
     }
 
 }
