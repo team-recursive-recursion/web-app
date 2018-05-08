@@ -16,16 +16,17 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
 
-    username: string;
+    email: string;
     password: string;
 
     constructor(private router: Router) {
-        this.username = "";
+        this.email = "";
         this.password = "";
     }
 
     onSubmit() {
         window.alert("Submitted");
+        // TODO verify login
         this.router.navigateByUrl("/mapper");
     }
 

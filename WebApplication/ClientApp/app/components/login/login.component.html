@@ -11,9 +11,9 @@
             <h1 style="text-align:center">Login</h1>
             <form #loginForm="ngForm">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="form-control" id="username"
-                            required [(ngModel)]="username" name="username">
+                    <label>Email</label>
+                    <input type="text" class="form-control" id="email"
+                            required [(ngModel)]="email" name="email">
                 </div>
 
                 <div class="form-group">
@@ -26,7 +26,11 @@
                         (click)="onSubmit()">
                     Login
                 </button>
-                <button class="btn btn-default">Register</button>
+                <a routerLink="/register">
+                    <button class="btn btn-default">
+                        Register
+                    </button>
+                </a>
             </form>
         </div>
     </div>

@@ -9,6 +9,7 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
 import { ControlsComponent } from './components/controls/controls.component';
 import { MapperComponent } from './components/mapper/mapper.component';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
     declarations: [
@@ -16,7 +17,8 @@ import { MapperComponent } from './components/mapper/mapper.component';
         NavMenuComponent,
         LoginComponent,
         ControlsComponent,
-        MapperComponent
+        MapperComponent,
+        RegisterComponent
     ],
     imports: [
         CommonModule,
@@ -26,6 +28,7 @@ import { MapperComponent } from './components/mapper/mapper.component';
             { path: '', redirectTo: 'login', pathMatch: 'full' },
             { path: 'login', component: LoginComponent },
             { path: 'mapper', component: MapperComponent },
+            { path: 'register', component: RegisterComponent },
             { path: '**', redirectTo: 'login' }
         ])
     ]
