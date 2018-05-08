@@ -1,3 +1,7 @@
 <div class='mapper'>
-    <div id="map"></div>
+    <div id="map">
+        <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom"
+                [mapTypeId]="mapType" [mapDraggable]="mapDraggable">
+        </agm-map>
+    </div>
 </div>

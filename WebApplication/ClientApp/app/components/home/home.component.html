@@ -1,4 +1,73 @@
 <div class="home">
-    <app-controls></app-controls>
+    <div class='controls'>
+        <div style="text-align: left">
+            <h4>Course Name:</h4>
+            <input type="text" class="form-control" value="Default Course"
+                   id="courseName">
+        </div>
+        <button type="button" class="btn btn-default" id="createCourse">
+            Create Course
+        </button>
+        <br>
+        <div style="text-align: left">
+            <h4>Course ID:</h4>
+            <input type="text" class="form-control" value="" id="courseId">
+        </div>
+        <button type="button" class="btn btn-default" id="loadCourse">
+            Load Course
+        </button>
+        <br>
+        <button type="button" class="btn btn-default" id="saveCourse">
+            Save Course
+        </button>
+        <br>
+        <div style="text-align: left">
+            <h4>Polygon Options:</h4>
+        </div>
+        <button onclick="newPolygon()" type="button" class="btn btn-default">
+            Save Polygon
+        </button>
+        <br>
+        <span style="font-size:small;font-color:grey">
+        Select Current Polygon Type:
+    </span>
+        <br>
+        <!-- Could remove the value, and store an array with the values in it. 
+        Then by using the index of the select to determine the colour. -->
+        <select id="courseType" onchange="changePolyType();">
+            <option>Rough</option>
+            <option>Fairway</option>
+            <option>Green</option>
+            <option>Bunker</option>
+            <option>Water Hazard</option>
+        </select>
+        <br>
+        <span style="font-size:small;font-color:grey">
+        Select Course:
+    </span>
+        <br>
+        <select id="courses" onchange="changeCourse();">
+        </select>
+        <br>
+        <br>
+        <div style="text-align: left">
+            <h4>Map Options:</h4>
+        </div>
+        <br>
+        <button (click)="toggleDraggable()" type="button" 
+                class="btn btn-default">Map Draggable
+        </button>
+        <br>
+        <br>
+        <span style="font-size:small;font-color:grey">
+        Controls are only for demo purposes
+    </span>
+        <br>
+        <br>
+        <button onclick="resetMap()" type="button"
+                class="btn btn-default">Reset Map
+        </button>
+
+    </div>
     <app-mapper style="width: 100%"></app-mapper>
 </div>
