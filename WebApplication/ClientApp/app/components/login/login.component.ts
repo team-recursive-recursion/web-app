@@ -7,6 +7,7 @@
  ***/
 
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'login',
@@ -18,13 +19,14 @@ export class LoginComponent {
     username: string;
     password: string;
 
-    constructor() {
+    constructor(private router: Router) {
         this.username = "";
         this.password = "";
     }
 
     onSubmit() {
         window.alert("Submitted");
+        this.router.navigateByUrl("/mapper");
     }
 
 }

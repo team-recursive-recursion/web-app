@@ -25,6 +25,7 @@ import { MapperComponent } from './components/mapper/mapper.component';
         RouterModule.forRoot([
             { path: '', redirectTo: 'login', pathMatch: 'full' },
             { path: 'login', component: LoginComponent },
+            { path: 'mapper', component: MapperComponent },
             { path: '**', redirectTo: 'login' }
         ])
     ]
