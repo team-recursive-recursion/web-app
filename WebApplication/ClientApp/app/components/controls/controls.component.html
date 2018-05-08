@@ -30,11 +30,18 @@
     <!-- Could remove the value, and store an array with the values in it. 
     Then by using the index of the select to determine the colour. -->
     <select id="courseType" onchange="changePolyType();">
-        <option value="#463E3E">Rough</option>
-        <option value="#73A15D">Fairway</option>
-        <option value="#BADA55">Green</option>
-        <option value="#C2B280">Bunker</option>
-        <option value="#336699">Water Hazard</option>
+        <option>Rough</option>
+        <option>Fairway</option>
+        <option>Green</option>
+        <option>Bunker</option>
+        <option>Water Hazard</option>
+    </select>
+    <br>
+    <span style="font-size:small;font-color:grey">
+        Select Course:
+    </span>
+    <br>
+    <select id="courses" onchange="changeCourse();">
     </select>
     <br>
     <br>
@@ -49,13 +56,6 @@
     <span style="font-size:small;font-color:grey">
         Controls are only for demo purposes
     </span>
-    <br>
-    <button onclick="showAllCoordinates()" type="button" 
-        class="btn btn-default">Show All Coordinates</button>
-    <br>
-    <br>
-    <button onclick="showCurrentCoordinate()" type="button" 
-        class="btn btn-default">Show Current Coordinates</button>
     <br>
     <br>
     <button onclick="resetMap()" type="button" 
