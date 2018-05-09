@@ -31,19 +31,20 @@ export class ApiService {
         return this.url;
     }
 
-    getUsers() {
-        var url = this.url + "/api/Users";
-        window.alert(url)
-        return this.http.get(url);
-    }
-
     userMatch(email: string, password: string) {
-        //return this.http.post(); // TODO
+        var url = this.url + "/api/Users/Match";
+        return this.http.post(url,
+                {"Email": email, "Password": password}
+        );
     }
 
     userCreate(email: string, firstname: string, lastname: string,
             password: string) {
-        // TODO
+        var url = this.url + "/api/Users/Create";
+        return this.http.post(url,
+                {"Email": email, "Name": firstname, "Surname": lastname,
+                "Password": password}
+        );
     }
 
 }
