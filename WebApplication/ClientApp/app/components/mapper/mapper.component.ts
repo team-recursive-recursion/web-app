@@ -99,7 +99,8 @@ export class MapperComponent implements OnInit {
         this.poly.zIndex = index;
     }
 
-    public resetMap() {
+    public createCourse(courseName: string) {
+
     }
 
     private addLatLng(event: object) {

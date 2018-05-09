@@ -18,7 +18,7 @@ import { RegisterComponent } from './components/register/register.component';
         NavMenuComponent,
         LoginComponent,
         MapperComponent,
-        RegisterComponent
+        RegisterComponent,
         HomeComponent
     ],
     imports: [
