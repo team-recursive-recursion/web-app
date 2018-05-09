@@ -29,16 +29,22 @@ export class LoginComponent {
     onSubmit() {
         // verify the user login details
         // TODO hash and possibly salt password
-        this.api.getUsers()
+        this.api.userMatch(this.email, this.password)
             .subscribe(
                 result => this.onRequestReceive(result.headers, result.json()),
-                error => console.error('Error: ' + error),
-                () => console.log("Login request complete")
+                error => this.onRequestFail(error.status, error.headers,
+                        error.text()),
+                () => console.log("Login request passed successfully.")
             );
     }
 
     onRequestReceive(headers: any, body: any) {
-        window.alert(JSON.stringify(body));
+        this.router.navigateByUrl("/mapper");
+    }
+
+    onRequestFail(status: number, headers: any, body: any) {
+        // TODO nice message
+        window.alert(body);
     }
 
 }
