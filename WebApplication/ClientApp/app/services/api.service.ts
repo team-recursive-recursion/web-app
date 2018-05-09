@@ -15,7 +15,7 @@ export class ApiService {
     url: string;
 
     constructor(private http: Http) {
-        this.url = "localhost:5001";
+        this.url = "http://localhost:5001";
     }
 
     /***
@@ -32,7 +32,9 @@ export class ApiService {
     }
 
     getUsers() {
-        return this.http.get(this.url + "/api/Users");
+        var url = this.url + "/api/Users";
+        window.alert(url)
+        return this.http.get(url);
     }
 
     userMatch(email: string, password: string) {

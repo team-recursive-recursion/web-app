@@ -4,6 +4,11 @@
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
+    "@agm/core": {
+      "version": "1.0.0-beta.2",
+      "resolved": "https://registry.npmjs.org/@agm/core/-/core-1.0.0-beta.2.tgz",
+      "integrity": "sha512-3bdfvkWDmJszpj/F6Fzgv7sks0cs/cUEQPfs37tcJFz3jc62SsXy4TGb/WJT8FpH2nSGE6DonP8lXuFxB0lblQ=="
+    },
     "@angular-devkit/build-optimizer": {
       "version": "0.3.2",
       "resolved": "https://registry.npmjs.org/@angular-devkit/build-optimizer/-/build-optimizer-0.3.2.tgz",
@@ -1243,6 +1248,16 @@
       "resolved": "https://registry.npmjs.org/@types/chai/-/chai-4.0.1.tgz",
       "integrity": "sha512-DWrdkraJO+KvBB7+Jc6AuDd2+fwV6Z9iK8cqEEoYpcurYrH7GiUZmwjFuQIIWj5HhFz6NsSxdN72YMIHT7Fy2Q==",
       "dev": true
+    },
+    "@types/geojson": {
+      "version": "7946.0.3",
+      "resolved": "https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.3.tgz",
+      "integrity": "sha512-BYHiG1vQJ7T93uswzuXZ0OBPWqj5tsAPtaMDQADV8sn2InllXarwg9llr6uaW22q1QCwBZ81gVajOpYWzjesug=="
+    },
+    "@types/googlemaps": {
+      "version": "3.30.8",
+      "resolved": "https://registry.npmjs.org/@types/googlemaps/-/googlemaps-3.30.8.tgz",
+      "integrity": "sha512-VbV2KHWCqU4ei+qZmmFJOLepCQH5iT7OPpbrnpJxGbNgHsNg+fdNE0smUm+h3STcfcnZPTWTY3yRCNYIleDGYw=="
     },
     "@types/jasmine": {
       "version": "2.5.53",
