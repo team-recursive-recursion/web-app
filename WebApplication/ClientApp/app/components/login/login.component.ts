@@ -21,8 +21,6 @@ export class LoginComponent {
     email: string;
     password: string;
 
-    result: Object;
-
     constructor(private router: Router, private api: ApiService) {
         this.email = "";
         this.password = "";
@@ -37,8 +35,6 @@ export class LoginComponent {
                 error => console.error('Error: ' + error),
                 () => console.log("Login request complete")
             );
-        //window.alert(this.result);
-        //this.router.navigateByUrl("/mapper");
     }
 
     onRequestReceive(object: Object) {
