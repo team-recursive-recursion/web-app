@@ -31,14 +31,14 @@ export class LoginComponent {
         // TODO hash and possibly salt password
         this.api.getUsers()
             .subscribe(
-                result => this.onRequestReceive(result),
+                result => this.onRequestReceive(result.headers, result.json()),
                 error => console.error('Error: ' + error),
                 () => console.log("Login request complete")
             );
     }
 
-    onRequestReceive(object: Object) {
-        window.alert(object);
+    onRequestReceive(headers: any, body: any) {
+        window.alert(JSON.stringify(body));
     }
 
 }
