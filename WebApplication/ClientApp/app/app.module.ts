@@ -6,26 +6,30 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
-import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './components/login/login.component';
 import { ControlsComponent } from './components/controls/controls.component';
 import { MapperComponent } from './components/mapper/mapper.component';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         NavMenuComponent,
-        HomeComponent,
+        LoginComponent,
         ControlsComponent,
-        MapperComponent
+        MapperComponent,
+        RegisterComponent
     ],
     imports: [
         CommonModule,
         HttpModule,
         FormsModule,
         RouterModule.forRoot([
-            { path: '', redirectTo: 'home', pathMatch: 'full' },
-            { path: 'home', component: HomeComponent },
-            { path: '**', redirectTo: 'home' }
+            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            { path: 'login', component: LoginComponent },
+            { path: 'mapper', component: MapperComponent },
+            { path: 'register', component: RegisterComponent },
+            { path: '**', redirectTo: 'login' }
         ])
     ]
 })
