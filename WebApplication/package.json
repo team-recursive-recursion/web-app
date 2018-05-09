@@ -63,5 +63,10 @@
   "main": "webpack.config.js",
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@types/googlemaps": "^3.30.8",
+    "@agm/core": "latest",
+    "@types/geojson": "latest"
+  }
 }
