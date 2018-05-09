@@ -1,7 +1,26 @@
 <div class='mapper'>
     <div id="map">
         <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom"
-                [mapTypeId]="mapType" [mapDraggable]="mapDraggable">
+                [mapTypeId]="mapType" [mapDraggable]="mapDraggable"
+                (mapClick)="mapClicked($event)">
+            <agm-polygon
+                    *ngFor="let p = poly;"
+                    [editable]="p.editable" 
+                    [polyDraggable]="p.polyDraggable" 
+                    [paths]="p.paths" 
+                    [fillColor]="p.fillColor" 
+                    [fillOpacity]="p.fillOpacity"
+                    [strokeColor]="p.strokeColor"
+                    (dragEnd)="updatePolyPosition(p, $event);">
+            </agm-polygon>
+            <agm-polygon
+                    *ngFor="let p of polygons; let i = index"
+                    [editable]="p.editable" [polyDraggable]="p.polyDraggable"
+                    [paths]="p.paths" [fillColor]="p.fillColor" 
+                    [fillOpacity]="p.fillOpacity"
+                    [strokeColor]="p.strokeColor"
+                    (dragEnd)="updatePolyPosition(p, $event);">
+            </agm-polygon>
         </agm-map>
     </div>
 </div>

@@ -2,14 +2,17 @@
     <div class='controls'>
         <div>
             <h4><b>Create Course:</b></h4>
-            <input type="text" class="form-control" value="Course Name">
+            <input #courseName type="text" class="form-control" 
+                    value="Course Name">
             <br>
-            <button type="button" class="btn btn-success" id="createCourse">
+            <button type="button" class="btn btn-success" 
+                    (click)="createCourse(courseName.value);">
                 Submit
             </button>
             <br>
             <br>
-            <button type="button" class="btn btn-success" id="saveCourse">
+            <button type="button" class="btn btn-success" 
+                    (click)="saveCourse();">
                 Save Course
             </button>
         </div>
@@ -18,11 +21,17 @@
         
         <div>
             <h4><b>Load Course:</b></h4>
-            <select id="courses" onchange="changeCourse();">
+            <select #courses (change)="loadCourses();">
+                <option
+                        *ngFor="let c of courses; let i = index"
+                        [value]="c.index">
+                    {{c.courseName}}
+                </option>
             </select>
             <br>
             <br>
-            <button type="button" class="btn btn-success" id="changeCourse">
+            <button type="button" class="btn btn-success" id="changeCourse"
+                    (click)="loadCourse(courses.target.value)">
                 Submit
             </button>
         </div>
@@ -35,16 +44,17 @@
                 Select Current Polygon Type:
             </span>
             <br>
-            <select id="courseType" onchange="changePolyType();">
-                <option>Rough</option>
-                <option>Fairway</option>
-                <option>Green</option>
-                <option>Bunker</option>
-                <option>Water Hazard</option>
+            <select (change)="changePolyType(true, $event.target.value);">
+                <option
+                        *ngFor="let t of terrainTypes; let i = index"
+                        [value]="t.ttype">
+                {{t.typeName}}
+                </option>
             </select>
             <br>
             <br>
-            <button onclick="newPolygon()" type="button" class="btn btn-success">
+            <button (click)="newPolygon();" type="button" 
+                    class="btn btn-success">
                 Save Polygon
             </button>
         </div>
@@ -58,7 +68,7 @@
             </button>
             <br>
             <br>
-            <button onclick="resetMap()" type="button"
+            <button (click)="resetMap()" type="button"
                     class="btn btn-success">Reset Map
             </button>
         </div>
