@@ -1,3 +1,10 @@
+<!--
+    Filename: home.component.html
+    Author  : Christiaan H Nel, Stephan Roos
+
+        The template for the controls and map for mapping.
+-->
+
 <div class="home">
     <div class='controls'>
         <div>
@@ -5,14 +12,13 @@
             <input #courseName type="text" class="form-control" 
                     value="Course Name">
             <br>
-            <button type="button" class="btn btn-success" 
-                    (click)="createCourse(courseName.value);">
+            <button type="button" class="btn btn-success">
                 Submit
             </button>
             <br>
             <br>
             <button type="button" class="btn btn-success" 
-                    (click)="saveCourse();">
+                    (click)="onSaveCourse();">
                 Save Course
             </button>
         </div>
@@ -21,7 +27,7 @@
         
         <div>
             <h4><b>Load Course:</b></h4>
-            <select #courses (change)="loadCourses();">
+            <select #courses (click)="onLoadCourses();">
                 <option
                         *ngFor="let c of courses; let i = index"
                         [value]="c.index">
@@ -31,7 +37,7 @@
             <br>
             <br>
             <button type="button" class="btn btn-success" id="changeCourse"
-                    (click)="loadCourse(courses.target.value)">
+                    (click)="onLoadCourse(courses.target.value)">
                 Submit
             </button>
         </div>
@@ -44,7 +50,7 @@
                 Select Current Polygon Type:
             </span>
             <br>
-            <select (change)="changePolyType(true, $event.target.value);">
+            <select (change)="onChangePolyType(true, $event.target.value);">
                 <option
                         *ngFor="let t of terrainTypes; let i = index"
                         [value]="t.ttype">
@@ -53,7 +59,7 @@
             </select>
             <br>
             <br>
-            <button (click)="newPolygon();" type="button" 
+            <button (click)="onNewPolygon();" type="button" 
                     class="btn btn-success">
                 Save Polygon
             </button>
@@ -63,12 +69,12 @@
         
         <div>
             <h4><b>Map Options:</b></h4>
-            <button (click)="toggleDraggable()" type="button"
+            <button (click)="onToggleDraggable()" type="button"
                     class="btn btn-success">Map Draggable
             </button>
             <br>
             <br>
-            <button (click)="resetMap()" type="button"
+            <button (click)="onResetMap()" type="button"
                     class="btn btn-success">Reset Map
             </button>
         </div>

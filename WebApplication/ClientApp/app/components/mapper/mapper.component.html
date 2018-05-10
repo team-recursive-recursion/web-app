@@ -1,17 +1,23 @@
+<!--
+    Filename: mapper.component.html
+    Author: Christiaan H Nel
+        
+        The template for the map.
+-->
+
 <div class='mapper'>
     <div id="map">
         <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom"
                 [mapTypeId]="mapType" [mapDraggable]="mapDraggable"
-                (mapClick)="mapClicked($event)">
+                (mapClick)="onMapClicked($event)">
             <agm-polygon
-                    *ngFor="let p = poly;"
-                    [editable]="p.editable" 
-                    [polyDraggable]="p.polyDraggable" 
-                    [paths]="p.paths" 
-                    [fillColor]="p.fillColor" 
-                    [fillOpacity]="p.fillOpacity"
-                    [strokeColor]="p.strokeColor"
-                    (dragEnd)="updatePolyPosition(p, $event);">
+                    [editable]="poly.editable" 
+                    [polyDraggable]="poly.polyDraggable" 
+                    [paths]="poly.paths" 
+                    [fillColor]="poly.fillColor" 
+                    [fillOpacity]="poly.fillOpacity"
+                    [strokeColor]="poly.strokeColor" [visible]="true"
+                    (dragEnd)="updatePolyPosition(poly, $event);">
             </agm-polygon>
             <agm-polygon
                     *ngFor="let p of polygons; let i = index"

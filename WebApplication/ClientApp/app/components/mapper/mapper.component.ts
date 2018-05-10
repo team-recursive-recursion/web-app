@@ -1,12 +1,23 @@
+/***
+ * Filename: mapper.component.ts
+ * Author  : Christiaan H Nel
+ * Class   : MapperComponent / <mapper>
+ *
+ *      The home of the mapper. Create, Load, Edit a map.
+ ***/
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MouseEvent, LatLngLiteral } from '@agm/core';
-
-declare var google: any;
+import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
+import { Course, Hole, Elements, Polygon } from 
+        '../../interfaces/course.interface';
 
 @Component({
   selector: 'app-mapper',
   templateUrl: './mapper.component.html',
-  styleUrls: ['./mapper.component.css']
+    styleUrls: ['./mapper.component.css'],
+    providers: [ApiService]
 })
 
 export class MapperComponent implements OnInit {
@@ -19,8 +30,11 @@ export class MapperComponent implements OnInit {
     mapType: string = "satellite";
     mapDraggable: boolean = true;
 
+    //current courses
+    courses: Course[] = [];
+
     //current polygon
-    poly: polygon = {
+    poly: Polygon = {
         strokeOpacity: 1,
         strokeWeight: 5,
         fillOpacity: 0.4,
@@ -34,9 +48,9 @@ export class MapperComponent implements OnInit {
         paths: []
     }
     //all polygons
-    polygons: polygon[] = [];
+    polygons: Polygon[] = [];
 
-    constructor() {
+    constructor(private router: Router, private api: ApiService) {
         //TODO
     }
 
@@ -47,18 +61,18 @@ export class MapperComponent implements OnInit {
     ngAfterViewInit() {
     }
 
-    public mapClicked($event: MouseEvent) {
+    public onMapClicked($event: MouseEvent) {
         this.poly.paths.push({
             lat: $event.coords.lat,
             lng: $event.coords.lng
         });
     }
 
-    public updatePolyPosition(_poly: polygon, $event: MouseEvent) {
+    public updatePolyPosition(_poly: Polygon, $event: MouseEvent) {
         console.log("polygon:", _poly," ", "whatever:", $event);
     }
 
-    public newPolygon() {
+    public onNewPolygon() {
         //    this.poly.polyDraggable = false;
         //this.poly.editable = false;
         //this.poly.clickable = false;
@@ -66,30 +80,55 @@ export class MapperComponent implements OnInit {
         this.poly = this.defaultPolygon();
     }
 
-    public saveCourse() {
+    public onSaveCourse() {
 
     }
 
-    public loadCourses(index: number) {
-
+    public onLoadCourses() {
+        this.api.getCourses()
+            .subscribe(
+                result => this.onRequestReceive(1, result.headers, 
+                        result.json()),
+                error => this.onRequestFail(1, error.status, error.headers,
+                        error.text()),
+                () => console.log("Got courses")
+            );
     }
 
-    public loadCourse(index: number) {
-
+    public onLoadCourse(courseId: string) {
+        this.api.getCourse(courseId)
+            .subscribe(
+                result => this.onRequestReceive(2, result.headers, 
+                        result.json()),
+                error => this.onRequestFail(2, error.status, error.headers,
+                        error.text()),
+                () => console.log("Got course")
+            );
     }
 
-    public resetMap() {
-
+    public onCreateCourse(courseName: string) {
+        this.api.createCourse(courseName)
+            .subscribe(
+                result => this.onRequestReceive(0, result.headers, 
+                        result.json()),
+                error => this.onRequestFail(0, error.status, error.headers,
+                        error.text()),
+                () => console.log("Course created")
+            );
     }
+ 
+    public onResetMap() {
 
-    public toggleDraggable() {
-        this.mapDraggable = !this.mapDraggable;
     }
 
     public getPolygons() {
     }
 
-    public changePolyType(bool: boolean, index: number) {
+    public onToggleDraggable() {
+        this.mapDraggable = !this.mapDraggable;
+    }
+
+    public onChangePolyType(bool: boolean, index: number) {
         this.poly.fillColor = this.getColor(index);
         this.poly.strokeColor = this.getColor(index);
         this.poly.polyDraggable = bool;
@@ -99,18 +138,10 @@ export class MapperComponent implements OnInit {
         this.poly.zIndex = index;
     }
 
-    public createCourse(courseName: string) {
-
-    }
-
-    private addLatLng(event: object) {
-    }
-
     private error(message: string) {
     }
 
     private getColor(data: number): string {
-        console.log("color " + data);
         if (data == 0) {
             return '#463E3E';
         }
@@ -146,18 +177,40 @@ export class MapperComponent implements OnInit {
         }
     }
 
-}
+    onRequestReceive(apiType: number, headers: any, body: any) {
+        //TODO output body
+        switch (apiType) {
+            //Create course
+            case 0: 
+                console.log("0: Create Course\n");
+                break;
+            //Load courses
+            case 1:
+                console.log("1: Load Courses\n");
+                break;
+            //Load course stuff
+            case 2:
+                console.log("2: Load Course\n");
+                break;
+        }
+        console.log(body);
+    }
 
-interface polygon {
-    strokeOpacity: number;
-    strokeWeight: number;
-    fillOpacity: number;
-    fillColor: string;
-    strokeColor: string;
-    polyDraggable: boolean;
-    editable: boolean;
-    clickable: boolean;
-    terrainType: number;
-    zIndex: number;
-    paths: Array<LatLngLiteral>;
-} 
+    onRequestFail(status: number, _status: any, headers: any, text: any) {
+        //TODO nice message
+        window.alert(_status + "\n" + "\n" + headers + "\n" + text);
+    }
+
+    /***
+     * Functions to get members of this Component
+     ***/
+    getCourses() {
+        return courses;
+    }
+
+    getCourse() {
+
+    } 
+
+
+}
