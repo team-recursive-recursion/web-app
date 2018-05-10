@@ -1,6 +1,14 @@
+/***
+ * Filename: home.component.ts
+ * Author  : Christaan H Nel
+ * Class   : HomeComponent / <home>
+ ***/
+
 import { Component, ViewChild } from '@angular/core';
 import { MapperComponent } from '../mapper/mapper.component'
 import { GeoJSON } from 'geojson'
+import { Course, Hole, Elements, Polygon } from 
+        '../../interfaces/course.interface';
 
 @Component({
     selector: 'HomeComponent',
@@ -20,69 +28,54 @@ export class HomeComponent {
         {"typeName": 'Water Hazard', "ttype": 4}
     ];
 
-    courses: golfCourses[] = [];
+    courses: Course[] = [];
 
     ngAfterViewInit() {
-        this.getServerURL();
+        //this.onCreateCourse("Koooos");
+        this.onLoadCourses();
+        //this.onLoadCourse("fcb67d04-1eb4-45d0-a1fa-0df35616ba63");
+        //this.onSaveCourse();
     }
 
-    getServerURL() {
-        this.url = prompt("Enter server URL:", "localhost:5001");
+    public onToggleDraggable() {
+        this.map.onToggleDraggable();
     }
 
-    //TODO
-    setupAPI() {
-    }
-
-    public toggleDraggable() {
-        this.map.toggleDraggable();
-    }
-
-    public changePolyType(bool: boolean, index: number) {
-        this.map.changePolyType(bool, index);
+    public onChangePolyType(bool: boolean, index: number) {
+        this.map.onChangePolyType(bool, index);
     }
 
     constructor() {
     }
     
-    public newPolygon() {
-        this.map.newPolygon();
+    public onNewPolygon() {
+        this.map.onNewPolygon();
     }
 
-    public createCourse(courseName: string) {
+    public onCreateCourse(courseName: string) {
         if (courseName != "") {
-            console.log("Course Name: " + courseName);
             //TODO call API
-            this.map.createCourse(courseName);
+            this.map.onCreateCourse(courseName);
         }
     }
 
-    public saveCourse() {
+    public onSaveCourse() {
         //TODO
-        this.map.saveCourse();
+        //this.map.onSaveCourse();
     }
 
-    public loadCourse(index: number) {
+    public onLoadCourse(courseId: string) {
         //TODO this should populate the select with courses
-        console.log(index);
-        this.map.loadCourse(index);
+        this.map.onLoadCourse(courseId);
     }
 
-    public loadCourses() {
-
+    public onLoadCourses() {
+        this.map.onLoadCourses();
+        this.courses = this.map.getCourses();
+        console.log(this.courses);
     }
 
-    public resetMap() {
-        this.map.resetMap();
+    public onResetMap() {
+        this.map.onResetMap();
     }
-}
-
-interface golfCourses {
-    courseName: string;
-    courseId: string;
-}
-
-interface golfCourse {
-    courseId: string;
-
 }

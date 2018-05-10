@@ -1,76 +1,126 @@
+<!--
+    Filename: home.component.html
+    Author  : Christiaan H Nel, Stephan Roos
+
+        The template for the controls and map for mapping.
+-->
+
 <div class="home">
     <div class='controls'>
         <div>
-            <h4><b>Create Course:</b></h4>
-            <input #courseName type="text" class="form-control" 
-                    value="Course Name">
-            <br>
-            <button type="button" class="btn btn-success" 
-                    (click)="createCourse(courseName.value);">
-                Submit
-            </button>
-            <br>
-            <br>
-            <button type="button" class="btn btn-success" 
-                    (click)="saveCourse();">
-                Save Course
-            </button>
-        </div>
-        
-        <br>
-        
-        <div>
-            <h4><b>Load Course:</b></h4>
-            <select #courses (change)="loadCourses();">
-                <option
-                        *ngFor="let c of courses; let i = index"
-                        [value]="c.index">
-                    {{c.courseName}}
-                </option>
-            </select>
+            <div>
+                <h4><b>Course:</b></h4>
+                <button type="button" class="btn btn-success"
+                        (click)="onSaveCourse();">
+                    Save Course
+                </button>
+                <br>
+                <br>
+                <button type="button" class="btn btn-success" 
+                        data-toggle="modal" data-target="#courseModal">
+                    Create/Load Course
+                </button>
+            </div>
             <br>
             <br>
-            <button type="button" class="btn btn-success" id="changeCourse"
-                    (click)="loadCourse(courses.target.value)">
-                Submit
-            </button>
-        </div>
-        
-        <br>
-        
-        <div>
             <h4><b>Elements/Polygons:</b></h4>
             <span style="font-size:small;font-color:grey">
                 Select Current Polygon Type:
             </span>
             <br>
-            <select (change)="changePolyType(true, $event.target.value);">
+            <select (change)="onChangePolyType(true, $event.target.value);">
                 <option
                         *ngFor="let t of terrainTypes; let i = index"
                         [value]="t.ttype">
-                {{t.typeName}}
+                    {{t.typeName}}
                 </option>
             </select>
             <br>
             <br>
-            <button (click)="newPolygon();" type="button" 
+            <button (click)="onNewPolygon();" type="button" 
                     class="btn btn-success">
                 Save Polygon
             </button>
         </div>
-        
+
         <br>
-        
+        <br>
+
         <div>
             <h4><b>Map Options:</b></h4>
-            <button (click)="toggleDraggable()" type="button"
+            <button (click)="onToggleDraggable()" type="button"
                     class="btn btn-success">Map Draggable
             </button>
             <br>
             <br>
-            <button (click)="resetMap()" type="button"
+            <button (click)="onResetMap()" type="button"
                     class="btn btn-success">Reset Map
             </button>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="courseModal" tabindex="-1" role="dialog" 
+                aria-labelledby="exampleModalLabel" aria-hidden="true" 
+                data-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered" role="document" 
+                    style="transform: translate(0, -50%);top: 50%;
+                    margin: 0 auto;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            Courses:
+                        </h5>
+                        <button type="button" class="close" 
+                                data-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 ml-auto">
+                                <h4><b>Create Course:</b></h4>
+                                <input #courseName type="text" 
+                                        class="form-control"
+                                        value="Course Name">
+                            </div>
+                            <div class="col-md-6 ml-auto">
+                                <h4><b>Load Course:</b></h4>
+                                <select #courses (change)="onLoadCourses();" 
+                                        style="width: 260px;height:32px;">
+                                    <option
+                                            *ngFor="let c of courses;
+                                            let i = index"
+                                            [value]="c.index">
+                                        {{c.courseName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6 ">
+                                <button type="button" class="btn btn-success"
+                                        (click)=
+                                        "onCreateCourse(courseName.value);">
+                                    Submit
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-success" 
+                                        id="changeCourse"
+                                        (click)=
+                                        "onLoadCourse(courses.target.value)">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" 
+                                data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <app-mapper style="width: 100%"></app-mapper>

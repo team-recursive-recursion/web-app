@@ -1,6 +1,6 @@
 /***
  * Filename: api.service.ts
- * Author  : Duncan Tilley
+ * Author  : Duncan Tilley, Christiaan H Nel
  * Class   : ApiService
  * 
  *     This service encapsulates API requests and should be used instead of
@@ -47,4 +47,26 @@ export class ApiService {
         );
     }
 
+    /***
+     *
+     * API calls for map spesifics
+     *
+     ***/
+    getCourses() {
+        var url = this.url + "/api/GolfCoursesNew";
+        return this.http.get(url);
+    }
+
+    getCourse(courseId: string) {
+        var url = this.url + "/api/GolfCoursesNew/" + courseId;
+        return this.http.get(url);
+    }
+
+    createCourse(name: string) {
+        var url = this.url + "/api/GolfCoursesNew";
+
+        return this.http.post(url, 
+            { "courseName": name}
+        );
+    }
 }
