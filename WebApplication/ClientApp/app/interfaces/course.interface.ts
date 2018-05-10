@@ -13,6 +13,13 @@ export interface Course {
     courseName: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface GolfCourse {
+    courseId: string;
+    courseName: string;
+    createdAt: string;
+    updatedAt: string;
     holes: Hole[];
     courseElement: Elements[];
 }

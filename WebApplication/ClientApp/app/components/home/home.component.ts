@@ -31,11 +31,10 @@ export class HomeComponent {
     courses: Course[] = [];
 
     ngAfterViewInit() {
-        console.log("whatever");
-        this.onCreateCourse("Koooos");
+        //this.onCreateCourse("Koooos");
         this.onLoadCourses();
-        this.onLoadCourse("fcb67d04-1eb4-45d0-a1fa-0df35616ba63");
-        this.onSaveCourse();
+        //this.onLoadCourse("fcb67d04-1eb4-45d0-a1fa-0df35616ba63");
+        //this.onSaveCourse();
     }
 
     public onToggleDraggable() {
@@ -68,11 +67,12 @@ export class HomeComponent {
     public onLoadCourse(courseId: string) {
         //TODO this should populate the select with courses
         this.map.onLoadCourse(courseId);
-        courses = this.map.getCourses();
     }
 
     public onLoadCourses() {
         this.map.onLoadCourses();
+        this.courses = this.map.getCourses();
+        console.log(this.courses);
     }
 
     public onResetMap() {

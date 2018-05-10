@@ -187,13 +187,20 @@ export class MapperComponent implements OnInit {
             //Load courses
             case 1:
                 console.log("1: Load Courses\n");
+                for (var c in body) {
+                    this.courses.push({
+                        courseId: body[c].courseId,
+                        courseName: body[c].courseName,
+                        createdAt: body[c].createdAt,
+                        updatedAt: body[c].updatedAt
+                    });
+                }
                 break;
             //Load course stuff
             case 2:
                 console.log("2: Load Course\n");
                 break;
         }
-        console.log(body);
     }
 
     onRequestFail(status: number, _status: any, headers: any, text: any) {
@@ -204,8 +211,8 @@ export class MapperComponent implements OnInit {
     /***
      * Functions to get members of this Component
      ***/
-    getCourses() {
-        return courses;
+    public getCourses() {
+        return this.courses;
     }
 
     getCourse() {

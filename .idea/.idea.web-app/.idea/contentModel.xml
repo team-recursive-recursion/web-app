@@ -165,22 +165,24 @@
             <e p="app.browser.module.ts" t="Include" />
             <e p="app.module.ts" t="Include" />
             <e p="app.server.module.ts" t="Include" />
+            <e p="assets" t="Include">
+              <e p="back-tile.png" t="Include" />
+            </e>
             <e p="components" t="Include">
               <e p="app" t="Include">
                 <e p="app.component.css" t="Include" />
                 <e p="app.component.html" t="Include" />
                 <e p="app.component.ts" t="Include" />
               </e>
-              <e p="controls" t="Include">
-                <e p="controls.component.css" t="Include" />
-                <e p="controls.component.html" t="Include" />
-                <e p="controls.component.spec.ts" t="Include" />
-                <e p="controls.component.ts" t="Include" />
-              </e>
               <e p="home" t="Include">
                 <e p="home.component.css" t="Include" />
                 <e p="home.component.html" t="Include" />
                 <e p="home.component.ts" t="Include" />
+              </e>
+              <e p="login" t="Include">
+                <e p="login.component.css" t="Include" />
+                <e p="login.component.html" t="Include" />
+                <e p="login.component.ts" t="Include" />
               </e>
               <e p="mapper" t="Include">
                 <e p="mapper.component.css" t="Include" />
@@ -193,6 +195,19 @@
                 <e p="navmenu.component.html" t="Include" />
                 <e p="navmenu.component.ts" t="Include" />
               </e>
+              <e p="register" t="Include">
+                <e p="register.component.css" t="Include" />
+                <e p="register.component.html" t="Include" />
+                <e p="register.component.spec.ts" t="Include" />
+                <e p="register.component.ts" t="Include" />
+              </e>
+            </e>
+            <e p="interfaces" t="Include">
+              <e p="user.interface.ts" t="Include" />
+            </e>
+            <e p="Services" t="Include">
+              <e p="api.service.spec.ts" t="Include" />
+              <e p="api.service.ts" t="Include" />
             </e>
           </e>
           <e p="boot.browser.ts" t="Include" />
