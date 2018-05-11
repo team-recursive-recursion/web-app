@@ -1,6 +1,6 @@
 <!--
     Filename: home.component.html
-    Author  : Christiaan H Nel, Stephan Roos
+    Author  : Christiaan H Nel, Stephan Roos, Duncan Tilley
 
         The template for the controls and map for mapping.
 -->
@@ -85,7 +85,7 @@
                             </div>
                             <div class="col-md-6 ml-auto">
                                 <h4><b>Load Course:</b></h4>
-                                <select #courses (change)="onLoadCourses();" 
+                                <select #courseSelector
                                         style="width: 260px;height:32px;">
                                     <option
                                             *ngFor="let c of courses;
@@ -109,7 +109,7 @@
                                 <button type="button" class="btn btn-success" 
                                         id="changeCourse"
                                         (click)=
-                                        "onLoadCourse(courses.target.value)">
+                                        "onLoadCourse(courseSelector.selectedIndex)">
                                     Submit
                                 </button>
                             </div>

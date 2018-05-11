@@ -48,9 +48,7 @@ export class ApiService {
     }
 
     /***
-     *
-     * API calls for map spesifics
-     *
+     * API calls for map specifics.
      ***/
     getCourses() {
         var url = this.url + "/api/GolfCoursesNew";
