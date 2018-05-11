@@ -1,6 +1,6 @@
 /***
  * Filename: mapper.component.ts
- * Author  : Christiaan H Nel
+ * Author  : Christiaan H Nel, Duncan Tilley
  * Class   : MapperComponent / <mapper>
  *
  *      The home of the mapper. Create, Load, Edit a map.
@@ -30,8 +30,7 @@ export class MapperComponent implements OnInit {
     mapType: string = "satellite";
     mapDraggable: boolean = true;
 
-    //current courses
-    courses: Course[] = [];
+    course: Course;
 
     //current polygon
     poly: Polygon = {
@@ -61,6 +60,19 @@ export class MapperComponent implements OnInit {
     ngAfterViewInit() {
     }
 
+    /***
+     * Course load and save handlers.
+     ***/
+    public onLoadCourse(course: Course) {
+        this.course = course;
+        window.alert(JSON.stringify(course));
+        // TODO load holes
+    }
+
+    public onSaveCourse() {
+        // TODO save course using API
+    }
+
     public onMapClicked($event: MouseEvent) {
         this.poly.paths.push({
             lat: $event.coords.lat,
@@ -78,43 +90,6 @@ export class MapperComponent implements OnInit {
         //this.poly.clickable = false;
         this.polygons.push(this.poly);
         this.poly = this.defaultPolygon();
-    }
-
-    public onSaveCourse() {
-
-    }
-
-    public onLoadCourses() {
-        this.api.getCourses()
-            .subscribe(
-                result => this.onRequestReceive(1, result.headers, 
-                        result.json()),
-                error => this.onRequestFail(1, error.status, error.headers,
-                        error.text()),
-                () => console.log("Got courses")
-            );
-    }
-
-    public onLoadCourse(courseId: string) {
-        this.api.getCourse(courseId)
-            .subscribe(
-                result => this.onRequestReceive(2, result.headers, 
-                        result.json()),
-                error => this.onRequestFail(2, error.status, error.headers,
-                        error.text()),
-                () => console.log("Got course")
-            );
-    }
-
-    public onCreateCourse(courseName: string) {
-        this.api.createCourse(courseName)
-            .subscribe(
-                result => this.onRequestReceive(0, result.headers, 
-                        result.json()),
-                error => this.onRequestFail(0, error.status, error.headers,
-                        error.text()),
-                () => console.log("Course created")
-            );
     }
  
     public onResetMap() {
@@ -176,49 +151,5 @@ export class MapperComponent implements OnInit {
             paths: []
         }
     }
-
-    onRequestReceive(apiType: number, headers: any, body: any) {
-        //TODO output body
-        switch (apiType) {
-            //Create course
-            case 0: 
-                console.log("0: Create Course\n");
-                break;
-            //Load courses
-            case 1:
-                console.log("1: Load Courses\n");
-                for (var c in body) {
-                    var _course = {
-                        courseId: body[c].courseId,
-                        courseName: body[c].courseName,
-                        createdAt: body[c].createdAt,
-                        updatedAt: body[c].updatedAt
-                    }
-                    this.courses.push(_course);
-                }
-                break;
-            //Load course stuff
-            case 2:
-                console.log("2: Load Course\n");
-                break;
-        }
-    }
-
-    onRequestFail(status: number, _status: any, headers: any, text: any) {
-        //TODO nice message
-        window.alert(_status + "\n" + "\n" + headers + "\n" + text);
-    }
-
-    /***
-     * Functions to get members of this Component
-     ***/
-    public getCourses() {
-        return this.courses;
-    }
-
-    getCourse() {
-
-    } 
-
 
 }

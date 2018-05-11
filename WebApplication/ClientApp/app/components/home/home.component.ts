@@ -21,6 +21,7 @@ export class HomeComponent {
     @ViewChild(MapperComponent) public map: MapperComponent;
     url: any;
     courseId: string = "";
+    selected: number = 0;
 
     terrainTypes = [
         {"typeName": 'Rough', "ttype": 0},
@@ -51,6 +52,13 @@ export class HomeComponent {
      ***/
     public onLoadCourse(index: number) {
         window.alert("Loading course '" + this.courses[index].courseName + "'");
+        // close the modal
+        var close = document.getElementById("modal-close");
+        if (close) {
+            close.click();
+        }
+        // update the mapper
+        this.map.onLoadCourse(this.courses[index]);
     }
 
     public onCreateCourse(name: string) {
@@ -74,8 +82,7 @@ export class HomeComponent {
      * Other event handlers.
      ***/
     public onSaveCourse() {
-        //TODO
-        //this.map.onSaveCourse();
+        this.map.onSaveCourse();
     }
 
     public onToggleDraggable() {
@@ -109,8 +116,14 @@ export class HomeComponent {
     }
 
     private onCreateReceive(headers: any, body: any) {
-        // TODO update the mapper
         this.courses.push(body);
+        // close the modal
+        var close = document.getElementById("modal-close");
+        if (close) {
+            close.click();
+        }
+        // update the mapper
+        this.map.onLoadCourse(body);
     }
 
     private onCreateFail(status: number, headers: any, body: any) {
