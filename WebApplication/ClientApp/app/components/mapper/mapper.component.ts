@@ -188,12 +188,13 @@ export class MapperComponent implements OnInit {
             case 1:
                 console.log("1: Load Courses\n");
                 for (var c in body) {
-                    this.courses.push({
+                    var _course = {
                         courseId: body[c].courseId,
                         courseName: body[c].courseName,
                         createdAt: body[c].createdAt,
                         updatedAt: body[c].updatedAt
-                    });
+                    }
+                    this.courses.push(_course);
                 }
                 break;
             //Load course stuff
