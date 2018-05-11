@@ -48,9 +48,7 @@ export class ApiService {
     }
 
     /***
-     *
-     * API calls for map spesifics
-     *
+     * API calls for map specifics.
      ***/
     getCourses() {
         var url = this.url + "/api/GolfCoursesNew";
@@ -68,5 +66,10 @@ export class ApiService {
         return this.http.post(url, 
             { "courseName": name}
         );
+    }
+
+    deleteCourse(id: string) {
+        var url = this.url + "/api/GolfCoursesNew/" + id;
+        return this.http.delete(url);
     }
 }

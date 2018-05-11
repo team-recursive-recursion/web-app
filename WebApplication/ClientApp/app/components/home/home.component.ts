@@ -1,6 +1,6 @@
 /***
  * Filename: home.component.ts
- * Author  : Christaan H Nel
+ * Author  : Christaan H Nel, Duncan Tilley
  * Class   : HomeComponent / <home>
  ***/
 
@@ -9,16 +9,19 @@ import { MapperComponent } from '../mapper/mapper.component'
 import { GeoJSON } from 'geojson'
 import { Course, Hole, Elements, Polygon } from 
         '../../interfaces/course.interface';
+import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'HomeComponent',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css']
+    styleUrls: ['./home.component.css'],
+    providers: [ApiService]
 })
 export class HomeComponent {
     @ViewChild(MapperComponent) public map: MapperComponent;
     url: any;
     courseId: string = "";
+    selected: number = 0;
 
     terrainTypes = [
         {"typeName": 'Rough', "ttype": 0},
@@ -30,11 +33,72 @@ export class HomeComponent {
 
     courses: Course[] = [];
 
+    constructor(private api: ApiService) {
+    }
+
     ngAfterViewInit() {
-        //this.onCreateCourse("Koooos");
-        this.onLoadCourses();
-        //this.onLoadCourse("fcb67d04-1eb4-45d0-a1fa-0df35616ba63");
-        //this.onSaveCourse();
+        // load saved courses
+        this.api.getCourses()
+            .subscribe(
+                result => this.onCoursesReceive(result.headers, result.json()),
+                error => this.onCoursesFail(error.status, error.headers,
+                        error.text()),
+                () => console.log("Courses loaded successfully.")
+            );
+    }
+
+    /***
+     * Load, create and delete event handlers.
+     ***/
+    public onLoadCourse(index: number) {
+        window.alert("Loading course '" + this.courses[index].courseName + "'");
+        // close the modal
+        var close = document.getElementById("modal-close");
+        if (close) {
+            close.click();
+        }
+        // update the mapper
+        this.map.onLoadCourse(this.courses[index]);
+    }
+
+    public onDeleteCourse(index: number) {
+        if (window.confirm("Are you sure you want to delete '" +
+                this.courses[index].courseName + "'?")) {
+            // delete the course
+            this.api.deleteCourse(this.courses[index].courseId)
+                .subscribe(
+                    result => this.onDeleteReceive(result.headers,
+                            result.json()),
+                    error => this.onDeleteFail(error.status, error.headers,
+                            error.text()),
+                    () => console.log("Course created successfully.")
+                );
+        }
+        // TODO
+    }
+
+    public onCreateCourse(name: string) {
+        if (name != "" && name != "Course Name") {
+            // create new course
+            this.api.createCourse(name)
+                .subscribe(
+                    result => this.onCreateReceive(result.headers,
+                            result.json()),
+                    error => this.onCreateFail(error.status, error.headers,
+                            error.text()),
+                    () => console.log("Course created successfully.")
+                );
+        } else {
+            // TODO nice message
+            window.alert("Please enter a course name");
+        }
+    }
+
+    /***
+     * Other event handlers.
+     ***/
+    public onSaveCourse() {
+        this.map.onSaveCourse();
     }
 
     public onToggleDraggable() {
@@ -44,38 +108,63 @@ export class HomeComponent {
     public onChangePolyType(bool: boolean, index: number) {
         this.map.onChangePolyType(bool, index);
     }
-
-    constructor() {
-    }
     
     public onNewPolygon() {
         this.map.onNewPolygon();
     }
 
-    public onCreateCourse(courseName: string) {
-        if (courseName != "") {
-            //TODO call API
-            this.map.onCreateCourse(courseName);
-        }
-    }
-
-    public onSaveCourse() {
-        //TODO
-        //this.map.onSaveCourse();
-    }
-
-    public onLoadCourse(courseId: string) {
-        //TODO this should populate the select with courses
-        this.map.onLoadCourse(courseId);
-    }
-
-    public onLoadCourses() {
-        this.map.onLoadCourses();
-        this.courses = this.map.getCourses();
-        console.log(this.courses);
-    }
-
     public onResetMap() {
         this.map.onResetMap();
     }
+
+    /***
+     * API response handlers.
+     ***/
+    private onCoursesReceive(headers: any, body: any) {
+        for (var i = 0; i < body.length; ++i) {
+            this.courses.push(body[i]);
+        }
+    }
+
+    private onCoursesFail(status: number, headers: any, body: any) {
+        window.alert("Failed to load saved courses.");
+        // TODO disable selector
+    }
+
+    private onCreateReceive(headers: any, body: any) {
+        this.courses.push(body);
+        // close the modal
+        var close = document.getElementById("modal-close");
+        if (close) {
+            close.click();
+        }
+        // update the mapper
+        this.map.onLoadCourse(body);
+    }
+
+    private onCreateFail(status: number, headers: any, body: any) {
+        // TODO nice message
+        window.alert("Create failed");
+    }
+
+    private onDeleteReceive(headers: any, body: any) {
+        // TODO nice message
+        window.alert("Delete successful");
+        // find the element to remove from the list
+        var i = 0;
+        var done = false;
+        while (!done && i < this.courses.length) {
+            if (this.courses[i].courseId == body.courseId) {
+                this.courses.splice(i, 1);
+                done = true;
+            }
+            ++i;
+        }
+    }
+
+    private onDeleteFail(status: number, headers: any, body: any) {
+        // TODO nice message
+        window.alert("Delete failed");
+    }
+
 }
