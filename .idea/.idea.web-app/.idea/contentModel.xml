@@ -4,6 +4,7 @@
     <e p="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.3.1/build/netcoreapp1.0/xunit.runner.reporters.netcoreapp10.dll" t="Include" />
     <e p="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.3.1/build/netcoreapp1.0/xunit.runner.utility.netcoreapp10.dll" t="Include" />
     <e p="$USER_HOME$/.nuget/packages/xunit.runner.visualstudio/2.3.1/build/netcoreapp1.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll" t="Include" />
+    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.-670153756.00" t="ExcludeRecursive" />
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="Mapper Api" t="IncludeRecursive">
         <e p="appsettings.Development.json" t="Include" />
@@ -17,6 +18,7 @@
           <e p="GolfCourseController.cs" t="Include" />
           <e p="HomeController.cs" t="Include" />
         </e>
+        <e p="hosting.json" t="Include" />
         <e p="Mapper Api.csproj" t="IncludeRecursive" />
         <e p="Migrations" t="Include">
           <e p="20180403205458_InitialCreate.cs" t="Include" />
@@ -163,22 +165,24 @@
             <e p="app.browser.module.ts" t="Include" />
             <e p="app.module.ts" t="Include" />
             <e p="app.server.module.ts" t="Include" />
+            <e p="assets" t="Include">
+              <e p="back-tile.png" t="Include" />
+            </e>
             <e p="components" t="Include">
               <e p="app" t="Include">
                 <e p="app.component.css" t="Include" />
                 <e p="app.component.html" t="Include" />
                 <e p="app.component.ts" t="Include" />
               </e>
-              <e p="controls" t="Include">
-                <e p="controls.component.css" t="Include" />
-                <e p="controls.component.html" t="Include" />
-                <e p="controls.component.spec.ts" t="Include" />
-                <e p="controls.component.ts" t="Include" />
-              </e>
               <e p="home" t="Include">
                 <e p="home.component.css" t="Include" />
                 <e p="home.component.html" t="Include" />
                 <e p="home.component.ts" t="Include" />
+              </e>
+              <e p="login" t="Include">
+                <e p="login.component.css" t="Include" />
+                <e p="login.component.html" t="Include" />
+                <e p="login.component.ts" t="Include" />
               </e>
               <e p="mapper" t="Include">
                 <e p="mapper.component.css" t="Include" />
@@ -191,6 +195,19 @@
                 <e p="navmenu.component.html" t="Include" />
                 <e p="navmenu.component.ts" t="Include" />
               </e>
+              <e p="register" t="Include">
+                <e p="register.component.css" t="Include" />
+                <e p="register.component.html" t="Include" />
+                <e p="register.component.spec.ts" t="Include" />
+                <e p="register.component.ts" t="Include" />
+              </e>
+            </e>
+            <e p="interfaces" t="Include">
+              <e p="user.interface.ts" t="Include" />
+            </e>
+            <e p="Services" t="Include">
+              <e p="api.service.spec.ts" t="Include" />
+              <e p="api.service.ts" t="Include" />
             </e>
           </e>
           <e p="boot.browser.ts" t="Include" />
@@ -245,9 +262,11 @@
             <e p="vendor.js" t="Include" />
           </e>
           <e p="favicon.ico" t="Include" />
+          <e p="Scripts" t="Include">
+            <e p="mapper-api.js" t="Include" />
+          </e>
         </e>
       </e>
     </e>
-    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_web-app.1771325527.00" t="ExcludeRecursive" />
   </component>
 </project>

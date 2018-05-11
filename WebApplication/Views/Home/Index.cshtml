@@ -4,113 +4,13 @@
 
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
+<script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="Scripts/mapper-api.js"></script>
 <script src="~/dist/vendor.js" asp-append-version="true"></script>
 
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
-    <script>
-        var map;
-        var drag = true;
-        var path;
-        var polygon = [];
-        var multiPolygons = [];
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'),
-                {
-                    zoom: 20,
-                    center: { lat: -25.658712, lng: 28.140347 },
-                    mapTypeId: 'satellite',
-                    panControl: false,
-                });
-            poly = new google.maps.Polygon({
-                strokeColor: '#BADA55',
-                strokeOpacity: 1,
-                strokeWeight: 5,
-                fillColor: '#BADA55',
-                fillOpacity: 0.4,
-                draggable: true,
-                editable: true
-            });
-            poly.setMap(map);
-
-            map.addListener('click', addLatLng);
-        }
-
-        function addLatLng(event) {
-            path = poly.getPath();
-            // Because path is an MVCArray, we can simply append a new coordinate
-            // and it will automatically appear.
-            path.push(event.latLng);
-            // Add a new polygon at the new plotted point on the polyline.
-            var point = new google.maps.Polygon({
-                position: event.latLng,
-                map: map
-            });
-            polygon.push(event.latLng);
-        }
-
-        function newPolygon() {
-
-            if (path.length !== 0) {
-                multiPolygons.push(polygon);
-                polygon = [];
-                path = [];
-            }
-
-            poly = new google.maps.Polygon({
-                strokeColor: '#BADA55',
-                strokeOpacity: 1,
-                strokeWeight: 5,
-                fillColor: '#BADA55',
-                fillOpacity: 0.4,
-                draggable: true,
-                editable: true
-            });
-            poly.setMap(map);
-        }
-
-        function toggleDraggable() {
-            drag = !drag;
-            map.setOptions({ draggable: drag });
-        }
-
-        function showAllCoordinates() {
-            var display = "";
-            var temp = "";
-            for (var i = 0; i < multiPolygons.length; i++) {
-                display += "index: " + i + " " + multiPolygons[i] + '\n';
-            }
-            if (polygon.length !== 0) {
-                for (var j = 0; j < polygon.length; j++) {
-                    temp += polygon[j] + ",";
-                }
-                display += "index: " + i + " " + temp + '\n';
-            }
-            //window.alert(display);
-            console.log(display);
-        }
-
-        function showCurrentCoordinate() {
-            var display = "";
-            for (var i = 0; i < polygon.length; i++) {
-                display += "index: " + i + " " + polygon[i] + '\n';
-            }
-            //window.alert(display);
-            console.log(display);
-        }
-
-        function changePolyType() {
-            var courseTypeSelector = document.getElementById("courseType");
-            var colour = courseTypeSelector.options[courseTypeSelector.selectedIndex].value;
-            
-            poly.setOptions({strokeColor: colour ,fillColor: colour});
-        }
-
-        window.onload = initMap();
-    </script>
-    <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog&callback=initMap">
-    </script>
-
 }

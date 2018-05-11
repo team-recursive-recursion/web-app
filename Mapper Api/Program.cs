@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,6 +23,11 @@ namespace Mapper_Api
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseConfiguration(
+                    new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("hosting.json", optional: true)
+                        .Build())
                 .UseStartup<Startup>()
                 .Build();
 
@@ -35,7 +40,6 @@ namespace Mapper_Api
                 .AddDbContext<CourseDb>()
                 .AddScoped<GolfCourseService>()
                 .BuildServiceProvider();
-
         }
     }
 }

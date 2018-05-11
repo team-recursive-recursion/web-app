@@ -13769,23 +13769,23 @@
     ]
   },
   "packageFolders": {
-    "/Users/ebendutoit/.nuget/packages/": {},
+    "/Users/stephan/.nuget/packages/": {},
     "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/ebendutoit/Dev/cos/web-app/Tests/Tests.csproj",
+      "projectUniqueName": "/Users/stephan/RiderProjects/web-app/Tests/Tests.csproj",
       "projectName": "Tests",
-      "projectPath": "/Users/ebendutoit/Dev/cos/web-app/Tests/Tests.csproj",
-      "packagesPath": "/Users/ebendutoit/.nuget/packages/",
-      "outputPath": "/Users/ebendutoit/Dev/cos/web-app/Tests/obj/",
+      "projectPath": "/Users/stephan/RiderProjects/web-app/Tests/Tests.csproj",
+      "packagesPath": "/Users/stephan/.nuget/packages/",
+      "outputPath": "/Users/stephan/RiderProjects/web-app/Tests/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/ebendutoit/.config/NuGet/NuGet.Config"
+        "/Users/stephan/.config/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
@@ -13796,8 +13796,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "/Users/ebendutoit/Dev/cos/web-app/Mapper Api/Mapper Api.csproj": {
-              "projectPath": "/Users/ebendutoit/Dev/cos/web-app/Mapper Api/Mapper Api.csproj"
+            "/Users/stephan/RiderProjects/web-app/Mapper Api/Mapper Api.csproj": {
+              "projectPath": "/Users/stephan/RiderProjects/web-app/Mapper Api/Mapper Api.csproj"
             }
           }
         }
