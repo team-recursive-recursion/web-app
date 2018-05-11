@@ -67,4 +67,9 @@ export class ApiService {
             { "courseName": name}
         );
     }
+
+    deleteCourse(id: string) {
+        var url = this.url + "/api/GolfCoursesNew/" + id;
+        return this.http.delete(url);
+    }
 }

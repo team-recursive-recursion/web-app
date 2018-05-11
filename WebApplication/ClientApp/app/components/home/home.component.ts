@@ -48,7 +48,7 @@ export class HomeComponent {
     }
 
     /***
-     * Load and create event handlers.
+     * Load, create and delete event handlers.
      ***/
     public onLoadCourse(index: number) {
         window.alert("Loading course '" + this.courses[index].courseName + "'");
@@ -59,6 +59,22 @@ export class HomeComponent {
         }
         // update the mapper
         this.map.onLoadCourse(this.courses[index]);
+    }
+
+    public onDeleteCourse(index: number) {
+        if (window.confirm("Are you sure you want to delete '" +
+                this.courses[index].courseName + "'?")) {
+            // delete the course
+            this.api.deleteCourse(this.courses[index].courseId)
+                .subscribe(
+                    result => this.onDeleteReceive(result.headers,
+                            result.json()),
+                    error => this.onDeleteFail(error.status, error.headers,
+                            error.text()),
+                    () => console.log("Course created successfully.")
+                );
+        }
+        // TODO
     }
 
     public onCreateCourse(name: string) {
@@ -129,6 +145,26 @@ export class HomeComponent {
     private onCreateFail(status: number, headers: any, body: any) {
         // TODO nice message
         window.alert("Create failed");
+    }
+
+    private onDeleteReceive(headers: any, body: any) {
+        // TODO nice message
+        window.alert("Delete successful");
+        // find the element to remove from the list
+        var i = 0;
+        var done = false;
+        while (!done && i < this.courses.length) {
+            if (this.courses[i].courseId == body.courseId) {
+                this.courses.splice(i, 1);
+                done = true;
+            }
+            ++i;
+        }
+    }
+
+    private onDeleteFail(status: number, headers: any, body: any) {
+        // TODO nice message
+        window.alert("Delete failed");
     }
 
 }

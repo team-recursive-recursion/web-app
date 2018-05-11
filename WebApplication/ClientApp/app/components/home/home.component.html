@@ -69,7 +69,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">
-                            Courses:
+                            Course Management
                         </h5>
                         <button type="button" class="close" 
                                 data-dismiss="modal" aria-label="Close">
@@ -85,7 +85,7 @@
                             </div>
                             <div class="col-md-6 ml-auto">
                                 <h4><b>Load Course:</b></h4>
-                                <select #courseSelector
+                                <select #courseSelector id="course-selector"
                                         style="width: 260px;height:32px;">
                                     <option
                                             *ngFor="let c of courses;
@@ -102,7 +102,7 @@
                                 <button type="button" class="btn btn-success"
                                         (click)=
                                         "onCreateCourse(courseName.value);">
-                                    Submit
+                                    Create
                                 </button>
                             </div>
                             <div class="col-md-6">
@@ -110,7 +110,13 @@
                                         id="changeCourse"
                                         (click)=
                                         "onLoadCourse(courseSelector.selectedIndex)">
-                                    Submit
+                                    Load
+                                </button>
+                                <button type="button" class="btn btn-success"
+                                        id="deleteCourse"
+                                        (click)=
+                                        "onDeleteCourse(courseSelector.selectedIndex)">
+                                    Delete
                                 </button>
                             </div>
                         </div>
