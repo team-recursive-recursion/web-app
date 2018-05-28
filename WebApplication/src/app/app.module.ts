@@ -14,7 +14,7 @@ import { MapperComponent } from './components/mapper/mapper.component';
 import { RegisterComponent } from './components/register/register.component';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgModel } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
@@ -70,15 +70,15 @@ import {
   ],
   imports: [
     CommonModule,
-        HttpModule,
-        FormsModule,
-        RouterModule.forRoot([
-            { path: '', redirectTo: 'login', pathMatch: 'full' },
-            { path: 'login', component: LoginComponent },
-            { path: 'mapper', component: HomeComponent },
-            { path: 'register', component: RegisterComponent },
-            { path: '**', redirectTo: 'login' }
-        ]),
+    HttpModule,
+    FormsModule,
+    RouterModule.forRoot([
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      { path: 'login', component: LoginComponent },
+      { path: 'mapper', component: HomeComponent },
+      { path: 'register', component: RegisterComponent },
+      { path: '**', redirectTo: 'login' }
+    ]),
     MatAutocompleteModule,
     MatBadgeModule,
     MatBottomSheetModule,

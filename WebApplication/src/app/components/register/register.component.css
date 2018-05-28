@@ -21,15 +21,16 @@ div.register-inner {
     vertical-align: middle;
 }
 
-div#register-form {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-
-    width: 60%;
+.login-card{
+    width: 60vw;
     max-width: 720px;
-    padding: 5px 20px 20px 20px;
+    margin: auto;
+}
 
-    box-shadow: 0px 0px 10px grey;
-    background-color: #FFFFFF;
+mat-form-field{
+    width: 100%;
+}
+
+.fill{
+    width: 100%;
 }
