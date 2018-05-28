@@ -111,65 +111,7 @@
         </mat-sidenav-content>
     </mat-sidenav-container>
 </div>
-<!-- 
-<div class="modal fade" id="courseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    data-backdrop="false">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="transform: translate(0, -50%);top: 50%;
-                    margin: 0 auto;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">
-                    Course Management
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6 ml-auto">
-                        <h4>
-                            <b>Create Course:</b>
-                        </h4>
-                        <input #courseName type="text" class="form-control" value="Course Name">
-                    </div>
-                    <div class="col-md-6 ml-auto">
-                        <h4>
-                            <b>Load Course:</b>
-                        </h4>
-                        <select #courseSelector id="course-selector" style="width: 260px;height:32px;">
-                            <option *ngFor="let c of courses;
-                                            let i = index" [value]="c.index">
-                                {{c.courseName}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-6 ">
-                        <button type="button" class="btn btn-success" (click)="onCreateCourse(courseName.value);">
-                            Create
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-success" id="changeCourse" (click)="onLoadCourse(courseSelector.selectedIndex)">
-                            Load
-                        </button>
-                        <button type="button" class="btn btn-success" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="modal-close">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
- -->
+
 <!-- 
 <mat-drawer-container class="home">
     <mat-drawer mode="side" opened="true">
