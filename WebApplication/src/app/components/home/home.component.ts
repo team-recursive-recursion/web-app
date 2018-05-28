@@ -14,6 +14,7 @@ import {
     LatLngBounds, LatLngBoundsLiteral, DataLayerManager
 } from '@agm/core';
 
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 declare var google: any;
 @Component({
@@ -65,7 +66,7 @@ export class HomeComponent {
     }
     courses: Course[] = [];
 
-    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
+    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public dialog: MatDialog) {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
@@ -217,6 +218,32 @@ export class HomeComponent {
     private onDeleteFail(status: number, headers: any, body: any) {
         // TODO nice message
         window.alert("Delete failed");
+    }
+
+    openDialog(): void {
+        let dialogRef = this.dialog.open(CourseDialog, {
+            width: '250px',
+            // data: { name: this.name, animal: this.animal }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log('The dialog was closed');
+            // this.animal = result;
+        });
+    }
+}
+@Component({
+    selector: 'course.dialog',
+    templateUrl: 'course.dialog.html',
+})
+export class CourseDialog {
+
+    constructor(
+        public dialogRef: MatDialogRef<CourseDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any) { }
+
+    onNoClick(): void {
+        this.dialogRef.close();
     }
 
 }

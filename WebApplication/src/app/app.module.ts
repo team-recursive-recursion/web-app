@@ -9,7 +9,7 @@ import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core'
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
-import { HomeComponent } from './components/home/home.component';
+import { HomeComponent , CourseDialog} from './components/home/home.component';
 import { MapperComponent } from './components/mapper/mapper.component';
 import { RegisterComponent } from './components/register/register.component';
 
@@ -66,7 +66,8 @@ import {
     LoginComponent,
     MapperComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent, 
+    CourseDialog
   ],
   imports: [
     CommonModule,
@@ -123,6 +124,7 @@ import {
   providers: [
     GoogleMapsAPIWrapper
   ],
+  entryComponents:[CourseDialog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,0 +1,48 @@
+<h1 mat-dialog-title>
+    Course Management
+</h1>
+<div mat-dialog-content>
+    <div class="row">
+        <div class="col-md-6 ml-auto">
+            <p>
+                <b>Create Course:</b>
+            </p>
+            <mat-form-field>
+                <input matInput #courseName type="text" class="form-control" value="Course Name" placeholder="Course Name">
+            </mat-form-field>
+        </div>
+        <div class="col-md-6 ml-auto">
+            <h4>
+                <b>Load Course:</b>
+            </h4>
+            <mat-form-field>
+                <mat-select placeholder="Course" #courseSelector id="course-selector" style="width: 260px;height:32px;">
+                    <mat-option *ngFor="let c of courses;
+                                            let i = index" [value]="c.index">
+                        {{c.courseName}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6 ">
+            <button mat-raised-button type="button" class="btn btn-success" (click)="onCreateCourse(courseName.value);">
+                Create
+            </button>
+        </div>
+        <div class="col-md-6">
+            <button mat-raised-button type="button" class="btn btn-success" id="changeCourse" (click)="onLoadCourse(courseSelector.selectedIndex)">
+                Load
+            </button>
+            <button mat-raised-button type="button" class="btn btn-success" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Close</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>
