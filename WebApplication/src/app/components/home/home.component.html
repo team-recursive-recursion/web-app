@@ -1,0 +1,228 @@
+<!--
+    Filename: home.component.html
+    Author  : Christiaan H Nel, Stephan Roos, Duncan Tilley
+
+        The template for the controls and map for mapping.
+-->
+
+<div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
+    <mat-toolbar color="primary" class="example-toolbar">
+        <button mat-icon-button (click)="snav.toggle()">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <h1 class="example-app-name">Responsive App</h1>
+    </mat-toolbar>
+
+    <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+        <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+            <mat-list>
+                <mat-accordion>
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Course
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                Manage your courses
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <input matInput placeholder="Course Name">
+                                </mat-form-field>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <input matInput placeholder="Owner Name">
+                                </mat-form-field>
+                            </mat-list-item>
+
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button>Create / Load</button>
+                            </mat-list-item>
+
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button (click)="onSaveCourse()">Save</button>
+                            </mat-list-item>
+
+                        </mat-list>
+                    </mat-expansion-panel>
+
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Elements / Polygons
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                Manage your courses
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <mat-select placeholder="Current Polygon Type">
+                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
+                                            {{t.typeName}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button (click)="onNewPolygon();">Save</button>
+                            </mat-list-item>
+
+                        </mat-list>
+                    </mat-expansion-panel>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Map options
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button (click)="onToggleDraggable()">Map Draggable</button>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button (click)="onResetMap()">Reset Map</button>
+                            </mat-list-item>
+
+                        </mat-list>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-list>
+        </mat-sidenav>
+
+        <mat-sidenav-content class="map-container">
+            <mat-card class="map-card">
+                <agm-map class="mapper" #AgmMap [latitude]="lat" [longitude]="lng" (idle)="mapIdle()">
+                </agm-map>
+            </mat-card>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>
+
+
+
+<!-- 
+<mat-drawer-container class="home">
+    <mat-drawer mode="side" opened="true">
+        <div class='controls'>
+            <div>
+                <div>
+                    <h4>
+                        <b>Course:</b>
+                    </h4>
+                    <button type="button" class="btn btn-success" (click)="onSaveCourse();">
+                        Save Course
+                    </button>
+                    <br>
+                    <br>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#courseModal">
+                        Create/Load Course
+                    </button>
+                </div>
+                <br>
+                <br>
+                <h4>
+                    <b>Elements/Polygons:</b>
+                </h4>
+                <span style="font-size:small;font-color:grey">
+                    Select Current Polygon Type:
+                </span>
+                <br>
+                <select (change)="onChangePolyType(true, $event.target.value);">
+                    <option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
+                        {{t.typeName}}
+                    </option>
+                </select>
+                <br>
+                <br>
+                <button (click)="onNewPolygon();" type="button" class="btn btn-success">
+                    Save Polygon
+                </button>
+            </div>
+
+            <br>
+            <br>
+
+            <div>
+                <h4>
+                    <b>Map Options:</b>
+                </h4>
+                <button (click)="onToggleDraggable()" type="button" class="btn btn-success">Map Draggable
+                </button>
+                <br>
+                <br>
+                <button (click)="onResetMap()" type="button" class="btn btn-success">Reset Map
+                </button>
+            </div>
+
+
+            <div class="modal fade" id="courseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+                data-backdrop="false">
+                <div class="modal-dialog modal-dialog-centered" role="document" style="transform: translate(0, -50%);top: 50%;
+                    margin: 0 auto;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Course Management
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 ml-auto">
+                                    <h4>
+                                        <b>Create Course:</b>
+                                    </h4>
+                                    <input #courseName type="text" class="form-control" value="Course Name">
+                                </div>
+                                <div class="col-md-6 ml-auto">
+                                    <h4>
+                                        <b>Load Course:</b>
+                                    </h4>
+                                    <select #courseSelector id="course-selector" style="width: 260px;height:32px;">
+                                        <option *ngFor="let c of courses;
+                                            let i = index" [value]="c.index">
+                                            {{c.courseName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6 ">
+                                    <button type="button" class="btn btn-success" (click)="onCreateCourse(courseName.value);">
+                                        Create
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-success" id="changeCourse" (click)="onLoadCourse(courseSelector.selectedIndex)">
+                                        Load
+                                    </button>
+                                    <button type="button" class="btn btn-success" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="modal-close">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-drawer>
+
+</mat-drawer-container> -->
