@@ -5,12 +5,17 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
 import { MapperComponent } from '../mapper/mapper.component'
-import { Course, Hole, Elements, Polygon } from
-    '../../interfaces/course.interface';
+import { Course, Hole, Elements, Polygon } from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
+import {
+    GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
+    LatLngBounds, LatLngBoundsLiteral, DataLayerManager
+} from '@agm/core';
 
+
+declare var google: any;
 @Component({
     selector: 'HomeComponent',
     templateUrl: './home.component.html',
@@ -20,20 +25,19 @@ import { ApiService } from '../../services/api.service';
 
 export class HomeComponent {
     @ViewChild(MapperComponent) public map: MapperComponent;
+    @ViewChild('AgmMap') agmMap: AgmMap;
+
     url: any;
     courseId: string = "";
     selected: number = 0;
-
+    button_state: string = "add";
+    // Map -- objects
+    geoJsonObject: any;
+    geoString: string = '{"type": "Feature","geometry":{"type": "Polygon","coordinates": [[[21.97265625,-3.337953961416472],[15.468749999999998,-9.79567758282973],[18.720703125,-18.646245142670598],[28.564453125,-12.897489183755892],[34.1015625,0.08789059053082422],[25.224609375,17.14079039331665],[15.8203125,17.22475820662464],[21.97265625,-3.337953961416472]]]}}';
+    googleMap: any = null;
+    features: any;
 
     mobileQuery: MediaQueryList;
-    fillerNav = Array(50).fill(0).map((_, i) => `Nav Item ${i + 1}`);
-    fillerContent = Array(50).fill(0).map(() =>
-        `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-         laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-         voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-         cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`);
-
     private _mobileQueryListener: () => void;
 
     terrainTypes = [
@@ -48,10 +52,21 @@ export class HomeComponent {
         this.mobileQuery.removeListener(this._mobileQueryListener);
     }
 
+    ngOnInit() {
+        this.geoJsonObject = JSON.parse(this.geoString);
+    }
+    mapInteractionClick(event) {
+        // for (var i = 0; i < this.features.length; i++) {
+        // this.googleMap.data.remove(this.features[i]);
+        // });
+    }
+    fabInteractionClick(event) {
+        console.log(event);
+    }
     courses: Course[] = [];
 
     constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
-        this.mobileQuery = media.matchMedia('(max-width: 20px)');
+        this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
     }
@@ -65,6 +80,23 @@ export class HomeComponent {
                     error.text()),
                 () => console.log("Courses loaded successfully.")
             );
+        this.agmMap.mapReady.subscribe(map => {
+            this.googleMap = map;
+            const bounds: LatLngBounds = new google.maps.LatLngBounds();
+            this.geoJsonObject.geometry.coordinates[0].forEach(element => {
+                bounds.extend(new google.maps.LatLng(element[1], element[0]));
+            });
+            map.fitBounds(bounds);
+            this.features = map.data.addGeoJson(this.geoJsonObject);
+            this.googleMap.data.setControls(['Point', 'LineString', 'Polygon']);
+            this.googleMap.data.setStyle({
+                editable: true,
+                draggable: true
+            });
+            this.features.forEach(feature => {
+                this.googleMap.data.overrideStyle(feature, { editable: true });
+            });
+        });
     }
 
     /***
@@ -122,7 +154,7 @@ export class HomeComponent {
     }
 
     public onToggleDraggable() {
-        this.map.onToggleDraggable();
+        this.googleMap.draggable = !this.googleMap.draggable;
     }
 
     public onChangePolyType(bool: boolean, index: number) {

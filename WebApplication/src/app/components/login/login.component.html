@@ -8,30 +8,34 @@
 <div class="login-outer">
     <div class="login-inner">
         <div id="login-form">
-            <h1 style="text-align:center">Login</h1>
-            <form #loginForm="ngForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" class="form-control" id="email"
-                            required [(ngModel)]="email" name="email">
-                </div>
+            <mat-card class="login-card">
+                <h1 style="text-align:center">Login</h1>
+                <form #loginForm="ngForm">
+                    <mat-list role="list">
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input type="text" class="form-control" id="email" required [(ngModel)]="email" name="email" matInput placeholder="Email">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input type="password" class="form-control" id="password" required [(ngModel)]="password" name="password" matInput placeholder="Password">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem" class="login-button-container">
+                            <a routerLink="/register" class="fill">
+                                <button mat-button class="fill">
+                                    Register
+                                </button>
+                            </a>
+                            <button  mat-raised-button type="submit" class="fill" (click)="onSubmit()">
+                                Login
+                            </button>
+                        </mat-list-item>
 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" id="password"
-                            required [(ngModel)]="password" name="password">
-                </div>
-
-                <button type="submit" class="btn btn-default"
-                        (click)="onSubmit()">
-                    Login
-                </button>
-                <a routerLink="/register">
-                    <button class="btn btn-default">
-                        Register
-                    </button>
-                </a>
-            </form>
+                    </mat-list>
+                </form>
+            </mat-card>
         </div>
     </div>
 </div>

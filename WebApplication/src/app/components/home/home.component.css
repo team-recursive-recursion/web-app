@@ -1,14 +1,22 @@
 .map-card {
+    position: relative; 
     flex: 1;
     display: flex;
     height: 97%;
     padding: 0;
 }
+.controls{
+    position: absolute;
+    z-index: 2;
+    right: 80px;
+    bottom: 80px;
+}
+
 
 .mapper {
     height: 100%;
     width: 100%;
-    flex-direction: column;
+    /* flex-direction: column; */
 }
 .map-container{
     position: relative;
