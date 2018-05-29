@@ -13,21 +13,17 @@
         <h1 class="example-app-name">Mapper</h1>
     </mat-toolbar>
 
-    <mat-sidenav-container class="example-sidenav-container" 
-                [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
-        <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" 
-                [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+    <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+        <mat-sidenav #snav opened="true" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
             <mat-list>
                 <mat-accordion>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                Course
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                Manage your courses
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Add Course
+                            </mat-card-title>
+                        </mat-card-header>
 
                         <mat-list role="list">
                             <mat-list-item role="listitem">
@@ -35,73 +31,89 @@
                                     <input matInput placeholder="Course Name">
                                 </mat-form-field>
                             </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Owner Name">
-                                </mat-form-field>
-                            </mat-list-item>
 
                             <mat-list-item role="listitem">
-                                <button mat-raised-button class="fill" (click)="openDialog()">Create / Load</button>
-                            </mat-list-item>
-
-                            <mat-list-item role="listitem">
-                                <button mat-raised-button class="fill" (click)="onSaveCourse()">Save</button>
+                                <button mat-raised-button class="fill" (click)="onSaveCourse()">Add</button>
                             </mat-list-item>
 
                         </mat-list>
-                    </mat-expansion-panel>
+                    </mat-card>
 
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                Elements / Polygons
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                Manage your courses
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Load Course:
+                            </mat-card-title>
+                        </mat-card-header>
 
                         <mat-list role="list">
                             <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <mat-select [(value)]="selectedType" class="fill" placeholder="Current Polygon Type">
-                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
+                                <mat-form-field>
+                                    <mat-select [(value)]="selected"  #courseSelector id="course-selector">
+                                        <mat-option  *ngFor="let c of courses; let i = index" [value]="i">
+                                            {{c.courseName}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-raised-button type="button" class="fill" (click)="onLoadCourse(selected)" id="changeCourse">
+                                    Load
+                                </button>
+                            </mat-list-item>
+
+                            <mat-list-item role="listitem">
+                                <button color="warn" class="fill" mat-button type="button" class="fill" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">
+                                    Delete
+                                </button>
+                            </mat-list-item>
+                        </mat-list>
+                    </mat-card>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Elements / Polygons
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <mat-select [(value)]="selectedType">
+                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
                                             {{t.typeName}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button 
-                                    (click)="onNewPolygon();">Save</button>
+                                <button class="fill" mat-raised-button (click)="onNewPolygon();">Save</button>
                             </mat-list-item>
 
                         </mat-list>
-                    </mat-expansion-panel>
+                    </mat-card>
 
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
                                 Map options
-                            </mat-panel-title>
-                        </mat-expansion-panel-header>
+                            </mat-card-title>
+                        </mat-card-header>
 
                         <mat-list role="list">
                             <mat-list-item role="listitem">
-                                <button mat-raised-button 
-                                        (click)="onToggleDraggable()">
+                                <button class="fill" mat-raised-button (click)="onToggleDraggable()" color="{{mapDraggable ? 'primary' : 'accent'}}">
                                     Map Draggable
                                 </button>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button mat-raised-button 
-                                        (click)="onResetMap()">
+                                <button class="fill" mat-button (click)="onResetMap()" color="warn" >
                                     Reset Map
                                 </button>
                             </mat-list-item>
                         </mat-list>
-                    </mat-expansion-panel>
+                    </mat-card>
                 </mat-accordion>
             </mat-list>
 
@@ -109,12 +121,10 @@
 
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
-                <agm-map class="mapper" #AgmMap [latitude]="lat" 
-                        [longitude]="lng" 
-                        (mapClick)="mapInteractionClick($event)">
+                <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper" #AgmMap [latitude]="lat" [longitude]="lng"
+                    (mapClick)="mapInteractionClick($event)">
                 </agm-map>
-                <button (click)="fabInteractionClick($event)" class="controls" 
-                        mat-fab>
+                <button (click)="fabInteractionClick($event)" class="controls" mat-fab>
                     <mat-icon>
                         {{button_state}}
                     </mat-icon>
