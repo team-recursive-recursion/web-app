@@ -5,8 +5,10 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
-import { Course, Hole, Elements, Polygon } from '../../interfaces/course.interface';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } 
+    from '@angular/core';
+import { Course, GolfCourse, Hole, Elements, Polygon } 
+    from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
@@ -105,7 +107,7 @@ export class HomeComponent {
     }
 
     /***
-     * Load, create and delete event handlers.
+     * Load, create and delete event handlers for Courses.
      ***/
     public onLoadCourses() {
         this.api.getCourses()
@@ -166,6 +168,11 @@ export class HomeComponent {
             window.alert("Please enter a course name");
         }
     }
+
+    /***
+     * Create, update, delete handlers for Holes.
+     ***/
+    
 
     /***
      * Other event handlers.
