@@ -65,7 +65,7 @@
                         <mat-list role="list">
                             <mat-list-item role="listitem">
                                 <mat-form-field class="fill">
-                                    <mat-select class="fill" placeholder="Current Polygon Type">
+                                    <mat-select [(value)]="selectedType" class="fill" placeholder="Current Polygon Type">
                                         <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
                                             {{t.typeName}}
                                         </mat-option>
