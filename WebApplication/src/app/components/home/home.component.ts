@@ -5,8 +5,10 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
-import { Course, Hole, Elements, Polygon } from '../../interfaces/course.interface';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } 
+    from '@angular/core';
+import { Course, GolfCourse, Hole, Elements, Polygon } 
+    from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
