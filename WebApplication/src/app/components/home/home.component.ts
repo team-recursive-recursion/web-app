@@ -5,9 +5,11 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } 
+        from '@angular/core';
 import { MapperComponent } from '../mapper/mapper.component'
-import { Course, Hole, Elements, Polygon } from '../../interfaces/course.interface';
+import { Course, Hole, Elements, Polygon } 
+        from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
@@ -27,6 +29,9 @@ declare var google: any;
 export class HomeComponent {
     @ViewChild(MapperComponent) public map: MapperComponent;
     @ViewChild('AgmMap') agmMap: AgmMap;
+
+    courses: Course[] = [];
+    
 
     url: any;
     courseId: string = "";
@@ -56,17 +61,20 @@ export class HomeComponent {
     ngOnInit() {
         this.geoJsonObject = JSON.parse(this.geoString);
     }
+
     mapInteractionClick(event) {
         // for (var i = 0; i < this.features.length; i++) {
         // this.googleMap.data.remove(this.features[i]);
         // });
     }
+
     fabInteractionClick(event) {
         console.log(event);
     }
-    courses: Course[] = [];
 
-    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public dialog: MatDialog) {
+
+    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, 
+            media: MediaMatcher, public dialog: MatDialog) {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
@@ -111,7 +119,8 @@ export class HomeComponent {
             close.click();
         }
         // update the mapper
-        this.map.onLoadCourse(this.courses[index]);
+        //this.map.onLoadCourse(this.courses[index]);
+        //console.log(this.api.getCourse());
     }
 
     public onDeleteCourse(index: number) {
@@ -222,7 +231,8 @@ export class HomeComponent {
 
     openDialog(): void {
         let dialogRef = this.dialog.open(CourseDialog, {
-            width: '250px',
+            width: '800px',
+            height: '600px'
             // data: { name: this.name, animal: this.animal }
         });
 
@@ -232,6 +242,7 @@ export class HomeComponent {
         });
     }
 }
+
 @Component({
     selector: 'course.dialog',
     templateUrl: 'course.dialog.html',
