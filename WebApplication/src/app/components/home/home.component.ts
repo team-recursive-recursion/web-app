@@ -107,6 +107,31 @@ export class HomeComponent {
         });
     }
 
+    public updateDataLayer(geoJson: any) {
+        //this.googleMap.data.remove(this.features);
+        const bounds: LatLngBounds = new google.maps.LatLngBounds();
+
+        this.geoJsonObject = geoJson;
+        console.log(geoJson);
+        this.geoJsonObject.features.forEach(
+            feature => 
+                {
+                    feature.coordinates[0].forEach(
+                        lnglat => bounds.extend(
+                            new google.maps.LatLng(lnglat[1], lnglat[0]))
+                    );
+                }
+        );
+
+        this.googleMap.fitBounds(bounds);
+        this.features = this.googleMap.data.addGeoJson(this.geoJsonObject);
+        this.features.forEach(
+            feature => this.googleMap.data.overrideStyle(feature, {
+                editable: true 
+            })
+        );
+    }
+
     /***
      * Load, create and delete event handlers for Courses.
      ***/
@@ -221,6 +246,19 @@ export class HomeComponent {
 
     private onCourseReceive(headers: any, body: any) {
         this.currentCourse = body;
+        console.log(body);
+        let elements: Array<any> = [];
+        this.currentCourse.courseElements.forEach(
+            element => {
+                elements.push(JSON.parse(element.geoJson));
+            }
+        );
+        let temp: any = {
+            "type": "FeatureCollection",
+            "features": elements
+        }
+
+        this.updateDataLayer(temp);
     }
 
     private onCourseFail(status: number, headers:any, body: any) {
