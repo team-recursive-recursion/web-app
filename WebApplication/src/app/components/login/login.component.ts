@@ -26,6 +26,10 @@ export class LoginComponent {
         this.password = "";
     }
 
+    onRegister() {
+        this.router.navigateByUrl("/register");
+    }
+
     onSubmit() {
         // verify the user login details
         // TODO hash and possibly salt password

@@ -31,6 +31,10 @@ export class RegisterComponent {
         this.password = "";
     }
 
+    onCancel() {
+        this.router.navigateByUrl("/login");
+    }
+
     onSubmit() {
         if (this.verifyDetails()) {
             // TODO hash and possibly salt password

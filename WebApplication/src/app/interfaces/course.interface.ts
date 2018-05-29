@@ -21,7 +21,7 @@ export interface GolfCourse {
     createdAt: string;
     updatedAt: string;
     holes: Hole[];
-    courseElement: Elements[];
+    courseElements: Elements[];
 }
 
 export interface Hole {

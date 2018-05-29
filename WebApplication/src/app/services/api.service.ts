@@ -32,7 +32,7 @@ export class ApiService {
     }
 
     userMatch(email: string, password: string) {
-        var url = this.url + "/api/Users/Match";
+        var url = this.url + "/api/users/match";
         return this.http.post(url,
                 {"Email": email, "Password": password}
         );
@@ -40,7 +40,7 @@ export class ApiService {
 
     userCreate(email: string, firstname: string, lastname: string,
             password: string) {
-        var url = this.url + "/api/Users/Create";
+        var url = this.url + "/api/users/create";
         return this.http.post(url,
                 {"Email": email, "Name": firstname, "Surname": lastname,
                 "Password": password}
@@ -48,28 +48,169 @@ export class ApiService {
     }
 
     /***
-     * API calls for map specifics.
+     * API calls for map specifics. api/courses
      ***/
     getCourses() {
-        var url = this.url + "/api/GolfCoursesNew";
+        var url = this.url + "/api/courses";
         return this.http.get(url);
     }
 
     getCourse(courseId: string) {
-        var url = this.url + "/api/GolfCoursesNew/" + courseId;
+        var url = this.url + "/api/courses/" + courseId;
         return this.http.get(url);
     }
 
     createCourse(name: string) {
-        var url = this.url + "/api/GolfCoursesNew";
+        var url = this.url + "/api/courses";
 
         return this.http.post(url, 
             { "courseName": name}
         );
     }
 
-    deleteCourse(id: string) {
-        var url = this.url + "/api/GolfCoursesNew/" + id;
+    deleteCourse(courseId: string) {
+        var url = this.url + "/api/courses/" + courseId;
+        return this.http.delete(url);
+    }
+
+    updateCourse(courseId: string, courseName: string) {
+        var url = this.url + "/api/courses";
+        return this.http.put(url, 
+            {
+                "courseId": courseId,
+                "courseName": courseName
+            }
+        );
+    }
+
+    /***
+     * API calls for map specifics. api/courses
+     ***/
+    getHoles() {
+        var url = this.url + "/api/holes";
+        return this.http.get(url);
+    }
+
+    getHole(holeId: string) {
+        var url = this.url + "/api/holes/" + holeId;
+        return this.http.get(url);
+    }
+
+    addHole(courseId: string, holeName: string) {
+        var url = this.url + "/api/holes";
+
+        return this.http.post(url, 
+            {
+                "Name": holeName,
+                "courseName": courseId
+            }
+        );
+    }
+
+    updateHole(holeId: string, holeName: string) {
+        var url = this.url + "/api/holes";
+
+        return this.http.put(url, 
+            {
+                "HoleId": holeId,
+                "Name": holeName
+            }
+        );
+    }
+
+    deleteHole(holeId: string) {
+        var url = this.url + "/api/holes/" + holeId;
+        return this.http.delete(url);
+    }
+
+    /***
+     * API calls for map specifics. api/points
+     ***/
+    getPoints() {
+        var url = this.url + "/api/points";
+        return this.http.get(url);
+    }
+
+    getPoint(pointId: string) {
+        var url = this.url + "/api/points/" + pointId;
+        return this.http.get(url);
+    }
+
+    addPoint(pointId: string, courseId: string, holeId: string, typeOf: number, 
+            geoJson: string) {
+        var url = this.url + "/api/points";
+        return this.http.post(url, 
+            {
+                "courseId": courseId,
+                "holeId": holeId,
+                "type": typeOf,
+                "geoJson": geoJson
+            }
+        );
+    }
+
+    updatePoint(pointId: string, courseId: string, holeId: string, 
+            geoJson: string, courseElementId: string, pointRaw: string, 
+            typeOf: number) {
+        var url = this.url + "/api/points/" + pointId;
+        return this.http.put(url,
+            {
+                "type": typeOf,
+                "pointRaw": pointRaw,
+                "geoJson": geoJson,
+                "courseElementId": courseElementId,
+                "holeId": holeId,
+                "courseId": courseId
+            }
+        );
+    }
+
+    deletePoint(pointId: string) {
+        var url = this.url + "/api/points/" + pointId;
+        return this.http.delete(url);
+    }
+
+    /***
+     * API calls for map specifics. api/polygons
+     ***/
+    getPolygons() {
+        var url = this.url + "/api/polygons";
+        return this.http.get(url);
+    }
+
+    addPolygon(courseId: string, holeId: string, typeOf: number, 
+            geoJson: string) {
+        var url = this.url + "/api/polygons";
+        return this.http.post(url,
+            {
+                "courseId": courseId,
+                "holeId": holeId,
+                "type": typeOf,
+                "geoJson": geoJson
+            }
+        );
+    }
+
+    getPolygon(polygonId: string) {
+        var url = this.url + "/api/polygons/" + polygonId;
+        return this.http.get(url);
+    }
+
+    updatePolygon(polygonId: string, typeOf:  number, geoJson: string,
+        courseElementId: string, courseId: string) {
+        var url = this.url + "/api/polygons/" + polygonId;
+        return this.http.put(url,
+            {
+                "type": typeOf,
+                "geoJson": geoJson,
+                "courseElementId": courseElementId,
+                "courseId": courseId
+            }
+        );
+    }
+
+    deletePolygon(polygonId: string) {
+        var url = this.url + "/api/polygons/" + polygonId;
         return this.http.delete(url);
     }
 }

@@ -26,8 +26,11 @@ declare var google: any;
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
 
+    courses: Course[] = [];
+    currentCourse: GolfCourse;
+    
+
     url: any;
-    courseId: string = "";
     selected: number = 0;
     button_state: string = "add";
     // Map -- objects
@@ -54,17 +57,20 @@ export class HomeComponent {
     ngOnInit() {
         this.geoJsonObject = JSON.parse(this.geoString);
     }
+
     mapInteractionClick(event) {
         // for (var i = 0; i < this.features.length; i++) {
         // this.googleMap.data.remove(this.features[i]);
         // });
     }
+
     fabInteractionClick(event) {
         console.log(event);
     }
-    courses: Course[] = [];
 
-    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public dialog: MatDialog) {
+
+    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, 
+            media: MediaMatcher, public dialog: MatDialog) {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
@@ -101,6 +107,17 @@ export class HomeComponent {
     /***
      * Load, create and delete event handlers.
      ***/
+    public onLoadCourses() {
+        this.api.getCourses()
+            .subscribe(
+                result => this.onCoursesReceive(result.headers,
+                    result.json()),
+                error => this.onCoursesFail(error.status, error.headers, 
+                    error.text()),
+                () => console.log("Courses loaded successfully.")
+            );
+    }
+
     public onLoadCourse(index: number) {
         window.alert("Loading course '" + this.courses[index].courseName + "'");
         // close the modal
@@ -108,8 +125,13 @@ export class HomeComponent {
         if (close) {
             close.click();
         }
-   // todo : update the mapper
-        // this.onLoadCourse(this.courses[index]);
+        this.api.getCourse(this.courses[index].courseId)
+            .subscribe(
+                result => this.onCourseReceive(result.headers, result.json()),
+                error => this.onCourseFail(error.status, error.headers, 
+                    error.text()),
+                () => console.log("Course loaded successfully.")
+            );
     }
 
     public onDeleteCourse(index: number) {
@@ -189,6 +211,14 @@ export class HomeComponent {
         // TODO disable selector
     }
 
+    private onCourseReceive(headers: any, body: any) {
+        this.currentCourse = body;
+    }
+
+    private onCourseFail(status: number, headers:any, body: any) {
+        window.alert("Failed to load course.");
+    }
+
     private onCreateReceive(headers: any, body: any) {
         this.courses.push(body);
         // close the modal
@@ -237,6 +267,7 @@ export class HomeComponent {
         });
     }
 }
+
 @Component({
     selector: 'course.dialog',
 
