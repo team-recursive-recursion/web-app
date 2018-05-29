@@ -1,3 +1,14 @@
+mat-sidenav  {
+    padding-left: 1%;
+    padding-right: 1%;
+}
+
+mat-accordion mat-card{
+    margin-bottom: 2%;
+}
+.selected{
+    color: red;
+}
 .map-card {
     position: relative; 
     flex: 1;

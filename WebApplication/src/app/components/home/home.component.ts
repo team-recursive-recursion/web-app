@@ -32,7 +32,6 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
 
-
     url: any;
     selected: number = 0;
     button_state: string = "add";
@@ -41,7 +40,13 @@ export class HomeComponent {
     geoString: string = '{"type": "Feature","geometry":{"type": "Polygon","coordinates": [[[21.97265625,-3.337953961416472],[15.468749999999998,-9.79567758282973],[18.720703125,-18.646245142670598],[28.564453125,-12.897489183755892],[34.1015625,0.08789059053082422],[25.224609375,17.14079039331665],[15.8203125,17.22475820662464],[21.97265625,-3.337953961416472]]]}}';
     googleMap: any = null;
     features: any;
-    selectedType: 1;
+    selectedType: number = 0;
+
+    lat: number = -25.658712;
+    lng: number = 28.140347;
+    zoom: number = 20;
+    mapType: string = "satellite";
+    mapDraggable: boolean = true;
 
     mobileQuery: MediaQueryList;
     private _mobileQueryListener: () => void;
@@ -172,11 +177,6 @@ export class HomeComponent {
             feature => this.googleMap.data.remove(feature)
         );
         this.googleMap.data.addGeoJson(this.geoJsonObject);
-        this.googleMap.data.forEach(
-            feature => this.googleMap.data.overrideStyle(feature, {
-                editable: true
-            })
-        );
 
     }
 
@@ -258,7 +258,7 @@ export class HomeComponent {
     }
 
     public onToggleDraggable() {
-        this.googleMap.draggable = !this.googleMap.draggable;
+        this.mapDraggable = !this.mapDraggable;
     }
 
     public onChangePolyType(bool: boolean, index: number) {
@@ -272,9 +272,9 @@ export class HomeComponent {
     }
 
     public onResetMap() {
-
-        // todo 
-        // this.map.onResetMap();
+        this.googleMap.data.forEach(
+            feature => this.googleMap.data.remove(feature)
+        );
     }
 
     /***
@@ -362,33 +362,5 @@ export class HomeComponent {
         window.alert("Delete failed");
     }
 
-    openDialog(): void {
-        let dialogRef = this.dialog.open(CourseDialog, {
-            width: '70vw',
-            data: { courses: this.courses }
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            this.onLoadCourse(result);
-        });
-    }
-}
-
-@Component({
-    selector: 'course.dialog',
-
-    styleUrls: ['./course.dialog.css'],
-    templateUrl: 'course.dialog.html',
-})
-export class CourseDialog {
-    courseControl = new FormControl('');
-    selected: any;
-    constructor(
-        public dialogRef: MatDialogRef<CourseDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: any) { }
-
-    onNoClick(): void {
-        this.dialogRef.close();
-    }
-
+ 
 }
