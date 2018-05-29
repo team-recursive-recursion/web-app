@@ -42,16 +42,15 @@
             <mat-list role="list">
                 <mat-list-item role="listitem">
                     <mat-form-field class="fill">
-                        <mat-select class="fill" placeholder="Course" #courseSelector id="course-selector" style="width: 260px;height:32px;">
-                            <mat-option class="fill" *ngFor="let c of data.courses;
-                                            let i = index" [value]="c.index">
+                        <mat-select [formControl]="courseControl" [(value)]="selected" class="fill" placeholder="Course" #courseSelector id="course-selector" style="width: 260px;height:32px;">
+                            <mat-option class="fill" *ngFor="let c of data.courses; let i = index" [value]="i">
                                 {{c.courseName}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
                 </mat-list-item>
                 <mat-list-item role="listitem" class="fill">
-                    <button class="fill" mat-raised-button type="button" class="btn btn-success" id="changeCourse" (click)="onLoadCourse(courseSelector.selectedIndex)">
+                    <button class="fill" [mat-dialog-close]="selected" mat-raised-button type="button" class="btn btn-success" id="changeCourse" (click)="onLoadCourse(courseSelector.selectedIndex)">
                         Load
                     </button>
                     <button class="fill" mat-raised-button type="button" class="btn btn-success" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">

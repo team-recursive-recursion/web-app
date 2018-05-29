@@ -14,6 +14,7 @@ import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
     LatLngBounds, LatLngBoundsLiteral, DataLayerManager
 } from '@agm/core';
+import {FormControl} from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
@@ -269,8 +270,7 @@ export class HomeComponent {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed');
-            // this.animal = result;
+            this.onLoadCourse(result);
         });
     }
 }
@@ -282,7 +282,8 @@ export class HomeComponent {
     templateUrl: 'course.dialog.html',
 })
 export class CourseDialog {
-
+    courseControl = new FormControl('');
+    selected: any;
     constructor(
         public dialogRef: MatDialogRef<CourseDialog>,
         @Inject(MAT_DIALOG_DATA) public data: any) { }

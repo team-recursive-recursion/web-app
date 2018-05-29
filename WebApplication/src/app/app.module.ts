@@ -9,12 +9,12 @@ import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core'
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
-import { HomeComponent , CourseDialog} from './components/home/home.component';
+import { HomeComponent, CourseDialog } from './components/home/home.component';
 import { MapperComponent } from './components/mapper/mapper.component';
 import { RegisterComponent } from './components/register/register.component';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgModel } from '@angular/forms';
+import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
@@ -66,13 +66,14 @@ import {
     LoginComponent,
     MapperComponent,
     RegisterComponent,
-    HomeComponent, 
+    HomeComponent,
     CourseDialog
   ],
   imports: [
     CommonModule,
     HttpModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: LoginComponent },
@@ -124,7 +125,7 @@ import {
   providers: [
     GoogleMapsAPIWrapper
   ],
-  entryComponents:[CourseDialog],
+  entryComponents: [CourseDialog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
