@@ -31,14 +31,14 @@ export class ApiService {
         return this.url;
     }
 
-    usermatch(email: string, password: string) {
+    userMatch(email: string, password: string) {
         var url = this.url + "/api/users/match";
         return this.http.post(url,
                 {"Email": email, "Password": password}
         );
     }
 
-    usercreate(email: string, firstname: string, lastname: string,
+    userCreate(email: string, firstname: string, lastname: string,
             password: string) {
         var url = this.url + "/api/users/create";
         return this.http.post(url,
@@ -73,9 +73,14 @@ export class ApiService {
         return this.http.delete(url);
     }
 
-    updateCourse(id: string, body: any) {
+    updateCourse(courseId: string, courseName: string) {
         var url = this.url + "/api/courses";
-        return this.http.put(url, body);
+        return this.http.put(url, 
+            {
+                "courseId": courseId,
+                "courseName": courseName
+            }
+        );
     }
 
     /***
@@ -97,17 +102,17 @@ export class ApiService {
         return this.http.post(url, 
             {
                 "Name": holeName,
-                "courseName": name
+                "courseName": courseId
             }
         );
     }
 
-    updateHole(courseId: string, holeName: string) {
+    updateHole(holeId: string, holeName: string) {
         var url = this.url + "/api/holes";
 
         return this.http.put(url, 
             {
-                "HoleId": name,
+                "HoleId": holeId,
                 "Name": holeName
             }
         );
@@ -133,7 +138,7 @@ export class ApiService {
 
     addPoint(pointId: string, courseId: string, holeId: string, typeOf: number, 
             geoJson: string) {
-        var url = this.url + "/api/points/" + pointId;
+        var url = this.url + "/api/points";
         return this.http.post(url, 
             {
                 "courseId": courseId,
@@ -173,10 +178,10 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    addPolygon(courseIdL: string, holeId: string, typeOf: number, 
+    addPolygon(courseId: string, holeId: string, typeOf: number, 
             geoJson: string) {
         var url = this.url + "/api/polygons";
-        return this.http.get(url,
+        return this.http.post(url,
             {
                 "courseId": courseId,
                 "holeId": holeId,
