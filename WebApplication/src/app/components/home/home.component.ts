@@ -116,7 +116,7 @@ export class HomeComponent {
         this.geoJsonObject.features.forEach(
             feature => 
                 {
-                    feature.coordinates[0].forEach(
+                    feature.geometry.coordinates[0].forEach(
                         lnglat => bounds.extend(
                             new google.maps.LatLng(lnglat[1], lnglat[0]))
                     );
@@ -124,11 +124,19 @@ export class HomeComponent {
         );
 
         this.googleMap.fitBounds(bounds);
+        this.features.forEach(
+            feature => this.googleMap.data.remove(feature)
+        );
         this.features = this.googleMap.data.addGeoJson(this.geoJsonObject);
         this.features.forEach(
             feature => this.googleMap.data.overrideStyle(feature, {
                 editable: true 
             })
+        );
+        this.googleMap.data.addListener('mouseover', 
+            e => {
+                //alert(e.feature.getProperty('courseElementId'));
+            }
         );
     }
 
@@ -147,7 +155,7 @@ export class HomeComponent {
     }
 
     public onLoadCourse(index: number) {
-        window.alert("Loading course '" + this.courses[index].courseName + "'");
+        //window.alert("Loading course '" + this.courses[index].courseName + "'");
         // close the modal
         var close = document.getElementById("modal-close");
         if (close) {
@@ -204,8 +212,9 @@ export class HomeComponent {
      * Other event handlers.
      ***/
     public onSaveCourse() {
-  // todo 
-        // this.map.onSaveCourse();
+        this.googleMap.data.toGeoJson(
+            data => console.log(data)
+        );
     }
 
     public onToggleDraggable() {
@@ -219,9 +228,7 @@ export class HomeComponent {
     }
 
     public onNewPolygon() {
-
-  // todo 
-        // this.map.onNewPolygon();
+        console.log(this.googleMaps.data);
     }
 
     public onResetMap() {
@@ -250,12 +257,26 @@ export class HomeComponent {
         let elements: Array<any> = [];
         this.currentCourse.courseElements.forEach(
             element => {
-                elements.push(JSON.parse(element.geoJson));
+                let value = 
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            ...JSON.parse(element.geoJson)
+                        }
+                        "properties": {
+                            "type": element.type,
+                            "courseElementId": element.courseElementId,
+                            "courseId": element.courseId
+                        }
+                    }
+                elements.push(value);
             }
         );
         let temp: any = {
             "type": "FeatureCollection",
-            "features": elements
+            "features": [ 
+                ...elements
+            ]
         }
 
         this.updateDataLayer(temp);
