@@ -31,10 +31,10 @@ export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
 
     courses: Course[] = [];
+    currentCourse: GolfCourse;
     
 
     url: any;
-    courseId: string = "";
     selected: number = 0;
     button_state: string = "add";
     // Map -- objects
@@ -111,6 +111,17 @@ export class HomeComponent {
     /***
      * Load, create and delete event handlers.
      ***/
+    public onLoadCourses() {
+        this.api.getCourses()
+            .subscribe(
+                result => this.onCoursesReceive(result.headers,
+                    result.json()),
+                error => this.onCoursesFail(error.status, error.headers, 
+                    error.text()),
+                () => console.log("Courses loaded successfully.")
+            );
+    }
+
     public onLoadCourse(index: number) {
         window.alert("Loading course '" + this.courses[index].courseName + "'");
         // close the modal
@@ -120,7 +131,13 @@ export class HomeComponent {
         }
         // update the mapper
         //this.map.onLoadCourse(this.courses[index]);
-        //console.log(this.api.getCourse());
+        this.api.getCourse(this.courses[index].courseId)
+            .subscribe(
+                result => this.onCourseReceive(result.headers, result.json()),
+                error => this.onCourseFail(error.status, error.headers, 
+                    error.text()),
+                () => console.log("Course loaded successfully.")
+            );
     }
 
     public onDeleteCourse(index: number) {
@@ -191,6 +208,14 @@ export class HomeComponent {
     private onCoursesFail(status: number, headers: any, body: any) {
         window.alert("Failed to load saved courses.");
         // TODO disable selector
+    }
+
+    private onCourseReceive(headers: any, body: any) {
+        this.currentCourse = body;
+    }
+
+    private onCourseFail(status: number, headers:any, body: any) {
+        window.alert("Failed to load course.");
     }
 
     private onCreateReceive(headers: any, body: any) {

@@ -107,11 +107,23 @@
                                     Reset Map
                                 </button>
                             </mat-list-item>
-
+                            <mat-list-item role="listitem">
+                                <button (click)="onLoadCourses()"  mat-raised-button 
+                                            class="controls" mat-fab>
+                                    Load stuff
+                                </button>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button (click)="onLoadCourse(1)" class="controls"  mat-raised-button 
+                                        mat-fab>
+                                    Load one stuff
+                                </button>
+                            </mat-list-item>
                         </mat-list>
                     </mat-expansion-panel>
                 </mat-accordion>
             </mat-list>
+
         </mat-sidenav>
 
         <mat-sidenav-content class="map-container">
