@@ -20,13 +20,13 @@ div.login-inner {
     vertical-align: middle;
 }
 
-.login-card{
+.login-card {
     width: 60vw;
     max-width: 720px;
     margin: auto;
 }
 
-mat-form-field{
+mat-form-field {
     width: 100%;
 }
 

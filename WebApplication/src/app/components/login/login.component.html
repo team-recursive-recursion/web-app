@@ -23,13 +23,11 @@
                             </mat-form-field>
                         </mat-list-item>
                         <mat-list-item role="listitem" class="login-button-container">
-                            <a routerLink="/register" class="fill">
-                                <button mat-button class="fill">
-                                    Register
-                                </button>
-                            </a>
-                            <button  mat-raised-button type="submit" class="fill" (click)="onSubmit()">
+                            <button  mat-button type="submit" class="fill" (click)="onSubmit()">
                                 Login
+                            </button>
+                            <button mat-button class="fill" (click)="onRegister()">
+                                Register
                             </button>
                         </mat-list-item>
 
