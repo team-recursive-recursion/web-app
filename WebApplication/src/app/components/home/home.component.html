@@ -29,22 +29,22 @@
 
                         <mat-list role="list">
                             <mat-list-item role="listitem">
-                                <mat-form-field>
+                                <mat-form-field class="fill">
                                     <input matInput placeholder="Course Name">
                                 </mat-form-field>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <mat-form-field>
+                                <mat-form-field class="fill">
                                     <input matInput placeholder="Owner Name">
                                 </mat-form-field>
                             </mat-list-item>
 
                             <mat-list-item role="listitem">
-                                <button mat-raised-button (click)="openDialog()">Create / Load</button>
+                                <button mat-raised-button class="fill" (click)="openDialog()">Create / Load</button>
                             </mat-list-item>
 
                             <mat-list-item role="listitem">
-                                <button mat-raised-button (click)="onSaveCourse()">Save</button>
+                                <button mat-raised-button class="fill" (click)="onSaveCourse()">Save</button>
                             </mat-list-item>
 
                         </mat-list>
@@ -63,8 +63,8 @@
 
                         <mat-list role="list">
                             <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select placeholder="Current Polygon Type">
+                                <mat-form-field class="fill">
+                                    <mat-select class="fill" placeholder="Current Polygon Type">
                                         <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
                                             {{t.typeName}}
                                         </mat-option>
@@ -72,7 +72,7 @@
                                 </mat-form-field>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button mat-raised-button (click)="onNewPolygon();">Save</button>
+                                <button class="fill" mat-raised-button (click)="onNewPolygon();">Save</button>
                             </mat-list-item>
 
                         </mat-list>
@@ -111,63 +111,3 @@
         </mat-sidenav-content>
     </mat-sidenav-container>
 </div>
-
-<!-- 
-<mat-drawer-container class="home">
-    <mat-drawer mode="side" opened="true">
-        <div class='controls'>
-            <div>
-                <div>
-                    <h4>
-                        <b>Course:</b>
-                    </h4>
-                    <button type="button" class="btn btn-success" (click)="onSaveCourse();">
-                        Save Course
-                    </button>
-                    <br>
-                    <br>
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#courseModal">
-                        Create/Load Course
-                    </button>
-                </div>
-                <br>
-                <br>
-                <h4>
-                    <b>Elements/Polygons:</b>
-                </h4>
-                <span style="font-size:small;font-color:grey">
-                    Select Current Polygon Type:
-                </span>
-                <br>
-                <select (change)="onChangePolyType(true, $event.target.value);">
-                    <option *ngFor="let t of terrainTypes; let i = index" [value]="t.ttype">
-                        {{t.typeName}}
-                    </option>
-                </select>
-                <br>
-                <br>
-                <button (click)="onNewPolygon();" type="button" class="btn btn-success">
-                    Save Polygon
-                </button>
-            </div>
-
-            <br>
-            <br>
-
-            <div>
-                <h4>
-                    <b>Map Options:</b>
-                </h4>
-                <button (click)="onToggleDraggable()" type="button" class="btn btn-success">Map Draggable
-                </button>
-                <br>
-                <br>
-                <button (click)="onResetMap()" type="button" class="btn btn-success">Reset Map
-                </button>
-            </div>
-
-
-        </div>
-    </mat-drawer>
-
-</mat-drawer-container> -->
