@@ -5,16 +5,16 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } 
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit }
     from '@angular/core';
-import { Course, GolfCourse, Hole, Elements, Polygon } 
+import { Course, GolfCourse, Hole, Elements, Polygon }
     from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
     LatLngBounds, LatLngBoundsLiteral, DataLayerManager
 } from '@agm/core';
-import {FormControl} from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
@@ -31,7 +31,7 @@ export class HomeComponent {
 
     courses: Course[] = [];
     currentCourse: GolfCourse;
-    
+
 
     url: any;
     selected: number = 0;
@@ -41,6 +41,7 @@ export class HomeComponent {
     geoString: string = '{"type": "Feature","geometry":{"type": "Polygon","coordinates": [[[21.97265625,-3.337953961416472],[15.468749999999998,-9.79567758282973],[18.720703125,-18.646245142670598],[28.564453125,-12.897489183755892],[34.1015625,0.08789059053082422],[25.224609375,17.14079039331665],[15.8203125,17.22475820662464],[21.97265625,-3.337953961416472]]]}}';
     googleMap: any = null;
     features: any;
+    selectedType: 1;
 
     mobileQuery: MediaQueryList;
     private _mobileQueryListener: () => void;
@@ -72,8 +73,8 @@ export class HomeComponent {
     }
 
 
-    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef, 
-            media: MediaMatcher, public dialog: MatDialog) {
+    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef,
+        media: MediaMatcher, public dialog: MatDialog) {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
@@ -104,6 +105,49 @@ export class HomeComponent {
             this.features.forEach(feature => {
                 this.googleMap.data.overrideStyle(feature, { editable: true });
             });
+            this.googleMap.data.setStyle(function (feature) {
+                const polyType = feature.getProperty('type');
+                let color = '#336699';
+                if (polyType == 0) {
+                    color = '#463E3E';
+                }
+                if (polyType == 1) {
+                    color = '#73A15D';
+                }
+                if (polyType == 2) {
+                    color = '#BADA55';
+                }
+                if (polyType == 3) {
+                    color = '#C2B280';
+                }
+                return {
+                    draggable: true,
+                    editable: true,
+                    fillColor: color,
+                    strokeWeight: 1
+                };
+            });
+            this.googleMap.data.addListener("addfeature", e => {
+                console.log("Added a polygon to the data of the map");
+
+                if (e.feature.getProperty('type') === undefined) {
+                    console.log("The element is completely new and do not have a type added the selected type ", this.selectedType);
+                    e.feature.setProperty("type", this.selectedType);
+                }
+            });
+            this.googleMap.data.addListener('setgeometry',
+                e => {
+                    console.log("Element on map's geometry have been edited new values are", e);
+                    e.feature.setProperty('type', this.selectedType);
+                }
+            );
+            this.googleMap.data.addListener('click',
+                e => {
+
+                    console.log("Item was clicked on so changed type to ", this.selectedType);
+                    e.feature.setProperty('type', this.selectedType);
+                }
+            );
         });
     }
 
@@ -114,13 +158,13 @@ export class HomeComponent {
         this.geoJsonObject = geoJson;
         console.log(geoJson);
         this.geoJsonObject.features.forEach(
-            feature => 
-                {
+            feature => {
+                if (feature.geometry.coordinates[0].forEach != null)
                     feature.geometry.coordinates[0].forEach(
                         lnglat => bounds.extend(
                             new google.maps.LatLng(lnglat[1], lnglat[0]))
                     );
-                }
+            }
         );
 
         this.googleMap.fitBounds(bounds);
@@ -130,14 +174,10 @@ export class HomeComponent {
         this.features = this.googleMap.data.addGeoJson(this.geoJsonObject);
         this.features.forEach(
             feature => this.googleMap.data.overrideStyle(feature, {
-                editable: true 
+                editable: true
             })
         );
-        this.googleMap.data.addListener('mouseover', 
-            e => {
-                //alert(e.feature.getProperty('courseElementId'));
-            }
-        );
+
     }
 
     /***
@@ -148,7 +188,7 @@ export class HomeComponent {
             .subscribe(
                 result => this.onCoursesReceive(result.headers,
                     result.json()),
-                error => this.onCoursesFail(error.status, error.headers, 
+                error => this.onCoursesFail(error.status, error.headers,
                     error.text()),
                 () => console.log("Courses loaded successfully.")
             );
@@ -164,7 +204,7 @@ export class HomeComponent {
         this.api.getCourse(this.courses[index].courseId)
             .subscribe(
                 result => this.onCourseReceive(result.headers, result.json()),
-                error => this.onCourseFail(error.status, error.headers, 
+                error => this.onCourseFail(error.status, error.headers,
                     error.text()),
                 () => console.log("Course loaded successfully.")
             );
@@ -206,7 +246,7 @@ export class HomeComponent {
     /***
      * Create, update, delete handlers for Holes.
      ***/
-    
+
 
     /***
      * Other event handlers.
@@ -223,17 +263,17 @@ export class HomeComponent {
 
     public onChangePolyType(bool: boolean, index: number) {
 
-  // todo 
+        // todo 
         // this.map.onChangePolyType(bool, index);
     }
 
     public onNewPolygon() {
-        console.log(this.googleMaps.data);
+        console.log(this.googleMap.data);
     }
 
     public onResetMap() {
 
-  // todo 
+        // todo 
         // this.map.onResetMap();
     }
 
@@ -257,12 +297,12 @@ export class HomeComponent {
         let elements: Array<any> = [];
         this.currentCourse.courseElements.forEach(
             element => {
-                let value = 
+                let value =
                     {
                         "type": "Feature",
                         "geometry": {
                             ...JSON.parse(element.geoJson)
-                        }
+                        },
                         "properties": {
                             "type": element.type,
                             "courseElementId": element.courseElementId,
@@ -274,7 +314,7 @@ export class HomeComponent {
         );
         let temp: any = {
             "type": "FeatureCollection",
-            "features": [ 
+            "features": [
                 ...elements
             ]
         }
@@ -282,7 +322,7 @@ export class HomeComponent {
         this.updateDataLayer(temp);
     }
 
-    private onCourseFail(status: number, headers:any, body: any) {
+    private onCourseFail(status: number, headers: any, body: any) {
         window.alert("Failed to load course.");
     }
 
