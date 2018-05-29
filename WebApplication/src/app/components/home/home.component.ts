@@ -168,11 +168,11 @@ export class HomeComponent {
         );
 
         this.googleMap.fitBounds(bounds);
-        this.features.forEach(
+        this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
-        this.features = this.googleMap.data.addGeoJson(this.geoJsonObject);
-        this.features.forEach(
+        this.googleMap.data.addGeoJson(this.geoJsonObject);
+        this.googleMap.data.forEach(
             feature => this.googleMap.data.overrideStyle(feature, {
                 editable: true
             })
@@ -304,7 +304,7 @@ export class HomeComponent {
                             ...JSON.parse(element.geoJson)
                         },
                         "properties": {
-                            "type": element.type,
+                            "type": element['type'],
                             "courseElementId": element.courseElementId,
                             "courseId": element.courseId
                         }
