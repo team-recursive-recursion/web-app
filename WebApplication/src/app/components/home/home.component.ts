@@ -5,11 +5,8 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } 
-        from '@angular/core';
-import { MapperComponent } from '../mapper/mapper.component'
-import { Course, Hole, Elements, Polygon } 
-        from '../../interfaces/course.interface';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
+import { Course, Hole, Elements, Polygon } from '../../interfaces/course.interface';
 import { ApiService } from '../../services/api.service';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
@@ -27,7 +24,6 @@ declare var google: any;
 })
 
 export class HomeComponent {
-    @ViewChild(MapperComponent) public map: MapperComponent;
     @ViewChild('AgmMap') agmMap: AgmMap;
 
     courses: Course[] = [];
@@ -129,8 +125,6 @@ export class HomeComponent {
         if (close) {
             close.click();
         }
-        // update the mapper
-        //this.map.onLoadCourse(this.courses[index]);
         this.api.getCourse(this.courses[index].courseId)
             .subscribe(
                 result => this.onCourseReceive(result.headers, result.json()),
@@ -177,7 +171,8 @@ export class HomeComponent {
      * Other event handlers.
      ***/
     public onSaveCourse() {
-        this.map.onSaveCourse();
+  // todo 
+        // this.map.onSaveCourse();
     }
 
     public onToggleDraggable() {
@@ -185,15 +180,21 @@ export class HomeComponent {
     }
 
     public onChangePolyType(bool: boolean, index: number) {
-        this.map.onChangePolyType(bool, index);
+
+  // todo 
+        // this.map.onChangePolyType(bool, index);
     }
 
     public onNewPolygon() {
-        this.map.onNewPolygon();
+
+  // todo 
+        // this.map.onNewPolygon();
     }
 
     public onResetMap() {
-        this.map.onResetMap();
+
+  // todo 
+        // this.map.onResetMap();
     }
 
     /***
@@ -225,8 +226,8 @@ export class HomeComponent {
         if (close) {
             close.click();
         }
-        // update the mapper
-        this.map.onLoadCourse(body);
+        // todo update the mapper
+        // this.map.onLoadCourse(body);
     }
 
     private onCreateFail(status: number, headers: any, body: any) {
@@ -256,9 +257,8 @@ export class HomeComponent {
 
     openDialog(): void {
         let dialogRef = this.dialog.open(CourseDialog, {
-            width: '800px',
-            height: '600px'
-            // data: { name: this.name, animal: this.animal }
+            width: '70vw',
+            data: { courses: this.courses }
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -270,6 +270,8 @@ export class HomeComponent {
 
 @Component({
     selector: 'course.dialog',
+
+    styleUrls: ['./course.dialog.css'],
     templateUrl: 'course.dialog.html',
 })
 export class CourseDialog {
