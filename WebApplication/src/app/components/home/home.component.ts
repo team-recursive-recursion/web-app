@@ -105,7 +105,7 @@ export class HomeComponent {
     }
 
     /***
-     * Load, create and delete event handlers.
+     * Load, create and delete event handlers for Courses.
      ***/
     public onLoadCourses() {
         this.api.getCourses()
@@ -166,6 +166,11 @@ export class HomeComponent {
             window.alert("Please enter a course name");
         }
     }
+
+    /***
+     * Create, update, delete handlers for Holes.
+     ***/
+    
 
     /***
      * Other event handlers.
