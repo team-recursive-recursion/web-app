@@ -31,7 +31,7 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
-    holes: any = ['hole 1','hole 2','hole 3','hole 4'];
+    holes: any = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
     selectedHole: any;
     courseName: string;
 
@@ -40,7 +40,6 @@ export class HomeComponent {
     button_state: string = "add";
     // Map -- objects
     geoJsonObject: any;
-    geoString: string = '{"type": "Feature","geometry":{"type": "Polygon","coordinates": [[[21.97265625,-3.337953961416472],[15.468749999999998,-9.79567758282973],[18.720703125,-18.646245142670598],[28.564453125,-12.897489183755892],[34.1015625,0.08789059053082422],[25.224609375,17.14079039331665],[15.8203125,17.22475820662464],[21.97265625,-3.337953961416472]]]}}';
     googleMap: any = null;
     features: any;
     selectedType: number = 0;
@@ -67,7 +66,6 @@ export class HomeComponent {
     }
 
     ngOnInit() {
-        this.geoJsonObject = JSON.parse(this.geoString);
     }
 
     mapInteractionClick(event) {
@@ -77,7 +75,7 @@ export class HomeComponent {
     }
 
     fabInteractionClick(event) {
-        console.log(event);
+        // console.log(event);
     }
 
 
@@ -100,10 +98,12 @@ export class HomeComponent {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
             const bounds: LatLngBounds = new google.maps.LatLngBounds();
-            this.geoJsonObject.geometry.coordinates[0].forEach(element => {
-                bounds.extend(new google.maps.LatLng(element[1], element[0]));
-            });
-            map.fitBounds(bounds);
+            if (this.geoJsonObject !== undefined) {
+                this.geoJsonObject.geometry.coordinates[0].forEach(element => {
+                    bounds.extend(new google.maps.LatLng(element[1], element[0]));
+                });
+                map.fitBounds(bounds);
+            }
             this.features = map.data.addGeoJson(this.geoJsonObject);
             this.googleMap.data.setControls(['Point', 'LineString', 'Polygon']);
             this.googleMap.data.setStyle({
@@ -136,25 +136,22 @@ export class HomeComponent {
                 };
             });
             this.googleMap.data.addListener("addfeature", e => {
-                console.log("Added a polygon to the data of the map");
 
                 if (e.feature.getProperty('type') === undefined) {
-                    console.log("The element is completely new and do not have a type added the selected type ", this.selectedType);
                     e.feature.setProperty("type", this.selectedType);
+                    e.feature.setProperty("courseId", this.currentCourse.courseId);
+                    e.feature.setProperty("holeId", this.selectedHole);
                     e.feature.setProperty("flag", Flags.NEW);
                 }
             });
             this.googleMap.data.addListener('setgeometry',
                 e => {
-                    console.log("Element on map's geometry have been edited new values are", e);
                     e.feature.setProperty('type', this.selectedType);
                     e.feature.setProperty('flag', Flags.UPDATE);
                 }
             );
             this.googleMap.data.addListener('click',
                 e => {
-
-                    console.log("Item was clicked on so changed type to ", this.selectedType);
                     e.feature.setProperty('type', this.selectedType);
                     e.feature.setProperty('flag', Flags.UPDATE);
                 }
@@ -165,20 +162,19 @@ export class HomeComponent {
     public updateDataLayer(geoJson: any) {
         //this.googleMap.data.remove(this.features);
         const bounds: LatLngBounds = new google.maps.LatLngBounds();
-
         this.geoJsonObject = geoJson;
-        console.log(geoJson);
-        this.geoJsonObject.features.forEach(
-            feature => {
-                if (feature.geometry.coordinates[0].forEach != null)
-                    feature.geometry.coordinates[0].forEach(
-                        lnglat => bounds.extend(
-                            new google.maps.LatLng(lnglat[1], lnglat[0]))
-                    );
-            }
-        );
-
-        this.googleMap.fitBounds(bounds);
+        if (this.geoJsonObject !== undefined) {
+            this.geoJsonObject.features.forEach(
+                feature => {
+                    if (feature.geometry.coordinates[0].forEach != null)
+                        feature.geometry.coordinates[0].forEach(
+                            lnglat => bounds.extend(
+                                new google.maps.LatLng(lnglat[1], lnglat[0]))
+                        );
+                }
+            );
+            this.googleMap.fitBounds(bounds);
+        }
         this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
@@ -217,7 +213,7 @@ export class HomeComponent {
     }
 
     public onDeleteCourse(index: number) {
-        console.log(this.courses[index], index);
+        // console.log(this.courses[index], index);
         if (window.confirm("Are you sure you want to delete '" +
             this.courses[index].courseName + "'?")) {
             // delete the course
@@ -234,13 +230,15 @@ export class HomeComponent {
     }
 
     public onCreateCourse(name: string) {
-        console.log("Course name: " + name);
+        // console.log("Course name: " + name);
         if (name != "" && name != "Course Name") {
             // create new course
             this.api.createCourse(name)
                 .subscribe(
-                    result => this.onCreateReceive(result.headers,
-                        result.json()),
+                    result => this.onCreateReceive(
+                        result.headers,
+                        result.json()
+                    ),
                     error => this.onCreateFail(error.status, error.headers
                         , error.text()),
                     () => console.log("Course created successfully.")
@@ -275,25 +273,25 @@ export class HomeComponent {
                         case Flags.NEW:
                             //if () { // is it is connected to a hole
                             //} else { // else it is global
-                                this.api.addPolygon(value)
-                                    .subscribe(
-                                        result => this.onPolyonSaved(
-                                            result.headers, result.json()),
-                                        error => this.onPolygonFail(error.status, 
-                                            error.headers, error.text(), value),
-                                        () => console.log("Polygon saved succesfully.")
-                                    );
+                            this.api.addPolygon(value)
+                                .subscribe(
+                                    result => this.onPolyonSaved(
+                                        result.headers, result.json()),
+                                    error => this.onPolygonFail(error.status,
+                                        error.headers, error.text(), value),
+                                    () => console.log("Polygon saved succesfully.")
+                                );
                             //}
                             break;
                         case Flags.UPDATE:
-                            value['courseElementId'] = 
+                            value['courseElementId'] =
                                 feature.properties.courseElementId;
                             this.api.updatePolygon(
-                                    feature.properties.courseElementId, value)
+                                feature.properties.courseElementId, value)
                                 .subscribe(
                                     result => this.onPolygonUpdate(
                                         result.headers, result.json()),
-                                    error => this.onPolygonFail(error.status, 
+                                    error => this.onPolygonFail(error.status,
                                         error.headers, error.text(), value),
                                     () => console.log("Polygon saved succesfully.")
                                 );
@@ -307,7 +305,7 @@ export class HomeComponent {
                 }
             ));
         //TODO update elements, add elements, and delete elements
-        
+
     }
 
     public onToggleDraggable() {
@@ -321,7 +319,7 @@ export class HomeComponent {
     }
 
     public onNewPolygon() {
-        console.log(this.googleMap.data);
+        // console.log(this.googleMap.data);
     }
 
     public onResetMap() {
@@ -346,7 +344,7 @@ export class HomeComponent {
 
     private onCourseReceive(headers: any, body: any) {
         this.currentCourse = body;
-        console.log(body);
+        // console.log(body);
         let elements: Array<any> = [];
         this.currentCourse.courseElements.forEach(
             element => {
@@ -383,13 +381,8 @@ export class HomeComponent {
 
     private onCreateReceive(headers: any, body: any) {
         this.courses.push(body);
-        // close the modal
-        var close = document.getElementById("modal-close");
-        if (close) {
-            close.click();
-        }
-        // todo update the mapper
-        // this.map.onLoadCourse(body);
+        this.currentCourse = body;
+        this.selected = this.courses.indexOf(body);
     }
 
     private onCreateFail(status: number, headers: any, body: any) {
@@ -417,17 +410,17 @@ export class HomeComponent {
         window.alert("Delete failed");
     }
 
-    private onPolygonFail(status:number, headers: any, body: any, val:any) {
+    private onPolygonFail(status: number, headers: any, body: any, val: any) {
         window.alert("<Something> polygon failed");
-        console.log(val);
+        // console.log(val);
     }
 
     private onPolyonSaved(headers: any, body: any) {
-        console.log("Polygon saved", body);
+        // console.log("Polygon saved", body);
     }
 
     private onPolygonUpdate(headers: any, body: any) {
-        console.log("Polygon saved", body);
+        // console.log("Polygon saved", body);
     }
 }
 
