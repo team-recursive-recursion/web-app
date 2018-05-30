@@ -31,6 +31,8 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
+    holes: any = ['hole 1','hole 2','hole 3','hole 4'];
+    selectedHole: any;
     courseName: string;
 
     url: any;
@@ -239,8 +241,8 @@ export class HomeComponent {
                 .subscribe(
                     result => this.onCreateReceive(result.headers,
                         result.json()),
-                    error => this.onCreateFail(error.status, error.headers,
-                        error.text()),
+                    error => this.onCreateFail(error.status, error.headers
+                        , error.text()),
                     () => console.log("Course created successfully.")
                 );
         } else {

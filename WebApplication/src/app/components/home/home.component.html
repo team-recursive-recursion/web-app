@@ -39,6 +39,7 @@
                                     (click)="onCreateCourse(courseName.value)">
                                     Add
                                 </button>
+
                             </mat-list-item>
 
                         </mat-list>
@@ -54,8 +55,8 @@
                         <mat-list role="list">
                             <mat-list-item role="listitem">
                                 <mat-form-field>
-                                    <mat-select [(value)]="selected"  #courseSelector id="course-selector">
-                                        <mat-option  *ngFor="let c of courses; let i = index" [value]="i">
+                                    <mat-select [(value)]="selected" #courseSelector id="course-selector">
+                                        <mat-option *ngFor="let c of courses; let i = index" [value]="i">
                                             {{c.courseName}}
                                         </mat-option>
                                     </mat-select>
@@ -79,6 +80,36 @@
                                 </button>
                             </mat-list-item>
                         </mat-list>
+                    </mat-card>
+
+                    <mat-card *ngIf="currentCourse !== undefined">
+                        <mat-card-header>
+                            <mat-card-title>
+                                Course Holes
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field class="fill">
+                                    <input matInput placeholder="Hole Name" [(ngModel)]="newHoleName">
+                                </mat-form-field>
+                                <mat-icon class="addButton" (click)="fabInteractionClick($event)">
+                                    {{button_state}}
+                                </mat-icon>
+                            </mat-list-item>
+                        </mat-list>
+                        <div *ngIf="holes !== undefined">
+                                <mat-radio-group class="hole-radio-group" [(ngModel)]="selectedHole">
+                                    <mat-radio-button class="hole-radio-button" [value]="undefined">
+                                        Course
+                                    </mat-radio-button>
+                                    <mat-radio-button class="hole-radio-button" *ngFor="let hole of holes" [value]="hole">
+                                        {{hole}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <div class="hole-selected-value">Selected: {{selectedHole}}</div>
+                        </div>
                     </mat-card>
 
                     <mat-card>
@@ -119,7 +150,7 @@
                                 </button>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button class="fill" mat-button (click)="onResetMap()" color="warn" >
+                                <button class="fill" mat-button (click)="onResetMap()" color="warn">
                                     Reset Map
                                 </button>
                             </mat-list-item>
@@ -132,8 +163,8 @@
 
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
-                <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper" #AgmMap [latitude]="lat" [longitude]="lng"
-                    (mapClick)="mapInteractionClick($event)">
+                <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
+                    #AgmMap [latitude]="lat" [longitude]="lng" (mapClick)="mapInteractionClick($event)">
                 </agm-map>
                 <button (click)="fabInteractionClick($event)" class="controls" mat-fab>
                     <mat-icon>
