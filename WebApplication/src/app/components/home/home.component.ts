@@ -31,6 +31,7 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
+    courseName: string;
 
     url: any;
     selected: number = 0;
@@ -214,6 +215,7 @@ export class HomeComponent {
     }
 
     public onDeleteCourse(index: number) {
+        console.log(this.courses[index], index);
         if (window.confirm("Are you sure you want to delete '" +
             this.courses[index].courseName + "'?")) {
             // delete the course
@@ -230,6 +232,7 @@ export class HomeComponent {
     }
 
     public onCreateCourse(name: string) {
+        console.log("Course name: " + name);
         if (name != "" && name != "Course Name") {
             // create new course
             this.api.createCourse(name)
@@ -249,6 +252,9 @@ export class HomeComponent {
     /***
      * Create, update, delete handlers for Holes.
      ***/
+    public onAddToHole(courseId: string) {
+
+    }
 
 
     /***
@@ -265,14 +271,17 @@ export class HomeComponent {
                     }
                     switch (feature.properties.flag) {
                         case Flags.NEW:
-                            this.api.addPolygon(value)
-                                .subscribe(
-                                    result => this.onPolyonSaved(
-                                        result.headers, result.json()),
-                                    error => this.onPolygonFail(error.status, 
-                                        error.headers, error.text(), value),
-                                    () => console.log("Polygon saved succesfully.")
-                                );
+                            //if () { // is it is connected to a hole
+                            //} else { // else it is global
+                                this.api.addPolygon(value)
+                                    .subscribe(
+                                        result => this.onPolyonSaved(
+                                            result.headers, result.json()),
+                                        error => this.onPolygonFail(error.status, 
+                                            error.headers, error.text(), value),
+                                        () => console.log("Polygon saved succesfully.")
+                                    );
+                            //}
                             break;
                         case Flags.UPDATE:
                             value['courseElementId'] = 

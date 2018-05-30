@@ -28,12 +28,17 @@
                         <mat-list role="list">
                             <mat-list-item role="listitem">
                                 <mat-form-field class="fill">
-                                    <input matInput placeholder="Course Name">
+                                    <input matInput placeholder="Course Name"
+                                                ([ngModel])="courseName"
+                                                #courseName>
                                 </mat-form-field>
                             </mat-list-item>
 
                             <mat-list-item role="listitem">
-                                <button mat-raised-button class="fill" (click)="onSaveCourse()">Add</button>
+                                <button mat-raised-button class="fill" 
+                                    (click)="onCreateCourse(courseName.value)">
+                                    Add
+                                </button>
                             </mat-list-item>
 
                         </mat-list>
@@ -57,13 +62,19 @@
                                 </mat-form-field>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button type="button" class="fill" (click)="onLoadCourse(selected)" id="changeCourse">
+                                <button class="fill" mat-raised-button 
+                                        type="button" class="fill" 
+                                        (click)="onLoadCourse(selected)" 
+                                        id="changeCourse">
                                     Load
                                 </button>
                             </mat-list-item>
 
                             <mat-list-item role="listitem">
-                                <button color="warn" class="fill" mat-button type="button" class="fill" id="deleteCourse" (click)="onDeleteCourse(courseSelector.selectedIndex)">
+                                <button color="warn" class="fill" mat-button 
+                                        type="button" class="fill" 
+                                        id="deleteCourse" 
+                                        (click)="onDeleteCourse(selected)">
                                     Delete
                                 </button>
                             </mat-list-item>
@@ -88,7 +99,7 @@
                                 </mat-form-field>
                             </mat-list-item>
                             <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onNewPolygon();">Save</button>
+                                <button class="fill" mat-raised-button (click)="onSaveCourse();">Save</button>
                             </mat-list-item>
 
                         </mat-list>
