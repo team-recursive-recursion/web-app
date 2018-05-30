@@ -31,7 +31,7 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
-    holes: any = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
+    holes: any;// = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
     selectedHole: any;
     courseName: string;
 
@@ -49,7 +49,7 @@ export class HomeComponent {
     zoom: number = 20;
     mapType: string = "satellite";
     mapDraggable: boolean = true;
-
+    newHoleName: string;
     mobileQuery: MediaQueryList;
     private _mobileQueryListener: () => void;
 
@@ -140,7 +140,7 @@ export class HomeComponent {
                 if (e.feature.getProperty('type') === undefined) {
                     e.feature.setProperty("type", this.selectedType);
                     e.feature.setProperty("courseId", this.currentCourse.courseId);
-                    e.feature.setProperty("holeId", this.selectedHole);
+                    e.feature.setProperty("holeId", this.selectedHole.holeID);
                     e.feature.setProperty("flag", Flags.NEW);
                 }
             });
@@ -263,8 +263,7 @@ export class HomeComponent {
             this.api.addHole(body)
                 .subscribe(
                     result => this.onHoleCreate(result.headers, result.json()),
-                    error => this.onHoleFail(error.status, error.headers, 
-                        error.text())
+                    error => this.onHoleFail(error.status, error.headers),
                     () => console.log("Hole added successfully.")
                 );
 
@@ -286,8 +285,10 @@ export class HomeComponent {
                     let value = {
                         "type": feature.properties['type'],
                         "geoJson": JSON.stringify(feature.geometry),
-                        "courseId": this.currentCourse.courseId
-                    }
+                        "courseId": feature.properties['courseId'],
+                        "holeId": feature.properties['holeId'],
+                    };
+                    
                     console.log("VALUE: " ,value);
                     switch (feature.properties.flag) {
                         case Flags.NEW:
@@ -385,7 +386,8 @@ export class HomeComponent {
                             "flag": Flags.NONE,
                             "type": element['type'],
                             "courseElementId": element.courseElementId,
-                            "courseId": element.courseId
+                            "courseId": element.courseId,
+                            "holeId": element.holeId
                         }
                     }
                 elements.push(value);
