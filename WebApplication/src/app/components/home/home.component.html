@@ -96,18 +96,18 @@
                                 <mat-form-field class="fill">
                                     <input matInput placeholder="Hole Name" [(ngModel)]="newHoleName">
                                 </mat-form-field>
-                                <mat-icon class="addButton" (click)="fabInteractionClick($event)">
+                                <mat-icon class="addButton" (click)="onAddHole()">
                                     {{button_state}}
                                 </mat-icon>
                             </mat-list-item>
                         </mat-list>
-                        <div *ngIf="holes !== undefined">
+                        <div *ngIf="currentCourse.holes !== undefined">
                                 <mat-radio-group class="hole-radio-group" [(ngModel)]="selectedHole">
                                     <mat-radio-button class="hole-radio-button" [value]="undefined">
                                         Course
                                     </mat-radio-button>
-                                    <mat-radio-button class="hole-radio-button" *ngFor="let hole of holes" [value]="hole">
-                                        {{hole}}
+                                    <mat-radio-button class="hole-radio-button" *ngFor="let hole of currentCourse.holes" [value]="hole">
+                                        {{hole.name}}
                                     </mat-radio-button>
                                 </mat-radio-group>
                                 <div class="hole-selected-value">Selected: {{selectedHole}}</div>

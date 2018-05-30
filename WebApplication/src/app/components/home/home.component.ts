@@ -252,8 +252,27 @@ export class HomeComponent {
     /***
      * Create, update, delete handlers for Holes.
      ***/
-    public onAddToHole(courseId: string) {
+    public onAddHole() {
+        console.log("New hole name:", this.newHoleName);
+        if (this.newHoleName != "" && this.newHoleName !== undefined && 
+                this.newHoleName != "Hole Name") {
+            let body = {
+                "Name": this.newHoleName,
+                "courseId": this.currentCourse.courseId
+            }
+            this.api.addHole(body)
+                .subscribe(
+                    result => this.onHoleCreate(result.headers, result.json()),
+                    error => this.onHoleFail(error.status, error.headers, 
+                        error.text())
+                    () => console.log("Hole added successfully.")
+                );
 
+        } else {
+            // TODO nice message
+            window.alert("Please enter a course name");
+        }
+    
     }
 
 
@@ -267,8 +286,9 @@ export class HomeComponent {
                     let value = {
                         "type": feature.properties['type'],
                         "geoJson": JSON.stringify(feature.geometry),
-                        "courseId": this.courseId
+                        "courseId": this.currentCourse.courseId
                     }
+                    console.log("VALUE: " ,value);
                     switch (feature.properties.flag) {
                         case Flags.NEW:
                             //if () { // is it is connected to a hole
@@ -428,6 +448,15 @@ export class HomeComponent {
 
     private onPolygonUpdate(headers: any, body: any) {
         // console.log("Polygon saved", body);
+    }
+
+    private onHoleCreate(headers: any, body: any) {
+        console.log("Hole added:", body);
+        this.currentCourse['holes'].push(body);
+    }
+
+    private onHoleFail(headers: any, body: any) {
+        window.alert("Hole creation failed");
     }
 }
 
