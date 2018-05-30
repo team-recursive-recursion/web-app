@@ -11,6 +11,8 @@
             <mat-icon>menu</mat-icon>
         </button>
         <h1 class="example-app-name">Mapper</h1>
+        <h1 *ngIf="currentCourse !== undefined" class="example-app-name"> - {{currentCourse.courseName}}</h1>
+
     </mat-toolbar>
 
     <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
@@ -158,7 +160,6 @@
                     </mat-card>
                 </mat-accordion>
             </mat-list>
-
         </mat-sidenav>
 
         <mat-sidenav-content class="map-container">
