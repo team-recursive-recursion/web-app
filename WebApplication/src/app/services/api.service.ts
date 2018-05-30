@@ -178,17 +178,9 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    addPolygon(courseId: string, holeId: string, typeOf: number, 
-            geoJson: string) {
+    addPolygon(body: any) {
         var url = this.url + "/api/polygons";
-        return this.http.post(url,
-            {
-                "courseId": courseId,
-                "holeId": holeId,
-                "type": typeOf,
-                "geoJson": geoJson
-            }
-        );
+        return this.http.post(url, body);
     }
 
     getPolygon(polygonId: string) {
@@ -196,17 +188,10 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    updatePolygon(polygonId: string, typeOf:  number, geoJson: string,
-        courseElementId: string, courseId: string) {
-        var url = this.url + "/api/polygons/" + polygonId;
-        return this.http.put(url,
-            {
-                "type": typeOf,
-                "geoJson": geoJson,
-                "courseElementId": courseElementId,
-                "courseId": courseId
-            }
-        );
+    updatePolygon(courseElementId: string, body: any) {
+        var url = this.url + "/api/polygons/" + courseElementId;
+        console.log("url:" + url, body);
+        return this.http.put(url, body);
     }
 
     deletePolygon(polygonId: string) {
