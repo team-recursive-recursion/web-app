@@ -22,7 +22,7 @@ declare var google: any;
 @Component({
     selector: 'HomeComponent',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css'],
+    styleUrls: ['./home.component.scss'],
     providers: [ApiService]
 })
 

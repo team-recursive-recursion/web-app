@@ -1,0 +1,70 @@
+@import './Variables';
+@import './mixins';
+@import '~@angular/material/theming';
+// Customize angular-material theme
+
+$brand-green: (
+        50: #f1f8e9,
+        100: #dcedc8,
+        200: #c5e1a5,
+        300: #aed581,
+        400: #9ccc65,
+        500: #8bc34a,
+        600: #7cb342,
+        700: #689f38,
+        800: #558b2f,
+        A200: #b2ff59,
+        A400: #76ff03,
+        A700: #64dd17,
+        contrast: (
+                500: white,
+                600: white,
+                700: white,
+                800: white,
+                900: white,
+                A700: white,
+        )
+);
+
+$brand-purple: (
+        50: #f3e5f5,
+        100: #e1bee7,
+        200: #ce93d8,
+        300: #ba68c8,
+        400: #ab47bc,
+        500: #9c27b0,
+        600: #8e24aa,
+        700: #7b1fa2,
+        800: #6a1b9a,
+        900: #4a148c,
+        A100: #ea80fc,
+        A200: #d500f9,
+        A400: #aa00ff,
+        A700: #aa00ff,
+        contrast: (
+                500: white,
+                600: white,
+                700: white,
+                800: white,
+                900: white,
+                A700: white,
+        )
+);
+@include mat-core();
+
+// mandatory stuff for theming
+$primary-palette: mat-palette($brand-green);
+$accent-palette:  mat-palette($brand-purple);
+$warn-palette:  mat-palette($brand-purple);
+//$ae-warn-palette: mat-palette(red);
+
+// include the custom theme components into a theme object
+$main-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
+
+//select primary and secondary colors
+$primary-color: map_get($primary-palette, 500);
+$secondary-color: map_get($accent-palette, 500);
+$warn-color: map_get($accent-palette, 100);
+
+// include the custom theme object into the angular material theme
+@include angular-material-theme($main-theme);

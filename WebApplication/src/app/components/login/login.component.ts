@@ -13,7 +13,7 @@ import { ApiService } from '../../services/api.service';
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
+    styleUrls: ['./login.component.scss'],
     providers: [ApiService]
 })
 export class LoginComponent {

@@ -14,7 +14,7 @@ import { ApiService } from '../../services/api.service';
 @Component({
     selector: 'register',
     templateUrl: './register.component.html',
-    styleUrls: ['./register.component.css'],
+    styleUrls: ['./register.component.scss'],
     providers: [ApiService]    
 })
 export class RegisterComponent {

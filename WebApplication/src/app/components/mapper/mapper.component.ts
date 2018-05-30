@@ -16,7 +16,7 @@ import { Course, Hole, Elements, Polygon } from
 @Component({
     selector: 'app-mapper',
     templateUrl: './mapper.component.html',
-    styleUrls: ['./mapper.component.css'],
+    styleUrls: ['./mapper.component.scss'],
     providers: [ApiService]
 })
 
