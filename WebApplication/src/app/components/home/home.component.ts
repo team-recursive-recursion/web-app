@@ -25,12 +25,12 @@ declare var google: any;
     styleUrls: ['./home.component.css'],
     providers: [ApiService]
 })
-
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
 
     courses: Course[] = [];
     currentCourse: GolfCourse;
+    courseId: string;
 
     url: any;
     selected: number = 0;
@@ -138,12 +138,14 @@ export class HomeComponent {
                 if (e.feature.getProperty('type') === undefined) {
                     console.log("The element is completely new and do not have a type added the selected type ", this.selectedType);
                     e.feature.setProperty("type", this.selectedType);
+                    e.feature.setProperty("flag", Flags.NEW);
                 }
             });
             this.googleMap.data.addListener('setgeometry',
                 e => {
                     console.log("Element on map's geometry have been edited new values are", e);
                     e.feature.setProperty('type', this.selectedType);
+                    e.feature.setProperty('flag', Flags.UPDATE);
                 }
             );
             this.googleMap.data.addListener('click',
@@ -151,6 +153,7 @@ export class HomeComponent {
 
                     console.log("Item was clicked on so changed type to ", this.selectedType);
                     e.feature.setProperty('type', this.selectedType);
+                    e.feature.setProperty('flag', Flags.UPDATE);
                 }
             );
         });
@@ -253,8 +256,47 @@ export class HomeComponent {
      ***/
     public onSaveCourse() {
         this.googleMap.data.toGeoJson(
-            data => console.log(data)
-        );
+            data => data.features.forEach(
+                feature => {
+                    let value = {
+                        "type": feature.properties['type'],
+                        "geoJson": JSON.stringify(feature.geometry),
+                        "courseId": this.courseId
+                    }
+                    switch (feature.properties.flag) {
+                        case Flags.NEW:
+                            this.api.addPolygon(value)
+                                .subscribe(
+                                    result => this.onPolyonSaved(
+                                        result.headers, result.json()),
+                                    error => this.onPolygonFail(error.status, 
+                                        error.headers, error.text(), value),
+                                    () => console.log("Polygon saved succesfully.")
+                                );
+                            break;
+                        case Flags.UPDATE:
+                            value['courseElementId'] = 
+                                feature.properties.courseElementId;
+                            this.api.updatePolygon(
+                                    feature.properties.courseElementId, value)
+                                .subscribe(
+                                    result => this.onPolygonUpdate(
+                                        result.headers, result.json()),
+                                    error => this.onPolygonFail(error.status, 
+                                        error.headers, error.text(), value),
+                                    () => console.log("Polygon saved succesfully.")
+                                );
+                            break;
+                        case Flags.DELETE:
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            ));
+        //TODO update elements, add elements, and delete elements
+        
     }
 
     public onToggleDraggable() {
@@ -304,12 +346,14 @@ export class HomeComponent {
                             ...JSON.parse(element.geoJson)
                         },
                         "properties": {
+                            "flag": Flags.NONE,
                             "type": element['type'],
                             "courseElementId": element.courseElementId,
                             "courseId": element.courseId
                         }
                     }
                 elements.push(value);
+                this.courseId = element.courseId
             }
         );
         let temp: any = {
@@ -362,5 +406,23 @@ export class HomeComponent {
         window.alert("Delete failed");
     }
 
- 
+    private onPolygonFail(status:number, headers: any, body: any, val:any) {
+        window.alert("<Something> polygon failed");
+        console.log(val);
+    }
+
+    private onPolyonSaved(headers: any, body: any) {
+        console.log("Polygon saved", body);
+    }
+
+    private onPolygonUpdate(headers: any, body: any) {
+        console.log("Polygon saved", body);
+    }
+}
+
+enum Flags {
+    NEW = 0,
+    UPDATE,
+    DELETE,
+    NONE,
 }
