@@ -96,15 +96,10 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    addHole(courseId: string, holeName: string) {
+    addHole(body: any) {
         var url = this.url + "/api/holes";
 
-        return this.http.post(url, 
-            {
-                "Name": holeName,
-                "courseName": courseId
-            }
-        );
+        return this.http.post(url, body);
     }
 
     updateHole(holeId: string, holeName: string) {
