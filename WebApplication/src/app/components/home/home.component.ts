@@ -31,6 +31,9 @@ export class HomeComponent {
 
     courses: Course[] = [];
     currentCourse: GolfCourse;
+    holes: any = ['hole 1','hole 2','hole 3','hole 4'];
+    selectedHole: any;
+    courseName: string;
 
     url: any;
     selected: number = 0;
@@ -227,14 +230,15 @@ export class HomeComponent {
     }
 
     public onCreateCourse(name: string) {
+        console.log(this.courseName);
         if (name != "" && name != "Course Name") {
             // create new course
             this.api.createCourse(name)
                 .subscribe(
                     result => this.onCreateReceive(result.headers,
                         result.json()),
-                    error => this.onCreateFail(error.status, error.headers,
-                        error.text()),
+                    error => this.onCreateFail(error.status, error.headers
+                        , error.text()),
                     () => console.log("Course created successfully.")
                 );
         } else {

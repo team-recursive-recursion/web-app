@@ -70,3 +70,20 @@ h1.example-app-name {
     width:100%;
 }
 
+.hole-radio-group {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.hole-radio-button {
+    margin: 5px;
+}
+
+.hole-selected-value {
+    margin: 15px 0;
+}
+
+.addButton{
+    user-select: none;
+    cursor: pointer;
+}
