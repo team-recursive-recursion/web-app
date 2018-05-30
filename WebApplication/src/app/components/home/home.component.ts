@@ -460,6 +460,10 @@ export class HomeComponent {
     private onHoleFail(headers: any, body: any) {
         window.alert("Hole creation failed");
     }
+
+    public updateHoles(event: any){
+        console.log(event.value);
+    }
 }
 
 enum Flags {
