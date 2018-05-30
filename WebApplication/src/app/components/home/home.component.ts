@@ -17,6 +17,7 @@ import {
 import { FormControl } from '@angular/forms';
 
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { element } from 'protractor';
 
 declare var google: any;
 @Component({
@@ -140,20 +141,28 @@ export class HomeComponent {
                 if (e.feature.getProperty('type') === undefined) {
                     e.feature.setProperty("type", this.selectedType);
                     e.feature.setProperty("courseId", this.currentCourse.courseId);
-                    e.feature.setProperty("holeId", this.selectedHole.holeID);
+                    if (this.selectedHole !== undefined) {
+                        e.feature.setProperty("holeId", this.selectedHole.holeID);
+                    }
                     e.feature.setProperty("flag", Flags.NEW);
                 }
             });
             this.googleMap.data.addListener('setgeometry',
                 e => {
                     e.feature.setProperty('type', this.selectedType);
+                    if (e.feature.setProperty('courseElementId') !== undefined) {
+                        e.feature.setProperty('flag', Flags.UPDATE);
+                    }
                     e.feature.setProperty('flag', Flags.UPDATE);
                 }
             );
             this.googleMap.data.addListener('click',
                 e => {
+
                     e.feature.setProperty('type', this.selectedType);
-                    e.feature.setProperty('flag', Flags.UPDATE);
+                    if (e.feature.setProperty('courseElementId') !== undefined) {
+                        e.feature.setProperty('flag', Flags.UPDATE);
+                    }
                 }
             );
         });
@@ -254,8 +263,8 @@ export class HomeComponent {
      ***/
     public onAddHole() {
         console.log("New hole name:", this.newHoleName);
-        if (this.newHoleName != "" && this.newHoleName !== undefined && 
-                this.newHoleName != "Hole Name") {
+        if (this.newHoleName != "" && this.newHoleName !== undefined &&
+            this.newHoleName != "Hole Name") {
             let body = {
                 "Name": this.newHoleName,
                 "courseId": this.currentCourse.courseId
@@ -271,7 +280,7 @@ export class HomeComponent {
             // TODO nice message
             window.alert("Please enter a course name");
         }
-    
+
     }
 
 
@@ -286,18 +295,23 @@ export class HomeComponent {
                         "type": feature.properties['type'],
                         "geoJson": JSON.stringify(feature.geometry),
                         "courseId": feature.properties['courseId'],
-                        "holeId": feature.properties['holeId'],
                     };
-                    
-                    console.log("VALUE: " ,value);
+
+                    if (feature.properties['holeId'] !== undefined) {
+                        value["holeId"] = feature.properties["holeId"];
+                    }
+
+
+                    console.log("VALUE: ", value);
                     switch (feature.properties.flag) {
                         case Flags.NEW:
+
                             //if () { // is it is connected to a hole
                             //} else { // else it is global
                             this.api.addPolygon(value)
                                 .subscribe(
                                     result => this.onPolyonSaved(
-                                        result.headers, result.json()),
+                                        result.headers, result.json(), feature),
                                     error => this.onPolygonFail(error.status,
                                         error.headers, error.text(), value),
                                     () => console.log("Polygon saved succesfully.")
@@ -305,13 +319,14 @@ export class HomeComponent {
                             //}
                             break;
                         case Flags.UPDATE:
+
                             value['courseElementId'] =
                                 feature.properties.courseElementId;
                             this.api.updatePolygon(
                                 feature.properties.courseElementId, value)
                                 .subscribe(
                                     result => this.onPolygonUpdate(
-                                        result.headers, result.json()),
+                                        result.headers, result.json(), feature),
                                     error => this.onPolygonFail(error.status,
                                         error.headers, error.text(), value),
                                     () => console.log("Polygon saved succesfully.")
@@ -351,7 +366,7 @@ export class HomeComponent {
         this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
-        this.googleMap.setCenter({lat: this.lat, lng: this.lng});
+        this.googleMap.setCenter({ lat: this.lat, lng: this.lng });
         this.googleMap.setZoom(this.zoom);
 
     }
@@ -410,6 +425,7 @@ export class HomeComponent {
 
     private onCreateReceive(headers: any, body: any) {
         this.courses.push(body);
+        this.onResetMap();
         this.currentCourse = body;
         this.selected = this.courses.indexOf(body);
     }
@@ -444,12 +460,27 @@ export class HomeComponent {
         // console.log(val);
     }
 
-    private onPolyonSaved(headers: any, body: any) {
+    private onPolyonSaved(headers: any, body: any, feature: any) {
         // console.log("Polygon saved", body);
+        if (feature !== undefined) {
+            if (feature.property.flag !== undefined) {
+                feature.property.flag = Flags.NONE;
+            }
+            feature.property["type"] = body.type;
+            feature.property["courseElementId"] = body.courseElementId;
+            feature.property["courseId"] = body.courseId;
+            feature.property['holeId'] = body.holeId;
+        }
     }
 
-    private onPolygonUpdate(headers: any, body: any) {
-        // console.log("Polygon saved", body);
+    private onPolygonUpdate(headers: any, body: any, feature: any) {
+        if (feature.property["flag"] !== undefined) {
+            feature.property["flag"] = Flags.NONE;
+        }
+        feature.property["type"] = body.type;
+        feature.property["courseElementId"] = body.courseElementId;
+        feature.property["courseId"] = body.courseId;
+        feature.property['holeId'] = body.holeId;
     }
 
     private onHoleCreate(headers: any, body: any) {
@@ -461,7 +492,7 @@ export class HomeComponent {
         window.alert("Hole creation failed");
     }
 
-    public updateHoles(event: any){
+    public updateHoles(event: any) {
         console.log(event.value);
     }
 }
