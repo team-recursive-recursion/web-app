@@ -33,6 +33,7 @@ export class HomeComponent {
     currentCourse: GolfCourse;
     courseId: string;
     holes: any[] = [];// = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
+    holeName: any[] = [];
     selectedHole: any;
     courseName: string;
 
@@ -52,6 +53,9 @@ export class HomeComponent {
     mapDraggable: boolean = true;
     newHoleName: string;
     mobileQuery: MediaQueryList;
+
+    activeElements: any;
+
     private _mobileQueryListener: () => void;
 
     terrainTypes = [
@@ -172,7 +176,7 @@ export class HomeComponent {
         //this.googleMap.data.remove(this.features);
         const bounds: LatLngBounds = new google.maps.LatLngBounds();
         this.geoJsonObject = geoJson;
-        if (this.geoJsonObject !== undefined) {
+        if (this.geoJsonObject !== undefined && this.geoJsonObject.features.length !== 0) {
             this.geoJsonObject.features.forEach(
                 feature => {
                     if (feature.geometry.coordinates[0].forEach != null)
@@ -388,37 +392,44 @@ export class HomeComponent {
     private onCourseReceive(headers: any, body: any) {
         this.currentCourse = body;
         // console.log(body);
-        let elements: Array<any> = [];
-        this.currentCourse.courseElements.forEach(
-            element => {
-                let value =
-                    {
-                        "type": "Feature",
-                        "geometry": {
-                            ...JSON.parse(element.geoJson)
-                        },
-                        "properties": {
-                            "flag": Flags.NONE,
-                            "type": element['type'],
-                            "courseElementId": element.courseElementId,
-                            "courseId": element.courseId,
-                            "holeId": element.holeId
-                        }
-                    }
-                elements.push(value);
-                this.courseId = element.courseId
-            }
-        );
-        let temp: any = {
+        this.activeElements = {
             "type": "FeatureCollection",
             "features": [
-                ...elements
+                ...this.generateFeature(this.currentCourse.courseElements)
             ]
         }
-
         this.onLoadHoles();
-        this.updateDataLayer(temp);
+        this.updateDataLayer(this.activeElements);
     }
+
+    private generateFeature(collection: Array<any>) {
+        let elements: Array<any> = [];
+        if (collection !== null) {
+
+            collection.forEach(
+                element => {
+                    let value =
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                ...JSON.parse(element.geoJson)
+                            },
+                            "properties": {
+                                "flag": Flags.NONE,
+                                "type": element['type'],
+                                "courseElementId": element.courseElementId,
+                                "courseId": element.courseId,
+                                "holeId": element.holeId
+                            }
+                        }
+                    elements.push(value);
+                    this.courseId = element.courseId
+                }
+            );
+        }
+        return elements;
+    }
+
 
     private onCourseFail(status: number, headers: any, body: any) {
         window.alert("Failed to load course.");
@@ -471,6 +482,9 @@ export class HomeComponent {
             feature.property["courseElementId"] = body.courseElementId;
             feature.property["courseId"] = body.courseId;
             feature.property['holeId'] = body.holeId;
+            if (body.holeId != null) {
+                this.holes.push(body);
+            }
         }
     }
 
@@ -482,25 +496,32 @@ export class HomeComponent {
         feature.property["courseElementId"] = body.courseElementId;
         feature.property["courseId"] = body.courseId;
         feature.property['holeId'] = body.holeId;
+        if (body.holeId != null) {
+            this.holes.push(body);
+        }
+
     }
 
     private onHoleCreate(headers: any, body: any) {
         console.log("Hole added:", body);
-        this.currentCourse['holes'].push(body);
+        if (this.currentCourse.holes === null) {
+            this.currentCourse.holes = [];
+        }
+        this.currentCourse.holes.push(body);
     }
 
     private onLoadHoles() {
         console.log("Current course holes:", this.currentCourse.holes);
         this.currentCourse.holes.forEach(
             hole => this.api.getHole(hole.holeID)
-                        .subscribe(
-                            result => this.onHoleReceive(result.headers, 
-                                    result.json()),
-                            error => this.onHoleFail(error.status, 
-                                    error.headers, error.text()),
-                            () => console.log("Hole loaded successfully.")
+                .subscribe(
+                    result => this.onHoleReceive(result.headers,
+                        result.json()),
+                    error => this.onHoleFail(error.status,
+                        error.headers, error.text()),
+                    () => console.log("Hole loaded successfully.")
 
-                        );
+                );
             );
         );
         console.log("Holes array:", this.holes);
@@ -508,6 +529,39 @@ export class HomeComponent {
 
     private onHoleReceive(headers: any, body: any) {
         this.holes.push(body);
+        if (this.holes.length === this.currentCourse.holes.length) {
+            this.showHoles();
+        }
+    }
+
+    private showHoles() {
+        let tempHolder: any = [...this.generateFeature(this.currentCourse.courseElements)];
+        this.holes.forEach(hole => {
+            tempHolder = [...tempHolder, ...this.generateFeature(hole.courseElements)]
+        });
+        this.activeElements = {
+            "type": "FeatureCollection",
+            "features": [
+                ...tempHolder
+            ]
+        }
+        this.updateDataLayer(this.activeElements);
+    }
+
+    private filterHoles(holeId: string) {
+        let tempHolder: any = [...this.generateFeature(this.currentCourse.courseElements)];
+        this.holes.forEach(hole => {
+            if (hole.holeID === holeId) {
+                tempHolder = [...tempHolder, ...this.generateFeature(hole.courseElements)]
+            }
+        });
+        this.activeElements = {
+            "type": "FeatureCollection",
+            "features": [
+                ...tempHolder
+            ]
+        }
+        this.updateDataLayer(this.activeElements);
     }
 
     private onHoleFail(status: number, headers: any, body: any) {
@@ -515,7 +569,11 @@ export class HomeComponent {
     }
 
     public updateHoles(event: any) {
-        console.log(event.value);
+        if (event.value !== undefined) {
+            this.filterHoles(event.value.holeID);
+        } else {
+            this.showHoles();
+        }
     }
 }
 
