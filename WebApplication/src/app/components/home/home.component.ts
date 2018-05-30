@@ -323,9 +323,16 @@ export class HomeComponent {
     }
 
     public onResetMap() {
+        this.selectedHole = undefined;
+        this.currentCourse = undefined;
+        this.selected = 0;
+
         this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
+        this.googleMap.setCenter({lat: this.lat, lng: this.lng});
+        this.googleMap.setZoom(this.zoom);
+
     }
 
     /***
