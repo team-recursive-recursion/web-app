@@ -32,7 +32,7 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
-    holes: any;// = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
+    holes: any[] = [];// = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
     selectedHole: any;
     courseName: string;
 
@@ -416,6 +416,7 @@ export class HomeComponent {
             ]
         }
 
+        this.onLoadHoles();
         this.updateDataLayer(temp);
     }
 
@@ -488,7 +489,28 @@ export class HomeComponent {
         this.currentCourse['holes'].push(body);
     }
 
-    private onHoleFail(headers: any, body: any) {
+    private onLoadHoles() {
+        console.log("Current course holes:", this.currentCourse.holes);
+        this.currentCourse.holes.forEach(
+            hole => this.api.getHole(hole.holeID)
+                        .subscribe(
+                            result => this.onHoleReceive(result.headers, 
+                                    result.json()),
+                            error => this.onHoleFail(error.status, 
+                                    error.headers, error.text()),
+                            () => console.log("Hole loaded successfully.")
+
+                        );
+            );
+        );
+        console.log("Holes array:", this.holes);
+    }
+
+    private onHoleReceive(headers: any, body: any) {
+        this.holes.push(body);
+    }
+
+    private onHoleFail(status: number, headers: any, body: any) {
         window.alert("Hole creation failed");
     }
 
