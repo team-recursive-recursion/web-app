@@ -32,7 +32,7 @@ export class HomeComponent {
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
-    holes: any[] = [];// = ['hole 1', 'hole 2', 'hole 3', 'hole 4'];
+    holes: any[] = [];
     holeName: any[] = [];
     selectedHole: any;
     courseName: string;
@@ -100,90 +100,88 @@ export class HomeComponent {
                     error.text()),
                 () => console.log("Courses loaded successfully.")
             );
+        this.setupMap();
+    }
+
+
+    private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
-            const bounds: LatLngBounds = new google.maps.LatLngBounds();
-            if (this.geoJsonObject !== undefined) {
-                this.geoJsonObject.geometry.coordinates[0].forEach(element => {
-                    bounds.extend(new google.maps.LatLng(element[1], element[0]));
-                });
-                map.fitBounds(bounds);
-            }
-            this.features = map.data.addGeoJson(this.geoJsonObject);
             this.googleMap.data.setControls(['Point', 'LineString', 'Polygon']);
-            this.googleMap.data.setStyle({
-                editable: true,
-                draggable: true
-            });
-            this.features.forEach(feature => {
-                this.googleMap.data.overrideStyle(feature, { editable: true });
-            });
-            this.googleMap.data.setStyle(function (feature) {
-                const polyType = feature.getProperty('type');
-                let color = '#336699';
-                if (polyType == 0) {
-                    color = '#463E3E';
-                }
-                if (polyType == 1) {
-                    color = '#73A15D';
-                }
-                if (polyType == 2) {
-                    color = '#BADA55';
-                }
-                if (polyType == 3) {
-                    color = '#C2B280';
-                }
-                return {
-                    draggable: true,
-                    editable: true,
-                    fillColor: color,
-                    strokeWeight: 1
-                };
-            });
-            this.googleMap.data.addListener("addfeature", e => {
-
-                if (e.feature.getProperty('type') === undefined) {
-                    e.feature.setProperty("type", this.selectedType);
-                    e.feature.setProperty("courseId", this.currentCourse.courseId);
-                    if (this.selectedHole !== undefined) {
-                        e.feature.setProperty("holeId", this.selectedHole.holeID);
-                    }
-                    e.feature.setProperty("flag", Flags.NEW);
-                }
-            });
-            this.googleMap.data.addListener('setgeometry',
-                e => {
-                    e.feature.setProperty('type', this.selectedType);
-                    if (e.feature.setProperty('courseElementId') !== undefined) {
-                        e.feature.setProperty('flag', Flags.UPDATE);
-                    }
-                    e.feature.setProperty('flag', Flags.UPDATE);
-                }
-            );
-            this.googleMap.data.addListener('click',
-                e => {
-
-                    e.feature.setProperty('type', this.selectedType);
-                    if (e.feature.setProperty('courseElementId') !== undefined) {
-                        e.feature.setProperty('flag', Flags.UPDATE);
-                    }
-                }
-            );
+            this.setUpMapEvents();
+            this.styleFeatures();
         });
     }
 
+    private setUpMapEvents() {
+        this.googleMap.data.addListener("addfeature", e => {
+
+            if (e.feature.getProperty('type') === undefined) {
+
+                e.feature.setProperty("flag", Flags.NEW);
+                e.feature.setProperty("type", this.selectedType);
+                e.feature.setProperty("courseId", this.currentCourse.courseId);
+                if (this.selectedHole !== undefined) {
+
+                    e.feature.setProperty("holeId", this.selectedHole.holeID);
+                }
+            }
+        });
+        this.googleMap.data.addListener('setgeometry', e => {
+
+            e.feature.setProperty('type', this.selectedType);
+            // if (e.feature.getProperty('flag') === undefined) {
+            e.feature.setProperty('flag', Flags.UPDATE);
+            // }
+        });
+        this.googleMap.data.addListener('click', e => {
+
+            e.feature.setProperty('type', this.selectedType);
+            // if (e.feature.getProperty('flag') === undefined) {
+            e.feature.setProperty('flag', Flags.UPDATE);
+            // }
+        });
+    }
+
+    private styleFeatures() {
+        this.googleMap.data.setStyle(function (feature) {
+            const polyType = feature.getProperty('type');
+            let color = '#336699';
+            if (polyType == 0) {
+                color = '#463E3E';
+            }
+            if (polyType == 1) {
+                color = '#73A15D';
+            }
+            if (polyType == 2) {
+                color = '#BADA55';
+            }
+            if (polyType == 3) {
+                color = '#C2B280';
+            }
+            return {
+                draggable: true,
+                editable: true,
+                fillColor: color,
+                strokeWeight: 1
+            };
+        });
+
+    }
+
+
     public updateDataLayer(geoJson: any) {
-        //this.googleMap.data.remove(this.features);
-        const bounds: LatLngBounds = new google.maps.LatLngBounds();
         this.geoJsonObject = geoJson;
         if (this.geoJsonObject !== undefined && this.geoJsonObject.features.length !== 0) {
+            const bounds: LatLngBounds = new google.maps.LatLngBounds();
             this.geoJsonObject.features.forEach(
                 feature => {
-                    if (feature.geometry.coordinates[0].forEach != null)
-                        feature.geometry.coordinates[0].forEach(
-                            lnglat => bounds.extend(
-                                new google.maps.LatLng(lnglat[1], lnglat[0]))
+                    if (feature.geometry.coordinates[0].forEach != null) {
+
+                        feature.geometry.coordinates[0].forEach(lngLat => bounds.extend(
+                            new google.maps.LatLng(lngLat[1], lngLat[0]))
                         );
+                    }
                 }
             );
             this.googleMap.fitBounds(bounds);
@@ -192,7 +190,6 @@ export class HomeComponent {
             feature => this.googleMap.data.remove(feature)
         );
         this.googleMap.data.addGeoJson(this.geoJsonObject);
-
     }
 
     /***
@@ -210,12 +207,7 @@ export class HomeComponent {
     }
 
     public onLoadCourse(index: number) {
-        //window.alert("Loading course '" + this.courses[index].courseName + "'");
         // close the modal
-        var close = document.getElementById("modal-close");
-        if (close) {
-            close.click();
-        }
         this.api.getCourse(this.courses[index].courseId)
             .subscribe(
                 result => this.onCourseReceive(result.headers, result.json()),
@@ -248,12 +240,8 @@ export class HomeComponent {
             // create new course
             this.api.createCourse(name)
                 .subscribe(
-                    result => this.onCreateReceive(
-                        result.headers,
-                        result.json()
-                    ),
-                    error => this.onCreateFail(error.status, error.headers
-                        , error.text()),
+                    result => this.onCreateReceive(result.headers, result.json()),
+                    error => this.onCreateFail(error.status, error.headers, error.text()),
                     () => console.log("Course created successfully.")
                 );
         } else {
@@ -276,7 +264,7 @@ export class HomeComponent {
             this.api.addHole(body)
                 .subscribe(
                     result => this.onHoleCreate(result.headers, result.json()),
-                    error => this.onHoleFail(error.status, error.headers),
+                    error => this.onHoleFail(error.status, error.headers, error.text),
                     () => console.log("Hole added successfully.")
                 );
 
@@ -310,17 +298,12 @@ export class HomeComponent {
                     switch (feature.properties.flag) {
                         case Flags.NEW:
 
-                            //if () { // is it is connected to a hole
-                            //} else { // else it is global
                             this.api.addPolygon(value)
                                 .subscribe(
-                                    result => this.onPolyonSaved(
-                                        result.headers, result.json(), feature),
-                                    error => this.onPolygonFail(error.status,
-                                        error.headers, error.text(), value),
-                                    () => console.log("Polygon saved succesfully.")
+                                    result => this.onPolygonSaved(result.headers, result.json(), feature),
+                                    error => this.onPolygonFail(error.status, error.headers, error.text(), value),
+                                    () => console.log("Polygon saved successfully.")
                                 );
-                            //}
                             break;
                         case Flags.UPDATE:
 
@@ -329,42 +312,29 @@ export class HomeComponent {
                             this.api.updatePolygon(
                                 feature.properties.courseElementId, value)
                                 .subscribe(
-                                    result => this.onPolygonUpdate(
-                                        result.headers, result.json(), feature),
-                                    error => this.onPolygonFail(error.status,
-                                        error.headers, error.text(), value),
-                                    () => console.log("Polygon saved succesfully.")
+                                    result => this.onPolygonUpdate(result.headers, result.json(), feature),
+                                    error => this.onPolygonFail(error.status, error.headers, error.text(), value),
+                                    () => console.log("Polygon saved successfully.")
                                 );
                             break;
                         case Flags.DELETE:
-
+                            // TO-DO: implement delete
                             break;
                         default:
                             break;
                     }
                 }
             ));
-        //TODO update elements, add elements, and delete elements
-
     }
 
     public onToggleDraggable() {
         this.mapDraggable = !this.mapDraggable;
     }
 
-    public onChangePolyType(bool: boolean, index: number) {
-
-        // todo 
-        // this.map.onChangePolyType(bool, index);
-    }
-
-    public onNewPolygon() {
-        // console.log(this.googleMap.data);
-    }
-
     public onResetMap() {
         this.selectedHole = undefined;
         this.currentCourse = undefined;
+        this.holes = [];
         this.selected = 0;
 
         this.googleMap.data.forEach(
@@ -472,8 +442,10 @@ export class HomeComponent {
         // console.log(val);
     }
 
-    private onPolyonSaved(headers: any, body: any, feature: any) {
-        // console.log("Polygon saved", body);
+    private onPolygonSaved(headers: any, body: any, feature: any) {
+        if (feature.property === undefined) {
+            return;
+        }
         if (feature !== undefined) {
             if (feature.property.flag !== undefined) {
                 feature.property.flag = Flags.NONE;
@@ -489,7 +461,10 @@ export class HomeComponent {
     }
 
     private onPolygonUpdate(headers: any, body: any, feature: any) {
-        if (feature.property["flag"] !== undefined) {
+        if (feature.property === undefined) {
+            return;
+        }
+        if (feature.property.flag !== undefined) {
             feature.property["flag"] = Flags.NONE;
         }
         feature.property["type"] = body.type;
@@ -512,19 +487,16 @@ export class HomeComponent {
 
     private onLoadHoles() {
         console.log("Current course holes:", this.currentCourse.holes);
+        this.holes = [];
         this.currentCourse.holes.forEach(
             hole => this.api.getHole(hole.holeID)
                 .subscribe(
-                    result => this.onHoleReceive(result.headers,
-                        result.json()),
-                    error => this.onHoleFail(error.status,
-                        error.headers, error.text()),
+                    result => this.onHoleReceive(result.headers, result.json()),
+                    error => this.onHoleFail(error.status, error.headers, error.text()),
                     () => console.log("Hole loaded successfully.")
-
-                );
-            );
+                )
         );
-        console.log("Holes array:", this.holes);
+
     }
 
     private onHoleReceive(headers: any, body: any) {
@@ -565,7 +537,7 @@ export class HomeComponent {
     }
 
     private onHoleFail(status: number, headers: any, body: any) {
-        window.alert("Hole creation failed");
+        window.alert("Hole creation failed" + body);
     }
 
     public updateHoles(event: any) {
