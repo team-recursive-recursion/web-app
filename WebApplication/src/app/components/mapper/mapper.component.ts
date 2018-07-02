@@ -9,7 +9,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MouseEvent, LatLngLiteral } from '@agm/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../services/api.service';
+import { ApiService } from '../../services/api/api.service';
 import { Course, Hole, Elements, Polygon } from
     '../../interfaces/course.interface';
 

@@ -2,20 +2,19 @@
  * Filename: register.component.ts
  * Author  : Duncan Tilley
  * Class   : RegisterComponent / <register>
- * 
+ *
  *     The registration form of the mapper. User is asked to enter details
  *     and to submit the form on completion.
  ***/
 
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../services/api.service';
+import { ApiService } from '../../services/api/api.service';
 
 @Component({
     selector: 'register',
     templateUrl: './register.component.html',
-    styleUrls: ['./register.component.scss'],
-    providers: [ApiService]    
+    styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
 
@@ -38,7 +37,7 @@ export class RegisterComponent {
     onSubmit() {
         if (this.verifyDetails()) {
             // TODO hash and possibly salt password
-            this.api.userCreate(this.email, this.firstname, this.lastname,
+            this.api.usersCreate(this.email, this.firstname, this.lastname,
                     this.password)
                 .subscribe(
                     result => this.onRequestReceive(result.headers,
@@ -58,7 +57,7 @@ export class RegisterComponent {
 
     onRequestFail(status: number, headers: any, body: any) {
         // TODO nice message
-        window.alert(body);
+        window.alert(status + ": " + body);
     }
 
     private verifyDetails(): boolean {

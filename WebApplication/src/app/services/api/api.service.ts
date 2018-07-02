@@ -2,7 +2,7 @@
  * Filename: api.service.ts
  * Author  : Duncan Tilley, Christiaan H Nel
  * Class   : ApiService
- * 
+ *
  *     This service encapsulates API requests and should be used instead of
  *     directly making HTTP requests from the component.
  ***/
@@ -20,7 +20,7 @@ export class ApiService {
 
     /***
      * setApiUrl(string)
-     * 
+     *
      *     Sets the base URL for API calls. Defaults as localhost:5001.
      ***/
     public setApiUrl(url: string) {
@@ -31,16 +31,20 @@ export class ApiService {
         return this.url;
     }
 
-    userMatch(email: string, password: string) {
+    /***
+     * API calls: api/users
+     ***/
+
+    usersMatch(email: string, password: string) {
         var url = this.url + "/api/users/match";
         return this.http.post(url,
                 {"Email": email, "Password": password}
         );
     }
 
-    userCreate(email: string, firstname: string, lastname: string,
+    usersCreate(email: string, firstname: string, lastname: string,
             password: string) {
-        var url = this.url + "/api/users/create";
+        var url = this.url + "/api/users";
         return this.http.post(url,
                 {"Email": email, "Name": firstname, "Surname": lastname,
                 "Password": password}
@@ -63,7 +67,7 @@ export class ApiService {
     createCourse(name: string) {
         var url = this.url + "/api/courses";
 
-        return this.http.post(url, 
+        return this.http.post(url,
             { "courseName": name}
         );
     }
@@ -75,7 +79,7 @@ export class ApiService {
 
     updateCourse(courseId: string, courseName: string) {
         var url = this.url + "/api/courses";
-        return this.http.put(url, 
+        return this.http.put(url,
             {
                 "courseId": courseId,
                 "courseName": courseName
@@ -105,7 +109,7 @@ export class ApiService {
     updateHole(holeId: string, holeName: string) {
         var url = this.url + "/api/holes";
 
-        return this.http.put(url, 
+        return this.http.put(url,
             {
                 "HoleId": holeId,
                 "Name": holeName
@@ -131,10 +135,10 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    addPoint(pointId: string, courseId: string, holeId: string, typeOf: number, 
+    addPoint(pointId: string, courseId: string, holeId: string, typeOf: number,
             geoJson: string) {
         var url = this.url + "/api/points";
-        return this.http.post(url, 
+        return this.http.post(url,
             {
                 "courseId": courseId,
                 "holeId": holeId,
@@ -144,8 +148,8 @@ export class ApiService {
         );
     }
 
-    updatePoint(pointId: string, courseId: string, holeId: string, 
-            geoJson: string, courseElementId: string, pointRaw: string, 
+    updatePoint(pointId: string, courseId: string, holeId: string,
+            geoJson: string, courseElementId: string, pointRaw: string,
             typeOf: number) {
         var url = this.url + "/api/points/" + pointId;
         return this.http.put(url,

@@ -13,6 +13,9 @@ import { HomeComponent } from './components/home/home.component';
 import { MapperComponent } from './components/mapper/mapper.component';
 import { RegisterComponent } from './components/register/register.component';
 
+import { ApiService } from './services/api/api.service';
+import { GlobalsService } from './services/globals/globals.service';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -122,7 +125,9 @@ import {
     })
   ],
   providers: [
-    GoogleMapsAPIWrapper
+    GoogleMapsAPIWrapper,
+    ApiService,
+    GlobalsService
   ],
   entryComponents: [],
   bootstrap: [AppComponent]

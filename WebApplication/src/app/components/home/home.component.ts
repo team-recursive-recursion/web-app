@@ -9,7 +9,9 @@ import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit }
     from '@angular/core';
 import { Course, GolfCourse, Hole, Elements, Polygon }
     from '../../interfaces/course.interface';
-import { ApiService } from '../../services/api.service';
+import { ApiService } from '../../services/api/api.service';
+import { GlobalsService } from '../../services/globals/globals.service';
+import { Router } from '@angular/router';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
     LatLngBounds, LatLngBoundsLiteral, DataLayerManager
@@ -23,8 +25,7 @@ declare var google: any;
 @Component({
     selector: 'HomeComponent',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss'],
-    providers: [ApiService]
+    styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
@@ -84,23 +85,30 @@ export class HomeComponent {
     }
 
 
-    constructor(private api: ApiService, changeDetectorRef: ChangeDetectorRef,
-        media: MediaMatcher, public dialog: MatDialog) {
+    constructor(private api: ApiService, private globals: GlobalsService,
+        private router: Router,
+        changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+        public dialog: MatDialog) {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
     }
 
     ngAfterViewInit() {
-        // load saved courses
-        this.api.getCourses()
-            .subscribe(
-                result => this.onCoursesReceive(result.headers, result.json()),
-                error => this.onCoursesFail(error.status, error.headers,
-                    error.text()),
-                () => console.log("Courses loaded successfully.")
-            );
-        this.setupMap();
+        // check if a user is logged in
+        if (this.globals.getUid() == null) {
+            this.router.navigateByUrl("/login");
+        } else {
+            // load saved courses
+            this.api.getCourses()
+                .subscribe(
+                    result => this.onCoursesReceive(result.headers, result.json()),
+                    error => this.onCoursesFail(error.status, error.headers,
+                        error.text()),
+                    () => console.log("Courses loaded successfully.")
+                );
+            this.setupMap();
+        }
     }
 
 
