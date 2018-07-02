@@ -28,16 +28,6 @@
     "rxjs-compat": "^6.1.0",
     "zone.js": "^0.8.26"
   },
-<<<<<<< HEAD
-  "main": "webpack.config.js",
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "@types/googlemaps": "^3.30.8",
-    "@agm/core": "latest",
-    "@types/geojson": "latest"
-=======
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.1",
     "@angular/cli": "^6.0.5",
@@ -58,6 +48,5 @@
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
     "typescript": "~2.7.2"
->>>>>>> feature/lean-website
   }
 }
