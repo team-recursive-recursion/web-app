@@ -1,0 +1,36 @@
+/***
+ * Filename: register.component.css
+ * Author  : Duncan Tilley
+ ***/
+
+ div.register-outer {
+    color: #000000;
+    background-color: #F4EFC9;
+    background-image: url(../../assets/back-tile.png);
+
+    display: table;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}
+
+div.register-inner {
+    position: relative;
+    top: -80px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.login-card{
+    width: 60vw;
+    max-width: 720px;
+    margin: auto;
+}
+
+mat-form-field{
+    width: 100%;
+}
+
+.fill{
+    width: 100%;
+}
