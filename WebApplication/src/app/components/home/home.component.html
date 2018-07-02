@@ -1,0 +1,168 @@
+<!--
+    Filename: home.component.html
+    Author  : Christiaan H Nel, Stephan Roos, Duncan Tilley
+
+        The template for the controls and map for mapping.
+-->
+
+<div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
+    <mat-toolbar color="primary" class="example-toolbar">
+        <button mat-icon-button (click)="snav.toggle()">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <h1 class="example-app-name">Mapper</h1>
+        <h1 *ngIf="currentCourse !== undefined" class="example-app-name"> - {{currentCourse.courseName}}</h1>
+
+    </mat-toolbar>
+
+    <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+        <mat-sidenav #snav opened="true" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+            <mat-list>
+                <mat-accordion>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Add Course
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field class="fill">
+                                    <input matInput placeholder="Course Name" ([ngModel])="courseName" #courseName>
+                                </mat-form-field>
+                            </mat-list-item>
+
+                            <mat-list-item role="listitem">
+                                <button mat-raised-button class="fill" (click)="onCreateCourse(courseName.value)">
+                                    Add
+                                </button>
+
+                            </mat-list-item>
+
+                        </mat-list>
+                    </mat-card>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Load Course:
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <mat-select [(value)]="selected" #courseSelector id="course-selector">
+                                        <mat-option *ngFor="let c of courses; let i = index" [value]="i">
+                                            {{c.courseName}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-raised-button type="button" class="fill" (click)="onLoadCourse(selected)" id="changeCourse">
+                                    Load
+                                </button>
+                            </mat-list-item>
+
+                            <mat-list-item role="listitem">
+                                <button color="warn" class="fill" mat-button type="button" class="fill" id="deleteCourse" (click)="onDeleteCourse(selected)">
+                                    Delete
+                                </button>
+                            </mat-list-item>
+                        </mat-list>
+                    </mat-card>
+
+                    <mat-card *ngIf="currentCourse !== undefined">
+                        <mat-card-header>
+                            <mat-card-title>
+                                Course Holes
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field class="fill">
+                                    <input matInput placeholder="Hole Name" [(ngModel)]="newHoleName">
+                                </mat-form-field>
+                                <mat-icon class="addButton" (click)="onAddHole()">
+                                    {{button_state}}
+                                </mat-icon>
+                            </mat-list-item>
+                        </mat-list>
+                        <div *ngIf="currentCourse.holes !== undefined">
+                            <mat-radio-group (change)="updateHoles($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
+                                <mat-radio-button class="hole-radio-button" [value]="undefined">
+                                    Course
+                                </mat-radio-button>
+                                <mat-radio-button class="hole-radio-button" *ngFor="let hole of currentCourse.holes" [value]="hole">
+                                    {{hole.name}}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </mat-card>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Elements / Polygons
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <mat-form-field>
+                                    <mat-select [(value)]="selectedType">
+                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
+                                            {{t.typeName}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-raised-button (click)="onSaveCourse();">Save</button>
+                            </mat-list-item>
+
+                        </mat-list>
+                    </mat-card>
+
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>
+                                Map options
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-raised-button (click)="onToggleDraggable()" color="{{mapDraggable ? 'primary' : 'accent'}}">
+                                    Map Draggable
+                                </button>
+                            </mat-list-item>
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-button (click)="onResetMap()" color="warn">
+                                    Reset Map
+                                </button>
+                            </mat-list-item>
+                        </mat-list>
+                    </mat-card>
+                </mat-accordion>
+            </mat-list>
+        </mat-sidenav>
+
+        <mat-sidenav-content class="map-container">
+            <mat-card class="map-card">
+                <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
+                    #AgmMap [latitude]="lat" [longitude]="lng" (mapClick)="mapInteractionClick($event)">
+                </agm-map>
+                <button (click)="fabInteractionClick($event)" class="controls" mat-fab>
+                    <mat-icon>
+                        {{button_state}}
+                    </mat-icon>
+                </button>
+            </mat-card>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>

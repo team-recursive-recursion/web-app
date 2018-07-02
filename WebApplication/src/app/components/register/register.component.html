@@ -1,0 +1,54 @@
+<!--
+    Filename: register.component.html
+    Author  : Duncan Tilley
+
+        The template for the registration form.
+-->
+
+<div class="register-outer">
+    <div class="register-inner">
+        <div id="register-form">
+            <mat-card class="login-card">
+
+                <h1 style="text-align:center">Register</h1>
+                <mat-list role="list">
+                    <form #registerForm="ngForm">
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input matInput type="text" class="form-control" id="email" required [(ngModel)]="email" name="email" placeholder="Email">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input matInput type="text" class="form-control" id="firstname" required [(ngModel)]="firstname" name="firstname" placeholder="First Name">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input matInput type="text" class="form-control" id="lastname" required [(ngModel)]="lastname" name="lastname" placeholder="Last Name">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input matInput type="password" class="form-control" id="password" required [(ngModel)]="password" name="password" placeholder="Password">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem">
+                            <mat-form-field>
+                                <input matInput type="password" class="form-control" placeholder="Confirm Password">
+                            </mat-form-field>
+                        </mat-list-item>
+                        <mat-list-item role="listitem" class="login-button-container">
+                            <button mat-button class="fill" (click)="onCancel()">
+                                Cancel
+                            </button>
+                            <button mat-button type="submit" class="fill" (click)="onSubmit()">
+                                Register
+                            </button>
+                        </mat-list-item>
+                </form>
+                </mat-list>
+            </mat-card>
+        </div>
+    </div>
+</div>
