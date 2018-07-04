@@ -6,20 +6,21 @@
 
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit }
-    from '@angular/core';
-import { Course, GolfCourse, Hole, Elements, Polygon }
-    from '../../interfaces/course.interface';
-import { ApiService } from '../../services/api/api.service';
-import { GlobalsService } from '../../services/globals/globals.service';
+        from '@angular/core';
 import { Router } from '@angular/router';
-import {
-    GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
-    LatLngBounds, LatLngBoundsLiteral, DataLayerManager
-} from '@agm/core';
+import { GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager, 
+    LatLngBounds, LatLngBoundsLiteral, DataLayerManager } from '@agm/core';
 import { FormControl } from '@angular/forms';
-
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { element } from 'protractor';
+
+import { Course, GolfCourse, Hole, Elements, Polygon }
+        from '../../interfaces/course.interface';
+import { EmptyClass, Call_t, PolygonState_t } 
+        from '../../interfaces/enum.interface';
+import { ApiService } from '../../services/api/api.service';
+import { GlobalsService } from '../../services/globals/globals.service';
+
 
 declare var google: any;
 @Component({
@@ -67,6 +68,16 @@ export class HomeComponent {
         { "typeName": 'Water Hazard', "ttype": 4 }
     ];
 
+    constructor(private api: ApiService, private globals: GlobalsService,
+            private router: Router,
+            changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+            public dialog: MatDialog) {
+
+        this.mobileQuery = media.matchMedia('(max-width: 600px)');
+        this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+        this.mobileQuery.addListener(this._mobileQueryListener);
+    }
+
     ngOnDestroy(): void {
         this.mobileQuery.removeListener(this._mobileQueryListener);
     }
@@ -84,16 +95,6 @@ export class HomeComponent {
         // console.log(event);
     }
 
-
-    constructor(private api: ApiService, private globals: GlobalsService,
-        private router: Router,
-        changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
-        public dialog: MatDialog) {
-        this.mobileQuery = media.matchMedia('(max-width: 600px)');
-        this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-        this.mobileQuery.addListener(this._mobileQueryListener);
-    }
-
     ngAfterViewInit() {
         // check if a user is logged in
         if (this.globals.getUid() == null) {
@@ -102,15 +103,15 @@ export class HomeComponent {
             // load saved courses
             this.api.getCourses()
                 .subscribe(
-                    result => this.onCoursesReceive(result.headers, result.json()),
-                    error => this.onCoursesFail(error.status, error.headers,
-                        error.text()),
+                    result => this.onResult(result.headers, result.json(),
+                        C_COURSES_LOAD),
+                    error => this.onFail(error.status, error.headers,
+                        error.text(), C_COURSES_LOAD),
                     () => console.log("Courses loaded successfully.")
                 );
             this.setupMap();
         }
     }
-
 
     private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
@@ -126,7 +127,7 @@ export class HomeComponent {
 
             if (e.feature.getProperty('type') === undefined) {
 
-                e.feature.setProperty("flag", Flags.NEW);
+                e.feature.setProperty("flag", PS_NEW);
                 e.feature.setProperty("type", this.selectedType);
                 e.feature.setProperty("courseId", this.currentCourse.courseId);
                 if (this.selectedHole !== undefined) {
@@ -139,14 +140,14 @@ export class HomeComponent {
 
             e.feature.setProperty('type', this.selectedType);
             // if (e.feature.getProperty('flag') === undefined) {
-            e.feature.setProperty('flag', Flags.UPDATE);
+            e.feature.setProperty('flag', PS_UPDATE);
             // }
         });
         this.googleMap.data.addListener('click', e => {
 
             e.feature.setProperty('type', this.selectedType);
             // if (e.feature.getProperty('flag') === undefined) {
-            e.feature.setProperty('flag', Flags.UPDATE);
+            e.feature.setProperty('flag', PS_UPDATE);
             // }
         });
     }
@@ -177,17 +178,18 @@ export class HomeComponent {
 
     }
 
-
     public updateDataLayer(geoJson: any) {
         this.geoJsonObject = geoJson;
-        if (this.geoJsonObject !== undefined && this.geoJsonObject.features.length !== 0) {
+        if (this.geoJsonObject !== undefined && 
+                this.geoJsonObject.features.length !== 0) {
             const bounds: LatLngBounds = new google.maps.LatLngBounds();
             this.geoJsonObject.features.forEach(
                 feature => {
                     if (feature.geometry.coordinates[0].forEach != null) {
 
-                        feature.geometry.coordinates[0].forEach(lngLat => bounds.extend(
-                            new google.maps.LatLng(lngLat[1], lngLat[0]))
+                        feature.geometry.coordinates[0].forEach(
+                            lngLat => bounds.extend(
+                                new google.maps.LatLng(lngLat[1], lngLat[0]))
                         );
                     }
                 }
@@ -201,46 +203,23 @@ export class HomeComponent {
     }
 
     /***
-     * Load, create and delete event handlers for Courses.
+     * Load event hander for retrieving all Courses for a User.
      ***/
+
     public onLoadCourses() {
         this.api.getCourses()
             .subscribe(
-                result => this.onCoursesReceive(result.headers,
-                    result.json()),
-                error => this.onCoursesFail(error.status, error.headers,
-                    error.text()),
+                result => this.onResult(result.headers, result.json(), 
+                    C_COURSES_LOAD),
+                error => this.onFail(error.status, error.headers,
+                    error.text(), C_COURSES_LOAD),
                 () => console.log("Courses loaded successfully.")
             );
     }
 
-    public onLoadCourse(index: number) {
-        // close the modal
-        this.api.getCourse(this.courses[index].courseId)
-            .subscribe(
-                result => this.onCourseReceive(result.headers, result.json()),
-                error => this.onCourseFail(error.status, error.headers,
-                    error.text()),
-                () => console.log("Course loaded successfully.")
-            );
-    }
-
-    public onDeleteCourse(index: number) {
-        // console.log(this.courses[index], index);
-        if (window.confirm("Are you sure you want to delete '" +
-            this.courses[index].courseName + "'?")) {
-            // delete the course
-            this.api.deleteCourse(this.courses[index].courseId)
-                .subscribe(
-                    result => this.onDeleteReceive(result.headers,
-                        result.json()),
-                    error => this.onDeleteFail(error.status, error.headers,
-                        error.text()),
-                    () => console.log("Course created successfully.")
-                );
-        }
-        // TODO
-    }
+    /***
+     * Create, load, save, and delete event handlers for a Course.
+     ***/
 
     public onCreateCourse(name: string) {
         // console.log("Course name: " + name);
@@ -248,8 +227,10 @@ export class HomeComponent {
             // create new course
             this.api.createCourse(name)
                 .subscribe(
-                    result => this.onCreateReceive(result.headers, result.json()),
-                    error => this.onCreateFail(error.status, error.headers, error.text()),
+                    result => this.onResult(result.headers, result.json(),
+                        C_COURSE_CREATE),
+                    error => this.onFail(error.status, error.headers, 
+                        error.text(), C_COURSE_CREATE),
                     () => console.log("Course created successfully.")
                 );
         } else {
@@ -258,35 +239,18 @@ export class HomeComponent {
         }
     }
 
-    /***
-     * Create, update, delete handlers for Holes.
-     ***/
-    public onAddHole() {
-        console.log("New hole name:", this.newHoleName);
-        if (this.newHoleName != "" && this.newHoleName !== undefined &&
-            this.newHoleName != "Hole Name") {
-            let body = {
-                "Name": this.newHoleName,
-                "courseId": this.currentCourse.courseId
-            }
-            this.api.addHole(body)
-                .subscribe(
-                    result => this.onHoleCreate(result.headers, result.json()),
-                    error => this.onHoleFail(error.status, error.headers, error.text),
-                    () => console.log("Hole added successfully.")
-                );
-
-        } else {
-            // TODO nice message
-            window.alert("Please enter a course name");
-        }
-
+    public onLoadCourse(index: number) {
+        // close the modal
+        this.api.getCourse(this.courses[index].courseId)
+            .subscribe(
+                result => this.onResult(result.headers, result.json(), 
+                    C_COURSE_LOAD),
+                error => this.onFail(error.status, error.headers,
+                    error.text(), C_COURSE_LOAD),
+                () => console.log("Course loaded successfully.")
+            );
     }
 
-
-    /***
-     * Other event handlers.
-     ***/
     public onSaveCourse() {
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
@@ -301,31 +265,36 @@ export class HomeComponent {
                         value["holeId"] = feature.properties["holeId"];
                     }
 
-
                     console.log("VALUE: ", value);
                     switch (feature.properties.flag) {
-                        case Flags.NEW:
-
+                        case PS_NEW:
                             this.api.addPolygon(value)
                                 .subscribe(
-                                    result => this.onPolygonSaved(result.headers, result.json(), feature),
-                                    error => this.onPolygonFail(error.status, error.headers, error.text(), value),
-                                    () => console.log("Polygon saved successfully.")
+                                    result => this.onResult(result.headers, 
+                                        result.json(), C_POLY_CREATE, feature),
+                                    error => this.onFail(error.status, 
+                                        error.headers, error.text(), 
+                                        C_POLY_CREATE),
+                                    () => console.log("Poly saved successfully")
                                 );
                             break;
-                        case Flags.UPDATE:
-
+                        case PS_UPDATE:
                             value['courseElementId'] =
                                 feature.properties.courseElementId;
                             this.api.updatePolygon(
                                 feature.properties.courseElementId, value)
                                 .subscribe(
-                                    result => this.onPolygonUpdate(result.headers, result.json(), feature),
-                                    error => this.onPolygonFail(error.status, error.headers, error.text(), value),
-                                    () => console.log("Polygon saved successfully.")
+                                    // TODO somehow remove feature and value
+                                    // as parameter
+                                    result => this.onResult(result.headers, 
+                                        result.json(), C_POLY_UPDATE, feature),
+                                    error => this.onFail(error.status, 
+                                        error.headers, error.text(), 
+                                        C_POLY_UPDATE),
+                                    () => console.log("Poly saved successfully")
                                 );
                             break;
-                        case Flags.DELETE:
+                        case PS_DELETE:
                             // TO-DO: implement delete
                             break;
                         default:
@@ -334,6 +303,93 @@ export class HomeComponent {
                 }
             ));
     }
+
+    public onDeleteCourse(index: number) {
+        // console.log(this.courses[index], index);
+        if (window.confirm("Are you sure you want to delete '" +
+            this.courses[index].courseName + "'?")) {
+            // delete the course
+            this.api.deleteCourse(this.courses[index].courseId)
+                .subscribe(
+                    result => this.onResult(result.headers, result.json(),
+                        C_COURSE_DELETE),
+                    error => this.onFail(error.status, error.headers,
+                        error.text(), C_COURSE_DELETE),
+                    () => console.log("Course created successfully.")
+                );
+        }
+        // TODO
+    }
+
+    /***
+     * Create and load handler for Holes.
+     ***/
+
+    public onAddHole() {
+        console.log("New hole name:", this.newHoleName);
+        if (this.newHoleName != "" && this.newHoleName !== undefined &&
+            this.newHoleName != "Hole Name") {
+            let body = {
+                "Name": this.newHoleName,
+                "courseId": this.currentCourse.courseId
+            }
+            this.api.addHole(body)
+                .subscribe(
+                    result => this.onResult(result.headers, result.json(),
+                        C_HOLE_CREATE),
+                    error => this.onFail(error.status, error.headers, 
+                        error.text(), C_HOLE_CREATE),
+                    () => console.log("Hole added successfully.")
+                );
+
+        } else {
+            // TODO nice message
+            window.alert("Please enter a Hole name");
+        }
+
+    }
+
+    private onLoadHoles() {
+        console.log("Current course holes:", this.currentCourse.holes);
+        this.holes = [];
+        this.currentCourse.holes.forEach(
+            hole => this.api.getHole(hole.holeID)
+                .subscribe(
+                    result => this.onResult(result.headers, result.json(),
+                        C_HOLE_LOAD),
+                    error => this.onFail(error.status, error.headers,
+                        error.text(), C_HOLE_LOAD),
+                    () => console.log("Hole loaded successfully.")
+                )
+        );
+
+    }
+
+    /***
+     * Client side saving and updating handlers for Polygons.
+     ***/
+
+    private onPolygonSaved(body: any, feature: any) {
+        if (feature.property === undefined) {
+            return;
+        }
+        if (feature !== undefined) {
+            if (feature.property.flag !== undefined) {
+                feature.property.flag = PS_NONE;
+            }
+            feature.property["type"] = body.type;
+            feature.property["courseElementId"] = body.courseElementId;
+            feature.property["courseId"] = body.courseId;
+            feature.property['holeId'] = body.holeId;
+            if (body.holeId != null) {
+                this.holes.push(body);
+            }
+        }
+    }
+
+    /***
+     * Other event handlers.
+     ***/
 
     public onToggleDraggable() {
         this.mapDraggable = !this.mapDraggable;
@@ -356,34 +412,106 @@ export class HomeComponent {
     /***
      * API response handlers.
      ***/
-    private onCoursesReceive(headers: any, body: any) {
-        for (var i = 0; i < body.length; ++i) {
-            this.courses.push(body[i]);
+
+    private onResult(headers: any, body: any, callType: Call_t, feature: any) {
+        switch (callType) {
+            case C_COURSES_LOAD:
+                for (var i = 0; i < body.length; ++i) {
+                    this.courses.push(body[i]);
+                }
+                break;
+            case C_COURSE_CREATE:
+                this.courses.push(body);
+                this.onResetMap();
+                this.currentCourse = body;
+                this.selected = this.courses.indexOf(body);
+                break;
+            case C_COURSE_LOAD:
+                this.currentCourse = body;
+                this.activeElements = {
+                    "type": "FeatureCollection",
+                    "features": [
+                        ...this.generateFeature(
+                            this.currentCourse.courseElements)
+                    ]
+                }
+                this.onLoadHoles();
+                this.updateDataLayer(this.activeElements);
+                break;
+            case C_COURSE_SAVE:
+                this.onSaveCourse()
+                break;
+            case C_COURSE_DELETE:
+                window.alert("Delete successful");
+                // find the element to remove from the list
+                var i = 0;
+                var done = false;
+                while (!done && i < this.courses.length) {
+                    if (this.courses[i].courseId == body.courseId) {
+                        this.courses.splice(i, 1);
+                        done = true;
+                    }
+                    ++i;
+                }
+                break;
+            case C_HOLE_CREATE:
+                console.log("Hole added:", body);
+                if (this.currentCourse.holes === null) {
+                    this.currentCourse.holes = [];
+                }
+                this.currentCourse.holes.push(body);
+                break;
+            case C_HOLE_LOAD:
+                this.holes.push(body);
+                if (this.holes.length === this.currentCourse.holes.length) {
+                    this.showHoles();
+                }
+                break;
+            case C_POLY_CREATE:
+            case C_POLY_UPDATE:
+                this.onPolygonSaved(body, feature);
+                break;
+            default:
+                window.alert("Success: Default success message.");
+                break;
         }
     }
 
-    private onCoursesFail(status: number, headers: any, body: any) {
-        window.alert("Failed to load saved courses.");
-        // TODO disable selector
-    }
-
-    private onCourseReceive(headers: any, body: any) {
-        this.currentCourse = body;
-        // console.log(body);
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...this.generateFeature(this.currentCourse.courseElements)
-            ]
+    private onFail(status: number, headers: any, body: any, callType: Call_t) {
+        switch (callType) {
+            case C_COURSES_LOAD:
+                window.alert("Error: Failed to load saved courses.");
+                break;
+            case C_COURSE_CREATE:
+                window.alert("Error: Failed to create course.");
+                break;
+            case C_COURSE_LOAD:
+                window.alert("Error: Failed to load course.");
+                break;
+            case C_COURSE_SAVE:
+                window.alert("Error: Failed to save course.");
+                break;
+            case C_COURSE_DELETE:
+                window.alert("Error: Failed to delete course.");
+                break;
+            case C_HOLE_CREATE:
+                window.alert("Error: Failed to create hole.");
+                break;
+            case C_POLY_CREATE:
+                window.alert("Error: Failed to create polygon.");
+                break;
+            case C_POLY_UPDATE:
+                window.alert("Error: Failed to update polygon.");
+                break;
+            default:
+                window.alert("Error: Default error message.");
+                break;
         }
-        this.onLoadHoles();
-        this.updateDataLayer(this.activeElements);
     }
 
     private generateFeature(collection: Array<any>) {
         let elements: Array<any> = [];
         if (collection !== null) {
-
             collection.forEach(
                 element => {
                     let value =
@@ -393,7 +521,7 @@ export class HomeComponent {
                                 ...JSON.parse(element.geoJson)
                             },
                             "properties": {
-                                "flag": Flags.NONE,
+                                "flag": PS_NONE,
                                 "type": element['type'],
                                 "courseElementId": element.courseElementId,
                                 "courseId": element.courseId,
@@ -408,116 +536,12 @@ export class HomeComponent {
         return elements;
     }
 
-
-    private onCourseFail(status: number, headers: any, body: any) {
-        window.alert("Failed to load course.");
-    }
-
-    private onCreateReceive(headers: any, body: any) {
-        this.courses.push(body);
-        this.onResetMap();
-        this.currentCourse = body;
-        this.selected = this.courses.indexOf(body);
-    }
-
-    private onCreateFail(status: number, headers: any, body: any) {
-        // TODO nice message
-        window.alert("Create failed");
-    }
-
-    private onDeleteReceive(headers: any, body: any) {
-        // TODO nice message
-        window.alert("Delete successful");
-        // find the element to remove from the list
-        var i = 0;
-        var done = false;
-        while (!done && i < this.courses.length) {
-            if (this.courses[i].courseId == body.courseId) {
-                this.courses.splice(i, 1);
-                done = true;
-            }
-            ++i;
-        }
-    }
-
-    private onDeleteFail(status: number, headers: any, body: any) {
-        // TODO nice message
-        window.alert("Delete failed");
-    }
-
-    private onPolygonFail(status: number, headers: any, body: any, val: any) {
-        window.alert("<Something> polygon failed");
-        // console.log(val);
-    }
-
-    private onPolygonSaved(headers: any, body: any, feature: any) {
-        if (feature.property === undefined) {
-            return;
-        }
-        if (feature !== undefined) {
-            if (feature.property.flag !== undefined) {
-                feature.property.flag = Flags.NONE;
-            }
-            feature.property["type"] = body.type;
-            feature.property["courseElementId"] = body.courseElementId;
-            feature.property["courseId"] = body.courseId;
-            feature.property['holeId'] = body.holeId;
-            if (body.holeId != null) {
-                this.holes.push(body);
-            }
-        }
-    }
-
-    private onPolygonUpdate(headers: any, body: any, feature: any) {
-        if (feature.property === undefined) {
-            return;
-        }
-        if (feature.property.flag !== undefined) {
-            feature.property["flag"] = Flags.NONE;
-        }
-        feature.property["type"] = body.type;
-        feature.property["courseElementId"] = body.courseElementId;
-        feature.property["courseId"] = body.courseId;
-        feature.property['holeId'] = body.holeId;
-        if (body.holeId != null) {
-            this.holes.push(body);
-        }
-
-    }
-
-    private onHoleCreate(headers: any, body: any) {
-        console.log("Hole added:", body);
-        if (this.currentCourse.holes === null) {
-            this.currentCourse.holes = [];
-        }
-        this.currentCourse.holes.push(body);
-    }
-
-    private onLoadHoles() {
-        console.log("Current course holes:", this.currentCourse.holes);
-        this.holes = [];
-        this.currentCourse.holes.forEach(
-            hole => this.api.getHole(hole.holeID)
-                .subscribe(
-                    result => this.onHoleReceive(result.headers, result.json()),
-                    error => this.onHoleFail(error.status, error.headers, error.text()),
-                    () => console.log("Hole loaded successfully.")
-                )
-        );
-
-    }
-
-    private onHoleReceive(headers: any, body: any) {
-        this.holes.push(body);
-        if (this.holes.length === this.currentCourse.holes.length) {
-            this.showHoles();
-        }
-    }
-
     private showHoles() {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse.courseElements)];
+        let tempHolder: any = [...this.generateFeature(this.currentCourse
+            .courseElements)];
         this.holes.forEach(hole => {
-            tempHolder = [...tempHolder, ...this.generateFeature(hole.courseElements)]
+            tempHolder = [...tempHolder, ...this.generateFeature(hole
+                .courseElements)]
         });
         this.activeElements = {
             "type": "FeatureCollection",
@@ -529,10 +553,12 @@ export class HomeComponent {
     }
 
     private filterHoles(holeId: string) {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse.courseElements)];
+        let tempHolder: any = [...this.generateFeature(this.currentCourse
+            .courseElements)];
         this.holes.forEach(hole => {
             if (hole.holeID === holeId) {
-                tempHolder = [...tempHolder, ...this.generateFeature(hole.courseElements)]
+                tempHolder = [...tempHolder, ...this.generateFeature(hole
+                    .courseElements)]
             }
         });
         this.activeElements = {
@@ -544,10 +570,6 @@ export class HomeComponent {
         this.updateDataLayer(this.activeElements);
     }
 
-    private onHoleFail(status: number, headers: any, body: any) {
-        window.alert("Hole creation failed" + body);
-    }
-
     public updateHoles(event: any) {
         if (event.value !== undefined) {
             this.filterHoles(event.value.holeID);
@@ -555,11 +577,4 @@ export class HomeComponent {
             this.showHoles();
         }
     }
-}
-
-enum Flags {
-    NEW = 0,
-    UPDATE,
-    DELETE,
-    NONE,
 }
