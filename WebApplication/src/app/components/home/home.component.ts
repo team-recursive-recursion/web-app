@@ -125,10 +125,10 @@ export class HomeComponent {
     private setUpMapEvents() {
         this.googleMap.data.addListener("addfeature", e => {
 
-            if (e.feature.getProperty('type') === undefined) {
+            if (e.feature.getProperty('polygonType') === undefined) {
 
                 e.feature.setProperty("flag", PolygonState_t.PS_NEW);
-                e.feature.setProperty("type", this.selectedType);
+                e.feature.setProperty("polygonType", this.selectedType);
                 e.feature.setProperty("courseId", this.currentCourse.courseId);
                 if (this.selectedHole !== undefined) {
 
@@ -138,14 +138,14 @@ export class HomeComponent {
         });
         this.googleMap.data.addListener('setgeometry', e => {
 
-            e.feature.setProperty('type', this.selectedType);
+            e.feature.setProperty('polygonType', this.selectedType);
             // if (e.feature.getProperty('flag') === undefined) {
             e.feature.setProperty('flag', PolygonState_t.PS_UPDATE);
             // }
         });
         this.googleMap.data.addListener('click', e => {
 
-            e.feature.setProperty('type', this.selectedType);
+            e.feature.setProperty('polygonType', this.selectedType);
             // if (e.feature.getProperty('flag') === undefined) {
             e.feature.setProperty('flag', PolygonState_t.PS_UPDATE);
             // }
@@ -154,7 +154,7 @@ export class HomeComponent {
 
     private styleFeatures() {
         this.googleMap.data.setStyle(function (feature) {
-            const polyType = feature.getProperty('type');
+            const polyType = feature.getProperty('polygonType');
             let color = '#336699';
             if (polyType == 0) {
                 color = '#463E3E';
@@ -256,7 +256,7 @@ export class HomeComponent {
             data => data.features.forEach(
                 feature => {
                     // extract polygon properties
-                    var type: number = feature.properties["type"];
+                    var type: number = feature.properties["polygonType"];
                     var geoJson: string = JSON.stringify(feature.geometry);
                     var courseId = feature.properties["courseId"];
                     var holeId = feature.properties["holeId"];
@@ -268,14 +268,14 @@ export class HomeComponent {
                             var http;
                             if (holeId !== undefined) {
                                 // post the polygon to the hole
-                                http = this.api.courseCreatePolygon(
+                                http = this.api.holeCreatePolygon(
                                     holeId,
                                     type,
                                     geoJson
                                 );
                             } else {
                                 // post the polygon to the course
-                                http = this.api.holeCreatePolygon(
+                                http = this.api.courseCreatePolygon(
                                     courseId,
                                     type,
                                     geoJson
@@ -382,7 +382,7 @@ export class HomeComponent {
             if (feature.property.flag !== undefined) {
                 feature.property.flag = PolygonState_t.PS_NONE;
             }
-            feature.property["type"] = body.type;
+            feature.property["polygonType"] = body.polygonType;
             feature.property["courseElementId"] = body.courseElementId;
             feature.property["courseId"] = body.courseId;
             feature.property['holeId'] = body.holeId;
@@ -484,6 +484,7 @@ export class HomeComponent {
     }
 
     private onFail(status: number, headers: any, body: any, callType: Call_t) {
+        console.log(JSON.stringify(body));
         switch (callType) {
             case Call_t.C_COURSES_LOAD:
                 window.alert("Error: Failed to load saved courses.");
@@ -517,7 +518,7 @@ export class HomeComponent {
 
     private generateFeature(collection: Array<any>) {
         let elements: Array<any> = [];
-        if (collection !== null) {
+        if (collection !== undefined && collection !== null) {
             collection.forEach(
                 element => {
                     let value =
@@ -528,8 +529,8 @@ export class HomeComponent {
                             },
                             "properties": {
                                 "flag": PolygonState_t.PS_NONE,
-                                "type": element['type'],
-                                "courseElementId": element.courseElementId,
+                                "polygonType": element['polygonType'],
+                                "courseElementId": element.elementId,
                                 "courseId": element.courseId,
                                 "holeId": element.holeId
                             }
