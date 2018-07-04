@@ -38,7 +38,7 @@ export enum Call_t {
     C_POINT_DELETE,
 }
 
-enum PolygonState_t {
+export enum PolygonState_t {
     PS_NEW = 0,
     PS_UPDATE,
     PS_DELETE,
