@@ -132,7 +132,7 @@ export class HomeComponent {
                 e.feature.setProperty("courseId", this.currentCourse.courseId);
                 if (this.selectedHole !== undefined) {
 
-                    e.feature.setProperty("holeId", this.selectedHole.holeID);
+                    e.feature.setProperty("holeId", this.selectedHole.holeId);
                 }
             }
         });
@@ -251,7 +251,7 @@ export class HomeComponent {
                     switch (feature.properties.flag) {
                         case PolygonState_t.PS_NEW:
                             var http;
-                            if (holeId !== undefined) {
+                            if (holeId !== undefined && holeId !== null) {
                                 // post the polygon to the hole
                                 http = this.api.holeCreatePolygon(
                                     holeId,
@@ -344,7 +344,7 @@ export class HomeComponent {
     private onLoadHoles() {
         this.holes = [];
         this.currentCourse.holes.forEach(
-            hole => this.api.holeGet(hole.holeID)
+            hole => this.api.holeGet(hole.holeId)
                 .subscribe(
                     result => this.onResult(result.headers, result.json(),
                         Call_t.C_HOLE_LOAD),
@@ -370,7 +370,7 @@ export class HomeComponent {
             feature.property["polygonType"] = body.polygonType;
             feature.property["elementId"] = body.elementId;
             feature.property["courseId"] = body.courseId;
-            feature.property['holeId'] = body.holeId;
+            feature.property["holeId"] = body.holeId;
             if (body.holeId != null) {
                 this.holes.push(body);
             }
@@ -550,7 +550,7 @@ export class HomeComponent {
         let tempHolder: any = [...this.generateFeature(this.currentCourse
             .elements)];
         this.holes.forEach(hole => {
-            if (hole.holeID === holeId) {
+            if (hole.holeId === holeId) {
                 tempHolder = [...tempHolder, ...this.generateFeature(hole
                     .elements)]
             }
@@ -566,7 +566,7 @@ export class HomeComponent {
 
     public updateHoles(event: any) {
         if (event.value !== undefined) {
-            this.filterHoles(event.value.holeID);
+            this.filterHoles(event.value.holeId);
         } else {
             this.showHoles();
         }

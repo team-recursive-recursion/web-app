@@ -26,7 +26,7 @@ export interface GolfCourse {
 
 export interface Hole {
     name: string;
-    holeID: string;
+    holeId: string;
     courseId: string;
     elements: Elements[];
 }
