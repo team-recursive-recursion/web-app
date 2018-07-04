@@ -70,6 +70,7 @@ export class ApiService {
 
     courseGet(cid: string) {
         var url = this.url + "/api/courses/" + cid;
+        return this.http.get(url);
     }
 
     courseDelete(cid: string) {
