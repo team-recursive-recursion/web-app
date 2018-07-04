@@ -203,21 +203,6 @@ export class HomeComponent {
     }
 
     /***
-     * Load event hander for retrieving all Courses for a User.
-     ***/
-
-    /*public onLoadCourses() {
-        this.api.getCourses()
-            .subscribe(
-                result => this.onResult(result.headers, result.json(),
-                    C_COURSES_LOAD),
-                error => this.onFail(error.status, error.headers,
-                    error.text(), C_COURSES_LOAD),
-                () => console.log("Courses loaded successfully.")
-            );
-    }*/
-
-    /***
      * Create, load, save, and delete event handlers for a Course.
      ***/
 
@@ -240,7 +225,7 @@ export class HomeComponent {
     }
 
     public onLoadCourse(index: number) {
-        // close the modal
+        // receive course info
         this.api.courseGet(this.courses[index].courseId)
             .subscribe(
                 result => this.onResult(result.headers, result.json(),
@@ -293,10 +278,10 @@ export class HomeComponent {
                             break;
 
                         case PolygonState_t.PS_UPDATE:
-                            /*value['courseElementId'] =
-                                feature.properties.courseElementId;
+                            /*value['elementId'] =
+                                feature.properties.elementId;
                             this.api.updatePolygon(
-                                feature.properties.courseElementId, value)
+                                feature.properties.elementId, value)
                                 .subscribe(
                                     // TODO somehow remove feature and value
                                     // as parameter
@@ -383,7 +368,7 @@ export class HomeComponent {
                 feature.property.flag = PolygonState_t.PS_NONE;
             }
             feature.property["polygonType"] = body.polygonType;
-            feature.property["courseElementId"] = body.courseElementId;
+            feature.property["elementId"] = body.elementId;
             feature.property["courseId"] = body.courseId;
             feature.property['holeId'] = body.holeId;
             if (body.holeId != null) {
@@ -433,12 +418,13 @@ export class HomeComponent {
                 this.selected = this.courses.indexOf(body);
                 break;
             case Call_t.C_COURSE_LOAD:
+                console.log(body);
                 this.currentCourse = body;
                 this.activeElements = {
                     "type": "FeatureCollection",
                     "features": [
                         ...this.generateFeature(
-                            this.currentCourse.courseElements)
+                            this.currentCourse.elements)
                     ]
                 }
                 this.onLoadHoles();
@@ -530,7 +516,7 @@ export class HomeComponent {
                             "properties": {
                                 "flag": PolygonState_t.PS_NONE,
                                 "polygonType": element['polygonType'],
-                                "courseElementId": element.elementId,
+                                "elementId": element.elementId,
                                 "courseId": element.courseId,
                                 "holeId": element.holeId
                             }
@@ -540,15 +526,16 @@ export class HomeComponent {
                 }
             );
         }
+        console.log(elements);
         return elements;
     }
 
     private showHoles() {
         let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .courseElements)];
+            .elements)];
         this.holes.forEach(hole => {
             tempHolder = [...tempHolder, ...this.generateFeature(hole
-                .courseElements)]
+                .elements)]
         });
         this.activeElements = {
             "type": "FeatureCollection",
@@ -561,11 +548,11 @@ export class HomeComponent {
 
     private filterHoles(holeId: string) {
         let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .courseElements)];
+            .elements)];
         this.holes.forEach(hole => {
             if (hole.holeID === holeId) {
                 tempHolder = [...tempHolder, ...this.generateFeature(hole
-                    .courseElements)]
+                    .elements)]
             }
         });
         this.activeElements = {

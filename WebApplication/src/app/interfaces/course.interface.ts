@@ -1,8 +1,8 @@
 /***
  * Filename: course.interface.ts
  * Author  : Christiaan H Nel
- * Class   : 
- * 
+ * Class   :
+ *
  *     The class that represents a course returned from the API and used
  *     by MapperComponent.
  ***/
@@ -21,14 +21,14 @@ export interface GolfCourse {
     createdAt: string;
     updatedAt: string;
     holes: Hole[];
-    courseElements: Elements[];
+    elements: Elements[];
 }
 
 export interface Hole {
     name: string;
     holeID: string;
     courseId: string;
-    courseElement: Elements[];
+    elements: Elements[];
 }
 
 export interface Elements {
@@ -37,11 +37,11 @@ export interface Elements {
     createdAt: string;
     updatedAt: string;
     geoJson: string;
-    courseElementId: string;
+    elementId: string;
     holeId: string;
     hole: string;
     courseId: string;
-    golfCourse: string;
+    course: string;
 }
 
 export interface Polygon {
