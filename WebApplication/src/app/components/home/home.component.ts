@@ -16,7 +16,7 @@ import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
         from '../../interfaces/course.interface';
-import { EmptyClass, Call_t, PolygonState_t }
+import { EmptyClass, Call_t, State_t }
         from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
@@ -221,6 +221,20 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
+     *
+     ***/
+    private getMapDrawingMode() {
+        // REALLY UGLY WAY TO GET THE CURRENT DRAWINGMANAGERMODE 
+        //                      _         _
+        //                       \_(o-o)_/
+
+        let obj = this.googleMap.data.gm_bindings_.drawingMode;
+        for (var a in this.googleMap.data.gm_bindings_.drawingMode) {
+            return obj[a].kd.getDrawingManagerMode();
+        }
+    }
+
+    /***
      * onMapFeatureAdd(any): void
      *
      *     Event handler for new & loaded elements on the map. The handler adds
@@ -228,6 +242,7 @@ export class HomeComponent {
      ***/
     private onMapFeatureAdd(e: any) {
         // ignore the loaded polygons
+
         if (e.feature.getProperty("elementId") === undefined) {
             // TODO polygon or point?
             // flag the polygon as new with the proper type and course/hole IDs
@@ -235,14 +250,39 @@ export class HomeComponent {
                 console.log("=== feature added ===");
                 console.log(e.feature);
                 console.log("=====================");
-                e.feature.setProperty("elementId", null);
-                e.feature.setProperty("state", PolygonState_t.PS_NEW);
-                e.feature.setProperty("polygonType", this.selectedType);
-                e.feature.setProperty("courseId", this.currentCourse.courseId);
-                if (this.selectedHole !== undefined) {
-                    e.feature.setProperty("holeId", this.selectedHole.holeId);
-                } else {
-                    e.feature.setProperty("holeId", null);
+                let mapDrawingMode = this.getMapDrawingMode();
+                console.log("Drawing Mode: " + mapDrawingMode);
+                if (mapDrawingMode !== undefined) {
+                    if (mapDrawingMode == "polygon") {
+                        e.feature.setProperty("elementId", null);
+                        e.feature.setProperty("elementType", 0);
+                        e.feature.setProperty("state", State_t.S_NEW);
+                        e.feature.setProperty("polygonType", this.selectedType);
+                        e.feature.setProperty("courseId", 
+                                this.currentCourse.courseId);
+                        if (this.selectedHole !== undefined) {
+                            e.feature.setProperty("holeId", 
+                                this.selectedHole.holeId);
+                        } else {
+                            e.feature.setProperty("holeId", null);
+                        }
+                    } else if (mapDrawingMode == "marker") {
+                        e.feature.setProperty("elementId", null);
+                        e.feature.setProperty("elementType", 1);
+                        e.feature.setProperty("state", State_t.S_NEW);
+                        e.feature.setProperty("pointType", 1);
+                        var promptAns = "";
+                        while (promptAns == "" || promptAns == null) {
+                            promptAns = prompt("Please provide point info", "");
+                        }
+                        e.feature.setProperty("info", promptAns);
+                        if (this.selectedHole !== undefined) {
+                            e.feature.setProperty("holeId", 
+                                this.selectedHole.holeId);
+                        } else {
+                            e.feature.setProperty("holeId", null);
+                        }
+                    }
                 }
             } else {
                 // remove the invalid feature
@@ -264,7 +304,7 @@ export class HomeComponent {
         if (e.feature != this.selectedFeature) {
             this.setSelectedFeature(e.feature);
         }
-        e.feature.setProperty("state", PolygonState_t.PS_UPDATE);
+        e.feature.setProperty("state", State_t.S_UPDATE);
     }
 
     /***
@@ -340,8 +380,15 @@ export class HomeComponent {
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
                 feature => {
+                    console.log("POO:", feature);
                     // extract polygon properties
-                    var type: number = feature.properties["polygonType"];
+                    
+                    var type: number;
+                    if (feature.geometry.type == "Point") {
+                        type = feature.properties["pointType"];
+                    } else {
+                        type = feature.properties["polygonType"];
+                    }
                     var geoJson: string = JSON.stringify(feature.geometry);
                     var courseId = feature.properties["courseId"];
                     var holeId = feature.properties["holeId"];
@@ -349,7 +396,12 @@ export class HomeComponent {
                     // perform the correct action for new, deleted and updated
                     // polygons
                     switch (feature.properties.state) {
-                        case PolygonState_t.PS_NEW:
+                        case State_t.S_NEW:
+                            // elementType = 0 => Polygon
+                            // elementType = 1 => Point
+                            if (feature.properties.elementType == 0) {
+                            } else if (feature.properties.elementType == 1) {
+                            }
                             var http;
                             if (holeId !== undefined && holeId !== null) {
                                 // post the polygon to the hole
@@ -377,7 +429,7 @@ export class HomeComponent {
                             );
                             break;
 
-                        case PolygonState_t.PS_UPDATE:
+                        case State_t.S_UPDATE:
                             /*value['elementId'] =
                                 feature.properties.elementId;
                             this.api.updatePolygon(
@@ -395,6 +447,7 @@ export class HomeComponent {
                             // TODO: implement update
                             break;
                     }
+                    console.log("Success: Course saved");
                 }
             )
         );
@@ -501,8 +554,8 @@ export class HomeComponent {
      * onPolygonSaved
      *
      *     This function is called when a polygon is saved or updated in
-     *     onSaveCourse(...). The feature parameter's state (feature.state) will
-     *     be reset to PolygonState.PS_NONE
+     *     onSaveCourse(...). The feature parameter's state (feature.flag) will
+     *     be reset to State_t.PS_NONE
      ***/
     private onPolygonSaved(body: any, feature: any) {
         if (feature.properties === undefined) {
@@ -510,7 +563,7 @@ export class HomeComponent {
         }
         if (feature !== undefined) {
             if (feature.properties.state !== undefined) {
-                feature.properties.state = PolygonState_t.PS_NONE;
+                feature.properties.state = State_t.S_NONE;
             }
             feature.properties["polygonType"] = body.polygonType;
             feature.properties["elementId"] = body.elementId;
@@ -615,7 +668,13 @@ export class HomeComponent {
                 break;
             case Call_t.C_POLY_CREATE:
             case Call_t.C_POLY_UPDATE:
+                console.log("BODY:",body);
                 this.onPolygonSaved(body, feature);
+                break;
+
+            case Call_t.C_POINT_CREATE:
+                break;
+            case Call_t.C_POINT_UPDATE:
                 break;
             default:
                 window.alert("Success: Default success message.");
@@ -668,20 +727,44 @@ export class HomeComponent {
         if (collection !== undefined && collection !== null) {
             collection.forEach(
                 element => {
-                    let value =
-                        {
-                            "type": "Feature",
-                            "geometry": {
-                                ...JSON.parse(element.geoJson)
-                            },
-                            "properties": {
-                                "state": PolygonState_t.PS_NONE,
-                                "polygonType": element['polygonType'],
-                                "elementId": element.elementId,
-                                "courseId": element.courseId,
-                                "holeId": element.holeId
+                    // if element is a Point (1)
+                    let value;
+                    if (element.elementType == 1) {
+                        value =
+                            {
+                                "type": "Feature",
+                                "geometry": {
+                                    ...JSON.parse(element.geoJson)
+                                },
+                                "properties": {
+                                    "state": State_t.S_NONE,
+                                    "pointType": element['pointType'],
+                                    "elementId": element.elementId,
+                                    "courseId": element.courseId,
+                                    "holeId": element.holeId
+                                }
                             }
-                        }
+                        elements.push(value);
+                        this.courseId = element.courseId
+                    } else if (element.elementType == 0) { 
+                    // else if element is a Polygon (0)
+                        value =
+                            {
+                                "type": "Feature",
+                                "geometry": {
+                                    ...JSON.parse(element.geoJson)
+                                },
+                                "properties": {
+                                    "state": State_t.S_NONE,
+                                    "polygonType": element['polygonType'],
+                                    "elementId": element.elementId,
+                                    "courseId": element.courseId,
+                                    "holeId": element.holeId
+                                }
+                            }
+                        elements.push(value);
+                        this.courseId = element.courseId
+                    }
                     elements.push(value);
                     this.courseId = element.courseId
                 }
