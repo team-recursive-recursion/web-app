@@ -422,12 +422,12 @@ export class HomeComponent {
                             if (feature.properties.elementType ==
                                     Element_t.E_POLY) {
                                 this.createPolygon(holeId, courseId, type,
-                                        geoJson);
+                                        geoJson, feature);
                             } else if (feature.properties.elementType ==
                                     Element_t.E_POINT) {
                                 let info = feature.properties["info"];
                                 this.createPoint(holeId, courseId, type, info,
-                                        geoJson);
+                                        geoJson, feature);
                             }
                             break;
 
@@ -456,12 +456,13 @@ export class HomeComponent {
     }
 
     /***
-     * createPolygon(string, string, number, string) : void
+     * createPolygon(string, string, number, string, any) : void
      *
-     *     Yeaaaaaaah
+     *     Function that adds a new unsaved Polygon currently on the map
+     *     through a API call.
      ***/
     private createPolygon(holeId: string, courseId: string, type: number,
-            geoJson: string) {
+            geoJson: string, feature: any) {
 
         var http;
         if (holeId !== undefined && holeId !== null) {
@@ -491,12 +492,13 @@ export class HomeComponent {
     }
 
     /***
-     * createPoint(string, string, number, string, string) : void
+     * createPoint(string, string, number, string, string, any) : void
      *
-     *     Yeaaaaaaah
+     *     Function that adds a new unsaved Point currently on the map
+     *     through a API call.
      ***/
     private createPoint(holeId: string, courseId: string, type: number,
-            info: string, geoJson: string) {
+            info: string, geoJson: string, feature: any) {
 
         var http;
         console.log("HOLEID:" + holeId);
