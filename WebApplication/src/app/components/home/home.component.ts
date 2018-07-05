@@ -16,7 +16,7 @@ import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
         from '../../interfaces/course.interface';
-import { EmptyClass, Call_t, State_t }
+import { EmptyClass, Call_t, State_t, Point_t }
         from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
@@ -51,7 +51,8 @@ export class HomeComponent {
     geoJsonObject: any;
     googleMap: any = null;
     features: any;
-    selectedType: number = 0;
+    polyType: number = 0;
+    pointType: number = 0;
 
     lat: number = -25.658712;
     lng: number = 28.140347;
@@ -73,6 +74,11 @@ export class HomeComponent {
         { "typeName": 'Water Hazard', "ttype": 4 }
     ];
 
+    pointTypes = [
+        {"pointName": 'Pin', "ptype": Point_t.P_PIN},
+        {"pointName": 'Hole', "ptype": Point_t.P_HOLE},
+        {"pointName": 'Tee', "ptype": Point_t.P_TEE}
+    ];
     constructor(private api: ApiService, private globals: GlobalsService,
             private router: Router,
             changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
@@ -260,7 +266,7 @@ export class HomeComponent {
                         e.feature.setProperty("elementId", null);
                         e.feature.setProperty("elementType", 0);
                         e.feature.setProperty("state", State_t.S_NEW);
-                        e.feature.setProperty("polygonType", this.selectedType);
+                        e.feature.setProperty("polygonType", this.polyType);
                         e.feature.setProperty("courseId",
                                 this.currentCourse.courseId);
                         if (this.selectedHole !== undefined) {
@@ -273,7 +279,7 @@ export class HomeComponent {
                         e.feature.setProperty("elementId", null);
                         e.feature.setProperty("elementType", 1);
                         e.feature.setProperty("state", State_t.S_NEW);
-                        e.feature.setProperty("pointType", 1);
+                        e.feature.setProperty("pointType", this.pointType);
                         var promptAns = "";
                         while (promptAns == "" || promptAns == null) {
                             promptAns = prompt("Please provide point info", "");
@@ -414,7 +420,11 @@ export class HomeComponent {
                             // elementType = 0 => Polygon
                             // elementType = 1 => Point
                             if (feature.properties.elementType == 0) {
+                                this.createPolygon(holeId, courseId, type, 
+                                        geoJson);
                             } else if (feature.properties.elementType == 1) {
+                                this.createPoint(holeId, courseId, type, 
+                                        geoJson);
                             }
                             var http;
                             if (holeId !== undefined && holeId !== null) {
