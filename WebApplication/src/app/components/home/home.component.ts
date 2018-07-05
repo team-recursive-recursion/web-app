@@ -229,12 +229,12 @@ export class HomeComponent {
     private onMapFeatureAdd(e: any) {
         // ignore the loaded polygons
         if (e.feature.getProperty("elementId") === undefined) {
-            console.log("=== feature added ===");
-            console.log(e.feature);
-            console.log("=====================");
             // TODO polygon or point?
             // flag the polygon as new with the proper type and course/hole IDs
             if (this.currentCourse !== undefined) {
+                console.log("=== feature added ===");
+                console.log(e.feature);
+                console.log("=====================");
                 e.feature.setProperty("elementId", null);
                 e.feature.setProperty("state", PolygonState_t.PS_NEW);
                 e.feature.setProperty("polygonType", this.selectedType);
@@ -348,7 +348,7 @@ export class HomeComponent {
 
                     // perform the correct action for new, deleted and updated
                     // polygons
-                    switch (feature.properties.flag) {
+                    switch (feature.properties.state) {
                         case PolygonState_t.PS_NEW:
                             var http;
                             if (holeId !== undefined && holeId !== null) {
@@ -501,21 +501,21 @@ export class HomeComponent {
      * onPolygonSaved
      *
      *     This function is called when a polygon is saved or updated in
-     *     onSaveCourse(...). The feature parameter's state (feature.flag) will
+     *     onSaveCourse(...). The feature parameter's state (feature.state) will
      *     be reset to PolygonState.PS_NONE
      ***/
     private onPolygonSaved(body: any, feature: any) {
-        if (feature.property === undefined) {
+        if (feature.properties === undefined) {
             return;
         }
         if (feature !== undefined) {
-            if (feature.property.flag !== undefined) {
-                feature.property.flag = PolygonState_t.PS_NONE;
+            if (feature.properties.state !== undefined) {
+                feature.properties.state = PolygonState_t.PS_NONE;
             }
-            feature.property["polygonType"] = body.polygonType;
-            feature.property["elementId"] = body.elementId;
-            feature.property["courseId"] = body.courseId;
-            feature.property["holeId"] = body.holeId;
+            feature.properties["polygonType"] = body.polygonType;
+            feature.properties["elementId"] = body.elementId;
+            feature.properties["courseId"] = body.courseId;
+            feature.properties["holeId"] = body.holeId;
             if (body.holeId != null) {
                 this.holes.push(body);
             }
