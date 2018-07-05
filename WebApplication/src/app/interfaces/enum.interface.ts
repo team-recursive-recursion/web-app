@@ -31,10 +31,12 @@ export enum Call_t {
     C_POLY_CREATE,
     C_POLY_LOAD,
     C_POLY_UPDATE,
+    C_POLY_DELETE,
 
     C_POINT_CREATE,
     C_POINT_LOAD,
-    C_POINT_DELETE,
+    C_POINT_UPDATE,
+    C_POINT_DELETE
 }
 
 export enum PolygonState_t {

@@ -34,6 +34,8 @@ export class HomeComponent {
     // selected items
     selectedFeature: any = null;
 
+    removedFeatures: Array<any> = []; // list of elements to be deleted
+
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
@@ -328,14 +330,25 @@ export class HomeComponent {
     }
 
     /***
-     * onSaveCourse
+     * onSaveCourse(): void
      *
      *     Function that saves the current course. New elements are posted,
      *     updated elements are put and removed elements are deleted.
      ***/
     public onSaveCourse() {
         // delete removed elements
-        // TODO
+        this.removedFeatures.forEach(feature => {
+            this.api.polygonDelete(feature.getProperty("elementId")).subscribe(
+                result => this.onResult(result.headers,
+                    result.json(),
+                    Call_t.C_POLY_DELETE, feature),
+                error => this.onFail(error.status,
+                    error.headers, error.text(),
+                    Call_t.C_POLY_DELETE),
+                () => console.log("Poly deleted successfully")
+            );
+        });
+        this.removedFeatures = [];
         // handle all existing features
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
@@ -425,12 +438,14 @@ export class HomeComponent {
     /***
      * onDeleteElement(): void
      *
-     *     Deletes the currently selected feature.
+     *     Deletes the currently selected feature and adds it to the remove
+     *     list.
      */
     public onDeleteElement() {
         if (this.selectedFeature !== null) {
             this.googleMap.data.remove(this.selectedFeature);
-            // TODO add to delete list
+            this.removedFeatures.push(this.selectedFeature);
+            this.selectedFeature.setProperty("state", PolygonState_t.PS_DELETE);
             this.selectedFeature = null;
         }
     }
@@ -616,9 +631,6 @@ export class HomeComponent {
             case Call_t.C_POLY_CREATE:
             case Call_t.C_POLY_UPDATE:
                 this.onPolygonSaved(body, feature);
-                break;
-            default:
-                window.alert("Success: Default success message.");
                 break;
         }
     }
