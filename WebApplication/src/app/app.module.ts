@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
-import { MapperComponent } from './components/mapper/mapper.component';
 import { RegisterComponent } from './components/register/register.component';
 
 import { ApiService } from './services/api/api.service';
@@ -67,7 +66,6 @@ import {
     ContentComponent,
     NavMenuComponent,
     LoginComponent,
-    MapperComponent,
     RegisterComponent,
     HomeComponent
   ],

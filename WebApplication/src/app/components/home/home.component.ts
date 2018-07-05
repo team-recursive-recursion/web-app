@@ -31,6 +31,9 @@ declare var google: any;
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
 
+    // selected items
+    selectedFeature: any;
+
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
@@ -133,33 +136,12 @@ export class HomeComponent {
      *     Function to set the Map Events listeners.
      ***/
     private setUpMapEvents() {
-        this.googleMap.data.addListener("addfeature", e => {
-
-            if (e.feature.getProperty('polygonType') === undefined) {
-
-                e.feature.setProperty("flag", PolygonState_t.PS_NEW);
-                e.feature.setProperty("polygonType", this.selectedType);
-                e.feature.setProperty("courseId", this.currentCourse.courseId);
-                if (this.selectedHole !== undefined) {
-
-                    e.feature.setProperty("holeId", this.selectedHole.holeId);
-                }
-            }
-        });
-        this.googleMap.data.addListener('setgeometry', e => {
-
-            e.feature.setProperty('polygonType', this.selectedType);
-            // if (e.feature.getProperty('flag') === undefined) {
-            e.feature.setProperty('flag', PolygonState_t.PS_UPDATE);
-            // }
-        });
-        this.googleMap.data.addListener('click', e => {
-
-            e.feature.setProperty('polygonType', this.selectedType);
-            // if (e.feature.getProperty('flag') === undefined) {
-            e.feature.setProperty('flag', PolygonState_t.PS_UPDATE);
-            // }
-        });
+        this.googleMap.data.addListener("addfeature", e =>
+                this.onMapFeatureAdd(e));
+        this.googleMap.data.addListener('setgeometry', e =>
+                this.onMapGeometrySet(e));
+        this.googleMap.data.addListener('click', e =>
+                this.onMapClick(e));
     }
 
     /***
@@ -195,10 +177,9 @@ export class HomeComponent {
     }
 
     /***
-     * updateDataLayer
+     * updateDataLayer(any): void
      *
-     *     Function that updates the Data Layer (items on the map) with the new
-     *     items.
+     *     Updates the items on the map to new items.
      ***/
     public updateDataLayer(geoJson: any) {
         this.geoJsonObject = geoJson;
@@ -225,10 +206,88 @@ export class HomeComponent {
     }
 
     /***
-     * onCreateCourse
+     * setSelectedFeature(any): void
+     *
+     *     Sets the currently selected feature and updates the controls to
+     *     reflect the selected feature.
+     ***/
+    private setSelectedFeature(f: any) {
+        this.selectedFeature = f;
+        // TODO update controls
+    }
+
+    /***************************************************************************
+     * Map event handlers.
+     **************************************************************************/
+
+    /***
+     * onMapFeatureAdd(any): void
+     *
+     *     Event handler for new & loaded elements on the map. The handler adds
+     *     the necessary properties to new elements.
+     ***/
+    private onMapFeatureAdd(e: any) {
+        // ignore the loaded polygons
+        if (e.feature.getProperty("elementId") === undefined) {
+            console.log("=== feature added ===");
+            console.log(e.feature);
+            console.log("=====================");
+            // TODO polygon or point?
+            // flag the polygon as new with the proper type and course/hole IDs
+            if (this.currentCourse !== undefined) {
+                e.feature.setProperty("elementId", null);
+                e.feature.setProperty("state", PolygonState_t.PS_NEW);
+                e.feature.setProperty("polygonType", this.selectedType);
+                e.feature.setProperty("courseId", this.currentCourse.courseId);
+                if (this.selectedHole !== undefined) {
+                    e.feature.setProperty("holeId", this.selectedHole.holeId);
+                } else {
+                    e.feature.setProperty("holeId", null);
+                }
+            } else {
+                // TODO remove the invalid feature
+                // TODO nice message
+                window.alert("Please load or create a course first");
+            }
+        }
+    }
+
+    /***
+     * onMapGeometrySet(any): void
+     *
+     *     Event handler for updated elements on the map. The handler sets the
+     *     current selected feature to the updated one and flags the feature
+     *     for update.
+     ***/
+    private onMapGeometrySet(e: any) {
+        if (e.feature != this.selectedFeature) {
+            this.setSelectedFeature(e.feature);
+        }
+        e.feature.setProperty("state", PolygonState_t.PS_UPDATE);
+    }
+
+    /***
+     * onMapClick(any): void
+     *
+     *     Event handler for map element clicks. The handler sets the current
+     *     selected feature to the clicked one.
+     ***/
+    private onMapClick(e: any) {
+        // TODO menu maybe?
+        if (e.feature != this.selectedFeature) {
+            this.setSelectedFeature(e.feature);
+        }
+    }
+
+    /***************************************************************************
+     * Create, load, save, and delete event handlers for a Course.
+     **************************************************************************/
+
+    /***
+     * onCreateCourse(string): void
      *
      *     Function that creates a new Course using the API.
-     *     On success, call onResult. 
+     *     On success, call onResult.
      *     On failure, call onFail.
      ***/
     public onCreateCourse(name: string) {
@@ -252,7 +311,7 @@ export class HomeComponent {
      * onLoadCourse
      *
      *     Function that retrieves the current (selected) Course using the API.
-     *     On success, call onResult. 
+     *     On success, call onResult.
      *     On failure, call onFail.
      ***/
     public onLoadCourse(index: number) {
@@ -271,7 +330,7 @@ export class HomeComponent {
      * onSaveCourse
      *
      *     Function that saves the current Course using the API.
-     *     On success, call onResult. 
+     *     On success, call onResult.
      *     On failure, call onFail.
      ***/
     public onSaveCourse() {
@@ -346,7 +405,7 @@ export class HomeComponent {
      * onDeleteCourse
      *
      *     Function that deletes the current (selected) Course using the API.
-     *     On success, call onResult. 
+     *     On success, call onResult.
      *     On failure, call onFail.
      ***/
     public onDeleteCourse(index: number) {
@@ -364,14 +423,18 @@ export class HomeComponent {
         }
     }
 
+    /***************************************************************************
+     * Create and load handler for Holes.
+     **************************************************************************/
+
     /***
-     * onAddHoles
-     *
-     *     Function that creates a new Hole for the current Course using the
-     *     API.
-     *     On success, call onResult. 
-     *     On failure, call onFail.
-     ***/
+    * onAddHoles
+    *
+    *     Function that creates a new Hole for the current Course using the
+    *     API.
+    *     On success, call onResult.
+    *     On failure, call onFail.
+    ***/
     public onAddHole() {
         console.log("New hole name:", this.newHoleName);
         if (this.newHoleName != "" && this.newHoleName !== undefined &&
@@ -394,7 +457,7 @@ export class HomeComponent {
      * onLoadHoles
      *
      *     Function that retrieves the Holes of a Course from the API.
-     *     On success, call onResult. 
+     *     On success, call onResult.
      *     On failure, call onFail.
      ***/
     private onLoadHoles() {
@@ -411,11 +474,16 @@ export class HomeComponent {
         );
     }
 
-    /***
+    /***************************************************************************
      * Create, load, update, and delete handler for Points.
-     ***/
+     **************************************************************************/
+
     public onCreatePoint() {
     }
+
+    /***************************************************************************
+     * Client side saving and updating handlers for Polygons.
+     **************************************************************************/
 
     /***
      * onPolygonSaved
@@ -442,8 +510,12 @@ export class HomeComponent {
         }
     }
 
+    /***************************************************************************
+     * Other event handlers.
+     **************************************************************************/
+
     /***
-     * onToggleDraggable
+     * onToggleDraggable(): void
      *
      *     Toggles the draggable option of the map.
      ***/
@@ -452,7 +524,7 @@ export class HomeComponent {
     }
 
     /***
-     * onResetMap
+     * onResetMap(): void
      *
      *     Removes all drawn items on the map.
      ***/
@@ -470,8 +542,12 @@ export class HomeComponent {
 
     }
 
+    /***************************************************************************
+     * API response handlers.
+     **************************************************************************/
+
     /***
-     * onResult
+     * onResult(any, any, Call_t, any): void
      *
      *     Function to be called after each successful API call.
      ***/
@@ -494,8 +570,7 @@ export class HomeComponent {
                 this.activeElements = {
                     "type": "FeatureCollection",
                     "features": [
-                        ...this.generateFeature(
-                            this.currentCourse.elements)
+                        ...this.generateFeature(this.currentCourse.elements)
                     ]
                 }
                 this.onLoadHoles();
@@ -540,7 +615,7 @@ export class HomeComponent {
     }
 
     /***
-     * onFail
+     * onFail(number, any, any, Call_t): void
      *
      *     Function to be called after each failed API call.
      ***/
@@ -578,7 +653,7 @@ export class HomeComponent {
     }
 
     /***
-     * generateFeature
+     * generateFeature(Array<any>): void
      *
      *     TODO No idea
      ***/
@@ -594,7 +669,7 @@ export class HomeComponent {
                                 ...JSON.parse(element.geoJson)
                             },
                             "properties": {
-                                "flag": PolygonState_t.PS_NONE,
+                                "state": PolygonState_t.PS_NONE,
                                 "polygonType": element['polygonType'],
                                 "elementId": element.elementId,
                                 "courseId": element.courseId,
@@ -610,7 +685,7 @@ export class HomeComponent {
     }
 
     /***
-     * showHoles
+     * showHoles(): void
      *
      *     TODO No idea
      ***/
@@ -631,7 +706,7 @@ export class HomeComponent {
     }
 
     /***
-     * filterHoles
+     * filterHoles(string): void
      *
      *     TODO no idea
      *     Possibly filter which holes to show?
@@ -655,7 +730,7 @@ export class HomeComponent {
     }
 
     /***
-     * updateHoles
+     * updateHoles(any): void
      *
      *     TODO no idea
      ***/
