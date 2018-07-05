@@ -16,10 +16,11 @@ import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
         from '../../interfaces/course.interface';
-import { EmptyClass, Call_t, State_t, Point_t }
+import { EmptyClass, Call_t, State_t, Point_t, Element_t }
         from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
+import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
 
 
 declare var google: any;
@@ -313,7 +314,9 @@ export class HomeComponent {
         if (e.feature != this.selectedFeature) {
             this.setSelectedFeature(e.feature);
         }
-        e.feature.setProperty("state", State_t.S_UPDATE);
+        if (e.feature.getProperty("state") != State_t.S_NEW) {
+            e.feature.setProperty("state", State_t.S_UPDATE);
+        }
     }
 
     /***
@@ -385,14 +388,22 @@ export class HomeComponent {
     public onSaveCourse() {
         // delete removed elements
         this.removedFeatures.forEach(feature => {
-            this.api.polygonDelete(feature.getProperty("elementId")).subscribe(
+            var http;
+            if (feature.getProperty("elementType") == Element_t.E_POLY) {
+                // delete the polygon
+                http = this.api.polygonDelete(feature.getProperty("elementId"));
+            } else {
+                // delete the point
+                http = this.api.pointDelete(feature.getProperty("elementId"));
+            }
+            http.subscribe(
                 result => this.onResult(result.headers,
                     result.json(),
-                    Call_t.C_POLY_DELETE, feature),
+                    Call_t.C_ELEMENT_DELETE, feature),
                 error => this.onFail(error.status,
                     error.headers, error.text(),
-                    Call_t.C_POLY_DELETE),
-                () => console.log("Poly deleted successfully")
+                    Call_t.C_ELEMENT_DELETE),
+                () => console.log("Element deleted successfully")
             );
         });
         this.removedFeatures = [];
@@ -420,10 +431,10 @@ export class HomeComponent {
                             // elementType = 0 => Polygon
                             // elementType = 1 => Point
                             if (feature.properties.elementType == 0) {
-                                this.createPolygon(holeId, courseId, type, 
+                                this.createPolygon(holeId, courseId, type,
                                         geoJson);
                             } else if (feature.properties.elementType == 1) {
-                                this.createPoint(holeId, courseId, type, 
+                                this.createPoint(holeId, courseId, type,
                                         geoJson);
                             }
                             var http;
@@ -445,10 +456,10 @@ export class HomeComponent {
                             http.subscribe(
                                 result => this.onResult(result.headers,
                                     result.json(),
-                                    Call_t.C_POLY_CREATE, feature),
+                                    Call_t.C_ELEMENT_CREATE, feature),
                                 error => this.onFail(error.status,
                                     error.headers, error.text(),
-                                    Call_t.C_POLY_CREATE),
+                                    Call_t.C_ELEMENT_CREATE),
                                 () => console.log("Poly saved successfully")
                             );
                             break;
@@ -568,24 +579,18 @@ export class HomeComponent {
     }
 
     /***************************************************************************
-     * Create, load, update, and delete handler for Points.
-     **************************************************************************/
-
-    public onCreatePoint() {
-    }
-
-    /***************************************************************************
      * Client side saving and updating handlers for Polygons.
      **************************************************************************/
 
     /***
-     * onPolygonSaved
+     * onElementSaved
      *
-     *     This function is called when a polygon is saved or updated in
-     *     onSaveCourse(...). The feature parameter's state (feature.flag) will
-     *     be reset to State_t.PS_NONE
+     *     This function is called when an element is saved or updated. The
+     *     element's properties are set to the properties received from the
+     *     response.
      ***/
-    private onPolygonSaved(body: any, feature: any) {
+    private onElementSaved(body: any, feature: any) {
+        // TODO point or polygon?
         if (feature.properties === undefined) {
             return;
         }
@@ -593,10 +598,17 @@ export class HomeComponent {
             if (feature.properties.state !== undefined) {
                 feature.properties.state = State_t.S_NONE;
             }
-            feature.properties["polygonType"] = body.polygonType;
+            feature.properties["elementType"] = body.elementType;
             feature.properties["elementId"] = body.elementId;
             feature.properties["courseId"] = body.courseId;
             feature.properties["holeId"] = body.holeId;
+            if (body.elementType == Element_t.E_POLY) {
+                feature.properties["polygonType"] = body.polygonType;
+            } else {
+                feature.properties["pointType"] = body.pointType;
+                feature.properties["info"] = body.info;
+            }
+            // TODO explain below
             if (body.holeId != null) {
                 this.holes.push(body);
             }
@@ -694,10 +706,10 @@ export class HomeComponent {
                     this.showHoles();
                 }
                 break;
-            case Call_t.C_POLY_CREATE:
-            case Call_t.C_POLY_UPDATE:
+            case Call_t.C_ELEMENT_CREATE:
+            case Call_t.C_ELEMENT_UPDATE:
                 console.log("BODY:",body);
-                this.onPolygonSaved(body, feature);
+                this.onElementSaved(body, feature);
                 break;
         }
     }
@@ -725,12 +737,16 @@ export class HomeComponent {
             case Call_t.C_HOLE_CREATE:
                 window.alert("Error: Failed to create hole.");
                 break;
-            case Call_t.C_POLY_CREATE:
-                window.alert("Error: Failed to create polygon.");
+            case Call_t.C_ELEMENT_CREATE:
+                window.alert("Error: Failed to create element.");
                 break;
-            case Call_t.C_POLY_UPDATE:
-                window.alert("Error: Failed to update polygon.");
+            case Call_t.C_ELEMENT_UPDATE:
+                window.alert("Error: Failed to update element.");
                 break;
+            case Call_t.C_ELEMENT_LOAD:
+                window.alert("Error: Failed to load element.");
+            case Call_t.C_ELEMENT_DELETE:
+                window.alert("Error: Failed to delete element.");
             default:
                 window.alert("Error: Default error message.");
                 break;
@@ -759,6 +775,7 @@ export class HomeComponent {
                                 "properties": {
                                     "state": State_t.S_NONE,
                                     "pointType": element['pointType'],
+                                    "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
                                     "holeId": element.holeId
@@ -775,6 +792,7 @@ export class HomeComponent {
                                 "properties": {
                                     "state": State_t.S_NONE,
                                     "polygonType": element['polygonType'],
+                                    "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
                                     "holeId": element.holeId

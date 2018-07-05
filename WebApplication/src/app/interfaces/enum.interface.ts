@@ -28,15 +28,10 @@ export enum Call_t {
     C_HOLE_LOAD,
     C_HOLE_DELETE,
 
-    C_POLY_CREATE,
-    C_POLY_LOAD,
-    C_POLY_UPDATE,
-    C_POLY_DELETE,
-
-    C_POINT_CREATE,
-    C_POINT_LOAD,
-    C_POINT_UPDATE,
-    C_POINT_DELETE
+    C_ELEMENT_CREATE,
+    C_ELEMENT_LOAD,
+    C_ELEMENT_UPDATE,
+    C_ELEMENT_DELETE
 }
 
 export enum State_t {
