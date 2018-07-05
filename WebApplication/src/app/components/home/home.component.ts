@@ -280,7 +280,6 @@ export class HomeComponent {
                         if (info == "Point Info" || info === undefined) {
                             info = "";
                         }
-                        window.alert("Info: " + info);
                         e.feature.setProperty("info", info);
                     }
                 }

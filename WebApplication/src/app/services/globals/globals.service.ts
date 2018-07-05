@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class GlobalsService {
 
-    uid: string = "15706542-8208-4e70-8711-71741320310d";
+    uid: string = null;
 
     public setUid(uid: string) {
         this.uid = uid;
