@@ -113,6 +113,11 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * setupMap
+     *                   _         _
+     *     TODO Whatever  \_(o-o)_/
+     ***/
     private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
@@ -122,6 +127,11 @@ export class HomeComponent {
         });
     }
 
+    /***
+     * setUpMapEvents
+     *
+     *     Function to set the Map Events listeners.
+     ***/
     private setUpMapEvents() {
         this.googleMap.data.addListener("addfeature", e => {
 
@@ -152,6 +162,12 @@ export class HomeComponent {
         });
     }
 
+    /***
+     * styleFeatures
+     *
+     *     Function that sets the color of the Polygon according to its
+     *     polygonType property.
+     ***/
     private styleFeatures() {
         this.googleMap.data.setStyle(function (feature) {
             const polyType = feature.getProperty('polygonType');
@@ -178,6 +194,12 @@ export class HomeComponent {
 
     }
 
+    /***
+     * updateDataLayer
+     *
+     *     Function that updates the Data Layer (items on the map) with the new
+     *     items.
+     ***/
     public updateDataLayer(geoJson: any) {
         this.geoJsonObject = geoJson;
         if (this.geoJsonObject !== undefined &&
@@ -203,11 +225,13 @@ export class HomeComponent {
     }
 
     /***
-     * Create, load, save, and delete event handlers for a Course.
+     * onCreateCourse
+     *
+     *     Function that creates a new Course using the API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
      ***/
-
     public onCreateCourse(name: string) {
-        // console.log("Course name: " + name);
         if (name != "" && name != "Course Name") {
             // create new course
             this.api.coursesCreate(this.globals.getUid(), name)
@@ -224,6 +248,13 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * onLoadCourse
+     *
+     *     Function that retrieves the current (selected) Course using the API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
+     ***/
     public onLoadCourse(index: number) {
         // receive course info
         this.api.courseGet(this.courses[index].courseId)
@@ -236,6 +267,13 @@ export class HomeComponent {
             );
     }
 
+    /***
+     * onSaveCourse
+     *
+     *     Function that saves the current Course using the API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
+     ***/
     public onSaveCourse() {
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
@@ -304,6 +342,13 @@ export class HomeComponent {
         );
     }
 
+    /***
+     * onDeleteCourse
+     *
+     *     Function that deletes the current (selected) Course using the API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
+     ***/
     public onDeleteCourse(index: number) {
         if (window.confirm("Are you sure you want to delete '" +
             this.courses[index].courseName + "'?")) {
@@ -320,9 +365,13 @@ export class HomeComponent {
     }
 
     /***
-     * Create and load handler for Holes.
+     * onAddHoles
+     *
+     *     Function that creates a new Hole for the current Course using the
+     *     API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
      ***/
-
     public onAddHole() {
         console.log("New hole name:", this.newHoleName);
         if (this.newHoleName != "" && this.newHoleName !== undefined &&
@@ -341,6 +390,13 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * onLoadHoles
+     *
+     *     Function that retrieves the Holes of a Course from the API.
+     *     On success, call onResult. 
+     *     On failure, call onFail.
+     ***/
     private onLoadHoles() {
         this.holes = [];
         this.currentCourse.holes.forEach(
@@ -356,9 +412,18 @@ export class HomeComponent {
     }
 
     /***
-     * Client side saving and updating handlers for Polygons.
+     * Create, load, update, and delete handler for Points.
      ***/
+    public onCreatePoint() {
+    }
 
+    /***
+     * onPolygonSaved
+     *
+     *     This function is called when a polygon is saved or updated in
+     *     onSaveCourse(...). The feature parameter's state (feature.flag) will
+     *     be reset to PolygonState.PS_NONE
+     ***/
     private onPolygonSaved(body: any, feature: any) {
         if (feature.property === undefined) {
             return;
@@ -378,13 +443,19 @@ export class HomeComponent {
     }
 
     /***
-     * Other event handlers.
+     * onToggleDraggable
+     *
+     *     Toggles the draggable option of the map.
      ***/
-
     public onToggleDraggable() {
         this.mapDraggable = !this.mapDraggable;
     }
 
+    /***
+     * onResetMap
+     *
+     *     Removes all drawn items on the map.
+     ***/
     public onResetMap() {
         this.selectedHole = undefined;
         this.currentCourse = undefined;
@@ -400,9 +471,10 @@ export class HomeComponent {
     }
 
     /***
-     * API response handlers.
+     * onResult
+     *
+     *     Function to be called after each successful API call.
      ***/
-
     private onResult(headers: any, body: any, callType: Call_t,
             feature: any = null) {
         switch (callType) {
@@ -418,7 +490,6 @@ export class HomeComponent {
                 this.selected = this.courses.indexOf(body);
                 break;
             case Call_t.C_COURSE_LOAD:
-                console.log(body);
                 this.currentCourse = body;
                 this.activeElements = {
                     "type": "FeatureCollection",
@@ -447,7 +518,6 @@ export class HomeComponent {
                 }
                 break;
             case Call_t.C_HOLE_CREATE:
-                console.log("Hole added:", body);
                 if (this.currentCourse.holes === null) {
                     this.currentCourse.holes = [];
                 }
@@ -469,8 +539,13 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * onFail
+     *
+     *     Function to be called after each failed API call.
+     ***/
     private onFail(status: number, headers: any, body: any, callType: Call_t) {
-        console.log(JSON.stringify(body));
+        //console.log(JSON.stringify(body));
         switch (callType) {
             case Call_t.C_COURSES_LOAD:
                 window.alert("Error: Failed to load saved courses.");
@@ -502,6 +577,11 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * generateFeature
+     *
+     *     TODO No idea
+     ***/
     private generateFeature(collection: Array<any>) {
         let elements: Array<any> = [];
         if (collection !== undefined && collection !== null) {
@@ -526,10 +606,14 @@ export class HomeComponent {
                 }
             );
         }
-        console.log(elements);
         return elements;
     }
 
+    /***
+     * showHoles
+     *
+     *     TODO No idea
+     ***/
     private showHoles() {
         let tempHolder: any = [...this.generateFeature(this.currentCourse
             .elements)];
@@ -546,6 +630,12 @@ export class HomeComponent {
         this.updateDataLayer(this.activeElements);
     }
 
+    /***
+     * filterHoles
+     *
+     *     TODO no idea
+     *     Possibly filter which holes to show?
+     ***/
     private filterHoles(holeId: string) {
         let tempHolder: any = [...this.generateFeature(this.currentCourse
             .elements)];
@@ -564,6 +654,11 @@ export class HomeComponent {
         this.updateDataLayer(this.activeElements);
     }
 
+    /***
+     * updateHoles
+     *
+     *     TODO no idea
+     ***/
     public updateHoles(event: any) {
         if (event.value !== undefined) {
             this.filterHoles(event.value.holeId);
