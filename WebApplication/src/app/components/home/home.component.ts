@@ -257,7 +257,6 @@ export class HomeComponent {
             // flag the element as new with the proper type and course/hole IDs
             if (this.currentCourse !== undefined) {
                 let mapDrawingMode = this.getMapDrawingMode();
-                console.log("Drawing Mode: " + mapDrawingMode);
                 if (mapDrawingMode !== undefined) {
                     e.feature.setProperty("state", State_t.S_NEW);
                     e.feature.setProperty("elementId", null);
@@ -402,7 +401,6 @@ export class HomeComponent {
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
                 feature => {
-                    console.log("POO:", feature);
                     // extract polygon properties
 
                     var type: number;
@@ -501,8 +499,6 @@ export class HomeComponent {
             info: string, geoJson: string, feature: any) {
 
         var http;
-        console.log("HOLEID:" + holeId);
-        console.log("COURSEID:" + courseId);
         if (holeId !== undefined && holeId !== null) {
             // post the point to the hole
             http = this.api.holeCreatePoint(
@@ -583,7 +579,6 @@ export class HomeComponent {
     *     On failure, call onFail.
     ***/
     public onAddHole() {
-        console.log("New hole name:", this.newHoleName);
         if (this.newHoleName != "" && this.newHoleName !== undefined &&
             this.newHoleName != "Hole Name") {
             this.api.holesCreate(this.currentCourse.courseId, this.newHoleName)
@@ -762,7 +757,6 @@ export class HomeComponent {
      *     Function to be called after each failed API call.
      ***/
     private onFail(status: number, headers: any, body: any, callType: Call_t) {
-        //console.log(JSON.stringify(body));
         switch (callType) {
             case Call_t.C_COURSES_LOAD:
                 window.alert("Error: Failed to load saved courses.");
