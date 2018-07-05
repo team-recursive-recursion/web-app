@@ -44,6 +44,7 @@ export class HomeComponent {
     holeName: any[] = [];
     selectedHole: any;
     courseName: string;
+    pointInfo: string;
 
     url: any;
     selected: number = 0;
@@ -251,56 +252,44 @@ export class HomeComponent {
      *     the necessary properties to new elements.
      ***/
     private onMapFeatureAdd(e: any) {
-        // ignore the loaded polygons
-
+        // ignore the loaded elements
         if (e.feature.getProperty("elementId") === undefined) {
-            // TODO polygon or point?
-            // flag the polygon as new with the proper type and course/hole IDs
+            // flag the element as new with the proper type and course/hole IDs
             if (this.currentCourse !== undefined) {
-                console.log("=== feature added ===");
-                console.log(e.feature);
-                console.log("=====================");
                 let mapDrawingMode = this.getMapDrawingMode();
                 console.log("Drawing Mode: " + mapDrawingMode);
                 if (mapDrawingMode !== undefined) {
+                    e.feature.setProperty("state", State_t.S_NEW);
+                    e.feature.setProperty("elementId", null);
+                    e.feature.setProperty("courseId",
+                            this.currentCourse.courseId);
+                    if (this.selectedHole !== undefined) {
+                        e.feature.setProperty("holeId",
+                                this.selectedHole.holeId);
+                    } else {
+                        e.feature.setProperty("holeId", null);
+                    }
+                    // assign polygon or point properties
                     if (mapDrawingMode == "polygon") {
-                        e.feature.setProperty("elementId", null);
                         e.feature.setProperty("elementType", Element_t.E_POLY);
-                        e.feature.setProperty("state", State_t.S_NEW);
                         e.feature.setProperty("polygonType", this.polyType);
-                        e.feature.setProperty("courseId",
-                                this.currentCourse.courseId);
-                        if (this.selectedHole !== undefined) {
-                            e.feature.setProperty("holeId",
-                                this.selectedHole.holeId);
-                        } else {
-                            e.feature.setProperty("holeId", null);
-                        }
                     } else if (mapDrawingMode == "marker") {
-                        e.feature.setProperty("elementId", null);
                         e.feature.setProperty("elementType", Element_t.E_POINT);
-                        e.feature.setProperty("state", State_t.S_NEW);
                         e.feature.setProperty("pointType", this.pointType);
-                        e.feature.setProperty("courseId",
-                                this.currentCourse.courseId);
-                        var promptAns = "";
-                        while (promptAns == "" || promptAns == null) {
-                            promptAns = prompt("Please provide point info", "");
+                        // get point info
+                        var info: string = this.pointInfo;
+                        if (info == "Point Info" || info === undefined) {
+                            info = "";
                         }
-                        e.feature.setProperty("info", promptAns);
-                        if (this.selectedHole !== undefined) {
-                            e.feature.setProperty("holeId",
-                                this.selectedHole.holeId);
-                        } else {
-                            e.feature.setProperty("holeId", null);
-                        }
+                        window.alert("Info: " + info);
+                        e.feature.setProperty("info", info);
                     }
                 }
             } else {
                 // remove the invalid feature
                 this.googleMap.data.remove(e.feature);
                 // TODO nice message
-                window.alert("Please load or create a course first");
+                window.alert("Please load or create a course first.");
             }
         }
     }
@@ -430,11 +419,11 @@ export class HomeComponent {
                     // polygons
                     switch (feature.properties.state) {
                         case State_t.S_NEW:
-                            if (feature.properties.elementType == 
+                            if (feature.properties.elementType ==
                                     Element_t.E_POLY) {
                                 this.createPolygon(holeId, courseId, type,
                                         geoJson);
-                            } else if (feature.properties.elementType == 
+                            } else if (feature.properties.elementType ==
                                     Element_t.E_POINT) {
                                 let info = feature.properties["info"];
                                 this.createPoint(holeId, courseId, type, info,
@@ -471,9 +460,9 @@ export class HomeComponent {
      *
      *     Yeaaaaaaah
      ***/
-    private createPolygon(holeId: string, courseId: string, type: number, 
+    private createPolygon(holeId: string, courseId: string, type: number,
             geoJson: string) {
-        
+
         var http;
         if (holeId !== undefined && holeId !== null) {
             // post the polygon to the hole
@@ -506,9 +495,9 @@ export class HomeComponent {
      *
      *     Yeaaaaaaah
      ***/
-    private createPoint(holeId: string, courseId: string, type: number, 
+    private createPoint(holeId: string, courseId: string, type: number,
             info: string, geoJson: string) {
-        
+
         var http;
         console.log("HOLEID:" + holeId);
         console.log("COURSEID:" + courseId);
