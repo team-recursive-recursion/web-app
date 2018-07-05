@@ -41,13 +41,21 @@ export enum State_t {
     S_NONE
 }
 
+export enum Element_t {
+    E_POLY = 0,
+    E_POINT
+}
+
 export enum Point_t {
     P_PIN =0,
     P_HOLE,
     P_TEE
 }
 
-export enum Element_t {
-    E_POLY = 0,
-    E_POINT
+export enum Polygon_t {
+    P_ROUGH = 0,
+    P_FAIR,
+    P_GREEN,
+    P_BUNKER,
+    P_WATER
 }

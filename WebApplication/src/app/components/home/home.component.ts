@@ -16,7 +16,7 @@ import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
         from '../../interfaces/course.interface';
-import { EmptyClass, Call_t, State_t, Point_t, Element_t }
+import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
         from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
@@ -68,11 +68,11 @@ export class HomeComponent {
     private _mobileQueryListener: () => void;
 
     terrainTypes = [
-        { "typeName": 'Rough', "ttype": 0 },
-        { "typeName": 'Fairway', "ttype": 1 },
-        { "typeName": 'Green', "ttype": 2 },
-        { "typeName": 'Bunker', "ttype": 3 },
-        { "typeName": 'Water Hazard', "ttype": 4 }
+        { "typeName": 'Rough', "ttype": Polygon_t.P_ROUGH },
+        { "typeName": 'Fairway', "ttype": Polygon_t.P_FAIR },
+        { "typeName": 'Green', "ttype": Polygon_t.P_GREEN },
+        { "typeName": 'Bunker', "ttype": Polygon_t.P_BUNKER },
+        { "typeName": 'Water Hazard', "ttype": Polygon_t.P_WATER }
     ];
 
     pointTypes = [
@@ -265,7 +265,7 @@ export class HomeComponent {
                 if (mapDrawingMode !== undefined) {
                     if (mapDrawingMode == "polygon") {
                         e.feature.setProperty("elementId", null);
-                        e.feature.setProperty("elementType", 0);
+                        e.feature.setProperty("elementType", Element_t.E_POLY);
                         e.feature.setProperty("state", State_t.S_NEW);
                         e.feature.setProperty("polygonType", this.polyType);
                         e.feature.setProperty("courseId",
@@ -278,9 +278,11 @@ export class HomeComponent {
                         }
                     } else if (mapDrawingMode == "marker") {
                         e.feature.setProperty("elementId", null);
-                        e.feature.setProperty("elementType", 1);
+                        e.feature.setProperty("elementType", Element_t.E_POINT);
                         e.feature.setProperty("state", State_t.S_NEW);
                         e.feature.setProperty("pointType", this.pointType);
+                        e.feature.setProperty("courseId",
+                                this.currentCourse.courseId);
                         var promptAns = "";
                         while (promptAns == "" || promptAns == null) {
                             promptAns = prompt("Please provide point info", "");
@@ -428,40 +430,16 @@ export class HomeComponent {
                     // polygons
                     switch (feature.properties.state) {
                         case State_t.S_NEW:
-                            // elementType = 0 => Polygon
-                            // elementType = 1 => Point
-                            if (feature.properties.elementType == 0) {
+                            if (feature.properties.elementType == 
+                                    Element_t.E_POLY) {
                                 this.createPolygon(holeId, courseId, type,
                                         geoJson);
-                            } else if (feature.properties.elementType == 1) {
-                                this.createPoint(holeId, courseId, type,
+                            } else if (feature.properties.elementType == 
+                                    Element_t.E_POINT) {
+                                let info = feature.properties["info"];
+                                this.createPoint(holeId, courseId, type, info,
                                         geoJson);
                             }
-                            var http;
-                            if (holeId !== undefined && holeId !== null) {
-                                // post the polygon to the hole
-                                http = this.api.holeCreatePolygon(
-                                    holeId,
-                                    type,
-                                    geoJson
-                                );
-                            } else {
-                                // post the polygon to the course
-                                http = this.api.courseCreatePolygon(
-                                    courseId,
-                                    type,
-                                    geoJson
-                                );
-                            }
-                            http.subscribe(
-                                result => this.onResult(result.headers,
-                                    result.json(),
-                                    Call_t.C_ELEMENT_CREATE, feature),
-                                error => this.onFail(error.status,
-                                    error.headers, error.text(),
-                                    Call_t.C_ELEMENT_CREATE),
-                                () => console.log("Poly saved successfully")
-                            );
                             break;
 
                         case State_t.S_UPDATE:
@@ -485,6 +463,80 @@ export class HomeComponent {
                     console.log("Success: Course saved");
                 }
             )
+        );
+    }
+
+    /***
+     * createPolygon(string, string, number, string) : void
+     *
+     *     Yeaaaaaaah
+     ***/
+    private createPolygon(holeId: string, courseId: string, type: number, 
+            geoJson: string) {
+        
+        var http;
+        if (holeId !== undefined && holeId !== null) {
+            // post the polygon to the hole
+            http = this.api.holeCreatePolygon(
+                holeId,
+                type,
+                geoJson
+            );
+        } else {
+            // post the polygon to the course
+            http = this.api.courseCreatePolygon(
+                courseId,
+                type,
+                geoJson
+            );
+        }
+        http.subscribe(
+            result => this.onResult(result.headers,
+                result.json(),
+                Call_t.C_ELEMENT_CREATE, feature),
+            error => this.onFail(error.status,
+                error.headers, error.text(),
+                Call_t.C_ELEMENT_CREATE),
+            () => console.log("Poly saved successfully")
+        );
+    }
+
+    /***
+     * createPoint(string, string, number, string, string) : void
+     *
+     *     Yeaaaaaaah
+     ***/
+    private createPoint(holeId: string, courseId: string, type: number, 
+            info: string, geoJson: string) {
+        
+        var http;
+        console.log("HOLEID:" + holeId);
+        console.log("COURSEID:" + courseId);
+        if (holeId !== undefined && holeId !== null) {
+            // post the point to the hole
+            http = this.api.holeCreatePoint(
+                holeId,
+                type,
+                info,
+                geoJson
+            );
+        } else {
+            // post the point to the course
+            http = this.api.courseCreatePoint(
+                courseId,
+                type,
+                info,
+                geoJson
+            );
+        }
+        http.subscribe(
+            result => this.onResult(result.headers,
+                result.json(),
+                Call_t.C_ELEMENT_CREATE, feature),
+            error => this.onFail(error.status,
+                error.headers, error.text(),
+                Call_t.C_ELEMENT_CREATE),
+            () => console.log("Point saved successfully")
         );
     }
 
@@ -590,7 +642,6 @@ export class HomeComponent {
      *     response.
      ***/
     private onElementSaved(body: any, feature: any) {
-        // TODO point or polygon?
         if (feature.properties === undefined) {
             return;
         }
@@ -763,9 +814,8 @@ export class HomeComponent {
         if (collection !== undefined && collection !== null) {
             collection.forEach(
                 element => {
-                    // if element is a Point (1)
                     let value;
-                    if (element.elementType == 1) {
+                    if (element.elementType == Element_t.E_POINT) {
                         value =
                             {
                                 "type": "Feature",
@@ -781,8 +831,7 @@ export class HomeComponent {
                                     "holeId": element.holeId
                                 }
                             }
-                    } else if (element.elementType == 0) {
-                    // else if element is a Polygon (0)
+                    } else if (element.elementType == Element_t.E_POLY) {
                         value =
                             {
                                 "type": "Feature",
