@@ -47,7 +47,7 @@
                     <mat-card>
                         <mat-card-header>
                             <mat-card-title>
-                                Load Course:
+                                Your Courses:
                             </mat-card-title>
                         </mat-card-header>
 
@@ -66,7 +66,11 @@
                                     Load
                                 </button>
                             </mat-list-item>
-
+                            <mat-list-item role="listitem">
+                                <button class="fill" mat-raised-button (click)="onSaveCourse()">
+                                    Save
+                                </button>
+                            </mat-list-item>
                             <mat-list-item role="listitem">
                                 <button color="warn" class="fill" mat-button type="button" class="fill" id="deleteCourse" (click)="onDeleteCourse(selected)">
                                     Delete
@@ -121,8 +125,11 @@
                                     </mat-select>
                                 </mat-form-field>
                             </mat-list-item>
+
                             <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onSaveCourse();">Save</button>
+                                <button class="fill" mat-raised-button (click)="onDeleteElement()">
+                                    Delete Element
+                                </button>
                             </mat-list-item>
 
                         </mat-list>

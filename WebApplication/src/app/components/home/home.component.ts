@@ -32,7 +32,7 @@ export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
 
     // selected items
-    selectedFeature: any;
+    selectedFeature: any = null;
 
     courses: Course[] = [];
     currentCourse: GolfCourse;
@@ -245,7 +245,8 @@ export class HomeComponent {
                     e.feature.setProperty("holeId", null);
                 }
             } else {
-                // TODO remove the invalid feature
+                // remove the invalid feature
+                this.googleMap.data.remove(e.feature);
                 // TODO nice message
                 window.alert("Please load or create a course first");
             }
@@ -280,7 +281,7 @@ export class HomeComponent {
     }
 
     /***************************************************************************
-     * Create, load, save, and delete event handlers for a Course.
+     * UI event handlers.
      **************************************************************************/
 
     /***
@@ -329,11 +330,13 @@ export class HomeComponent {
     /***
      * onSaveCourse
      *
-     *     Function that saves the current Course using the API.
-     *     On success, call onResult.
-     *     On failure, call onFail.
+     *     Function that saves the current course. New elements are posted,
+     *     updated elements are put and removed elements are deleted.
      ***/
     public onSaveCourse() {
+        // delete removed elements
+        // TODO
+        // handle all existing features
         this.googleMap.data.toGeoJson(
             data => data.features.forEach(
                 feature => {
@@ -391,10 +394,6 @@ export class HomeComponent {
                                 );*/
                             // TODO: implement update
                             break;
-
-                        case PolygonState_t.PS_DELETE:
-                            // TODO implement delete
-                            break;
                     }
                 }
             )
@@ -420,6 +419,19 @@ export class HomeComponent {
                         error.text(), Call_t.C_COURSE_DELETE),
                     () => console.log("Course created successfully.")
                 );
+        }
+    }
+
+    /***
+     * onDeleteElement(): void
+     *
+     *     Deletes the currently selected feature.
+     */
+    public onDeleteElement() {
+        if (this.selectedFeature !== null) {
+            this.googleMap.data.remove(this.selectedFeature);
+            // TODO add to delete list
+            this.selectedFeature = null;
         }
     }
 
@@ -576,9 +588,6 @@ export class HomeComponent {
                 this.onLoadHoles();
                 this.updateDataLayer(this.activeElements);
                 break;
-            case Call_t.C_COURSE_SAVE:
-                this.onSaveCourse()
-                break;
             case Call_t.C_COURSE_DELETE:
                 window.alert("Delete successful");
                 // find the element to remove from the list
@@ -630,9 +639,6 @@ export class HomeComponent {
                 break;
             case Call_t.C_COURSE_LOAD:
                 window.alert("Error: Failed to load course.");
-                break;
-            case Call_t.C_COURSE_SAVE:
-                window.alert("Error: Failed to save course.");
                 break;
             case Call_t.C_COURSE_DELETE:
                 window.alert("Error: Failed to delete course.");

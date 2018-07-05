@@ -2,8 +2,8 @@
  * Filename: call.interface.ts
  * Author  : Christiaan H Nel
  * Enum    : Call_t
- * 
- *     The enum than represents the type of call made by the web app, that 
+ *
+ *     The enum than represents the type of call made by the web app, that
  *     is used for error checking.
  *
  * Enum    : PolygonState_t
@@ -22,7 +22,6 @@ export enum Call_t {
 
     C_COURSE_CREATE,
     C_COURSE_LOAD,
-    C_COURSE_SAVE,
     C_COURSE_DELETE,
 
     C_HOLE_CREATE,
