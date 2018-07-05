@@ -45,3 +45,14 @@ export enum State_t {
     S_DELETE,
     S_NONE
 }
+
+export enum Point_t {
+    P_PIN =0,
+    P_HOLE,
+    P_TEE
+}
+
+export enum Element_t {
+    E_POLY = 0,
+    E_POINT
+}
