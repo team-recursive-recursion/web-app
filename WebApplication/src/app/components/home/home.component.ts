@@ -184,6 +184,7 @@ export class HomeComponent {
      *     Updates the items on the map to new items.
      ***/
     public updateDataLayer(geoJson: any) {
+        console.log(geoJson);
         this.geoJsonObject = geoJson;
         if (this.geoJsonObject !== undefined &&
                 this.geoJsonObject.features.length !== 0) {
@@ -226,7 +227,7 @@ export class HomeComponent {
      *
      ***/
     private getMapDrawingMode() {
-        // REALLY UGLY WAY TO GET THE CURRENT DRAWINGMANAGERMODE 
+        // REALLY UGLY WAY TO GET THE CURRENT DRAWINGMANAGERMODE
         //                      _         _
         //                       \_(o-o)_/
 
@@ -260,10 +261,10 @@ export class HomeComponent {
                         e.feature.setProperty("elementType", 0);
                         e.feature.setProperty("state", State_t.S_NEW);
                         e.feature.setProperty("polygonType", this.selectedType);
-                        e.feature.setProperty("courseId", 
+                        e.feature.setProperty("courseId",
                                 this.currentCourse.courseId);
                         if (this.selectedHole !== undefined) {
-                            e.feature.setProperty("holeId", 
+                            e.feature.setProperty("holeId",
                                 this.selectedHole.holeId);
                         } else {
                             e.feature.setProperty("holeId", null);
@@ -279,7 +280,7 @@ export class HomeComponent {
                         }
                         e.feature.setProperty("info", promptAns);
                         if (this.selectedHole !== undefined) {
-                            e.feature.setProperty("holeId", 
+                            e.feature.setProperty("holeId",
                                 this.selectedHole.holeId);
                         } else {
                             e.feature.setProperty("holeId", null);
@@ -395,7 +396,7 @@ export class HomeComponent {
                 feature => {
                     console.log("POO:", feature);
                     // extract polygon properties
-                    
+
                     var type: number;
                     if (feature.geometry.type == "Point") {
                         type = feature.properties["pointType"];
@@ -497,8 +498,10 @@ export class HomeComponent {
     public onDeleteElement() {
         if (this.selectedFeature !== null) {
             this.googleMap.data.remove(this.selectedFeature);
-            this.removedFeatures.push(this.selectedFeature);
-            this.selectedFeature.setProperty("state", PolygonState_t.PS_DELETE);
+            if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
+                this.removedFeatures.push(this.selectedFeature);
+                this.selectedFeature.setProperty("state", State_t.S_DELETE);
+            }
             this.selectedFeature = null;
         }
     }
@@ -686,14 +689,6 @@ export class HomeComponent {
                 console.log("BODY:",body);
                 this.onPolygonSaved(body, feature);
                 break;
-
-            case Call_t.C_POINT_CREATE:
-                break;
-            case Call_t.C_POINT_UPDATE:
-                break;
-            default:
-                window.alert("Success: Default success message.");
-                break;
         }
     }
 
@@ -759,9 +754,7 @@ export class HomeComponent {
                                     "holeId": element.holeId
                                 }
                             }
-                        elements.push(value);
-                        this.courseId = element.courseId
-                    } else if (element.elementType == 0) { 
+                    } else if (element.elementType == 0) {
                     // else if element is a Polygon (0)
                         value =
                             {
@@ -777,8 +770,6 @@ export class HomeComponent {
                                     "holeId": element.holeId
                                 }
                             }
-                        elements.push(value);
-                        this.courseId = element.courseId
                     }
                     elements.push(value);
                     this.courseId = element.courseId
