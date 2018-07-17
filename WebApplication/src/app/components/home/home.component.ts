@@ -173,7 +173,7 @@ export class HomeComponent {
                     if (enabled) {
                         switch (polyType) {
                             case 0:
-                                color = '#463E3E';
+                                color = '#1D442D';
                                 break;
                             case 1:
                                 color = '#73A15D';
@@ -196,7 +196,7 @@ export class HomeComponent {
                         editable: selected,
                         visible: true,
                         fillColor: color,
-                        fillOpacity: 0.5,
+                        fillOpacity: 0.3,
                         //strokeColor: ,
                         //strokeOpacity: ,
                         strokeWeight: 1,
@@ -221,36 +221,6 @@ export class HomeComponent {
             }
         });
 
-    }
-
-    /***
-     * updateDataLayer(any): void
-     *
-     *     Updates the items on the map to new items.
-     ***/
-    public updateDataLayer(geoJson: any) {
-        console.log(geoJson);
-        this.geoJsonObject = geoJson;
-        if (this.geoJsonObject !== undefined &&
-                this.geoJsonObject.features.length !== 0) {
-            const bounds: LatLngBounds = new google.maps.LatLngBounds();
-            this.geoJsonObject.features.forEach(
-                feature => {
-                    if (feature.geometry.coordinates[0].forEach != null) {
-
-                        feature.geometry.coordinates[0].forEach(
-                            lngLat => bounds.extend(
-                                new google.maps.LatLng(lngLat[1], lngLat[0]))
-                        );
-                    }
-                }
-            );
-            this.googleMap.fitBounds(bounds);
-        }
-        this.googleMap.data.forEach(
-            feature => this.googleMap.data.remove(feature)
-        );
-        this.googleMap.data.addGeoJson(this.geoJsonObject);
     }
 
     /***
@@ -308,7 +278,7 @@ export class HomeComponent {
                     }
                     // assign polygon or point properties
                     e.feature.setProperty("enabled", true);
-                    e.feature.setProperty("selected", false);
+                    e.feature.setProperty("selected", true);
                     if (mapDrawingMode == "polygon") {
                         e.feature.setProperty("elementType", Element_t.E_POLY);
                         e.feature.setProperty("polygonType", this.polyType);
@@ -322,6 +292,11 @@ export class HomeComponent {
                         }
                         e.feature.setProperty("info", info);
                     }
+                    // update selection
+                    if (this.selectedFeature != null) {
+                        this.selectedFeature.setProperty("selected", false);
+                    }
+                    this.selectedFeature = e.feature;
                 }
             } else {
                 // remove the invalid feature
@@ -661,12 +636,29 @@ export class HomeComponent {
      *     hole to the selected one.
      ***/
     public onSelectHole(event: any) {
+        // unselect everything
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+        }
         if (event.value !== undefined) {
-            // display only the selected hole
-            this.showHole(event.value.holeId);
+            // enable the features of the hole
+            this.googleMap.data.forEach(feature => {
+                if (feature.getProperty("holeId") == event.value.holeId) {
+                    feature.setProperty("enabled", true);
+                } else {
+                    feature.setProperty("enabled", false);
+                }
+            });
         } else {
-            // the course was selected, show course polygons
-            this.showCourse();
+            // enable the features of the course
+            this.googleMap.data.forEach(feature => {
+                if (feature.getProperty("holeId") == null) {
+                    feature.setProperty("enabled", true);
+                } else {
+                    feature.setProperty("enabled", false);
+                }
+            });
         }
     }
 
@@ -707,24 +699,15 @@ export class HomeComponent {
     }
 
     /***************************************************************************
-     * Other event handlers.
+     * Display and data updating
      **************************************************************************/
 
     /***
-     * onToggleDraggable(): void
-     *
-     *     Toggles the draggable option of the map.
-     ***/
-    public onToggleDraggable() {
-        this.mapDraggable = !this.mapDraggable;
-    }
-
-    /***
-     * onResetMap(): void
+     * resetMap(): void
      *
      *     Removes all drawn items on the map.
      ***/
-    public onResetMap() {
+    public resetMap() {
         this.selectedHole = undefined;
         this.currentCourse = undefined;
         this.holes = [];
@@ -737,16 +720,42 @@ export class HomeComponent {
         this.googleMap.setZoom(this.zoom);
     }
 
-    /***************************************************************************
-     * Hole and course filtering.
-     **************************************************************************/
+    /***
+     * updateDataLayer(any): void
+     *
+     *     Updates the items on the map to new items.
+     ***/
+    public updateDataLayer(geoJson: any) {
+        console.log(geoJson);
+        this.geoJsonObject = geoJson;
+        if (this.geoJsonObject !== undefined &&
+                this.geoJsonObject.features.length !== 0) {
+            const bounds: LatLngBounds = new google.maps.LatLngBounds();
+            this.geoJsonObject.features.forEach(
+                feature => {
+                    if (feature.geometry.coordinates[0].forEach != null) {
+
+                        feature.geometry.coordinates[0].forEach(
+                            lngLat => bounds.extend(
+                                new google.maps.LatLng(lngLat[1], lngLat[0]))
+                        );
+                    }
+                }
+            );
+            this.googleMap.fitBounds(bounds);
+        }
+        this.googleMap.data.forEach(
+            feature => this.googleMap.data.remove(feature)
+        );
+        this.googleMap.data.addGeoJson(this.geoJsonObject);
+    }
 
     /***
      * showHole(string): void
      *
      *     Filter to show only a specific hole's elements.
      ***/
-    private showHole(id: string) {
+    /*private showHole(id: string) {
         // add the course elements as disabled
         let features: any = [
             ...this.generateFeature(this.currentCourse.elements, false)
@@ -766,14 +775,14 @@ export class HomeComponent {
             ]
         }
         this.updateDataLayer(this.activeElements);
-    }
+    }*/
 
     /***
-     * showCourse(): void
+     * displayCourse(): void
      *
-     *     Filter to show the course elements.
+     *     Reset the map to display all the elements
      ***/
-    private showCourse() {
+    private displayCourse() {
         // add the course elements
         let features: any = [...this.generateFeature(this.currentCourse
             .elements)];
@@ -813,7 +822,7 @@ export class HomeComponent {
                 break;
             case Call_t.C_COURSE_CREATE:
                 this.courses.push(body);
-                this.onResetMap();
+                this.resetMap();
                 this.currentCourse = body;
                 this.selected = this.courses.indexOf(body);
                 break;
@@ -850,7 +859,7 @@ export class HomeComponent {
             case Call_t.C_HOLE_LOAD:
                 this.holes.push(body);
                 if (this.holes.length === this.currentCourse.holes.length) {
-                    this.showCourse();
+                    this.displayCourse();
                 }
                 break;
             case Call_t.C_ELEMENT_CREATE:
