@@ -128,15 +128,15 @@ export class HomeComponent {
 
     /***
      * setupMap
-     *                   _         _
-     *     TODO Whatever  \_(o-o)_/
+     *
+     *     Sets up the initial map controls and styling.
      ***/
     private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
             this.googleMap.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
-            this.styleFeatures();
+            this.setUpStyling();
         });
     }
 
@@ -155,33 +155,70 @@ export class HomeComponent {
     }
 
     /***
-     * styleFeatures
+     * setUpStyling(): void
      *
-     *     Function that sets the color of the Polygon according to its
-     *     polygonType property.
+     *     Function that sets the color and style of features according to its
+     *     type and enabled properties.
      ***/
-    private styleFeatures() {
-        this.googleMap.data.setStyle(function (feature) {
-            const polyType = feature.getProperty('polygonType');
-            let color = '#336699';
-            if (polyType == 0) {
-                color = '#463E3E';
+    private setUpStyling() {
+        this.googleMap.data.setStyle(function(feature) {
+            let enabled = feature.getProperty('enabled');
+            let selected = feature.getProperty('selected');
+            if (feature.getGeometry() != null) {
+                if (feature.getGeometry().getType() == "Polygon") {
+                    // styling for polygons
+                    const polyType = feature.getProperty('polygonType');
+                    // choose the color based on enabled and the type
+                    let color = '#2E2E2E';
+                    if (enabled) {
+                        switch (polyType) {
+                            case 0:
+                                color = '#463E3E';
+                                break;
+                            case 1:
+                                color = '#73A15D';
+                                break;
+                            case 2:
+                                color = '#BADA55';
+                                break;
+                            case 3:
+                                color = '#C2B280';
+                                break;
+                            case 4:
+                                color = '#336699';
+                                break;
+                        }
+                    }
+                    // return the styling
+                    return {
+                        clickable: enabled,
+                        draggable: selected,
+                        editable: selected,
+                        visible: true,
+                        fillColor: color,
+                        fillOpacity: 0.5,
+                        //strokeColor: ,
+                        //strokeOpacity: ,
+                        strokeWeight: 1,
+                        zIndex: polyType
+                    };
+                } else {
+                    // TODO styling for points
+                    return {
+                        clickable: enabled,
+                        draggable: selected,
+                        editable: selected,
+                        visible: true,
+                        zIndex: 0
+                        /*
+                        cursor: Mouse cursor to show on hover.
+                        icon: Icon to show for the point geometry.
+                        shape: Defines the image map used for hit detection.
+                        title: Rollover text.
+                        */
+                    };
+                }
             }
-            if (polyType == 1) {
-                color = '#73A15D';
-            }
-            if (polyType == 2) {
-                color = '#BADA55';
-            }
-            if (polyType == 3) {
-                color = '#C2B280';
-            }
-            return {
-                draggable: true,
-                editable: true,
-                fillColor: color,
-                strokeWeight: 1
-            };
         });
 
     }
@@ -232,13 +269,14 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
+     * getMapDrawingMode(): string
      *
+     *     Returns the current drawing manager mode, i.e. whether the user is
+     *     adding a point or a polygon.
+     *     Returns "polygon" or "marker".
      ***/
-    private getMapDrawingMode() {
-        // REALLY UGLY WAY TO GET THE CURRENT DRAWINGMANAGERMODE
-        //                      _         _
-        //                       \_(o-o)_/
-
+    private getMapDrawingMode() : string {
+        // TODO get a better way to do this?
         let obj = this.googleMap.data.gm_bindings_.drawingMode;
         for (var a in this.googleMap.data.gm_bindings_.drawingMode) {
             return obj[a].kd.getDrawingManagerMode();
@@ -269,6 +307,8 @@ export class HomeComponent {
                         e.feature.setProperty("holeId", null);
                     }
                     // assign polygon or point properties
+                    e.feature.setProperty("enabled", true);
+                    e.feature.setProperty("selected", false);
                     if (mapDrawingMode == "polygon") {
                         e.feature.setProperty("elementType", Element_t.E_POLY);
                         e.feature.setProperty("polygonType", this.polyType);
@@ -315,8 +355,11 @@ export class HomeComponent {
      *     selected feature to the clicked one.
      ***/
     private onMapClick(e: any) {
-        // TODO menu maybe?
         if (e.feature != this.selectedFeature) {
+            if (this.selectedFeature != null) {
+                this.selectedFeature.setProperty('selected', false);
+            }
+            e.feature.setProperty('selected', true);
             this.setSelectedFeature(e.feature);
         }
     }
@@ -565,12 +608,8 @@ export class HomeComponent {
         }
     }
 
-    /***************************************************************************
-     * Create and load handler for Holes.
-     **************************************************************************/
-
     /***
-    * onAddHoles
+    * onAddHole(): void
     *
     *     Function that creates a new Hole for the current Course using the
     *     API.
@@ -613,6 +652,22 @@ export class HomeComponent {
                     () => console.log("Hole loaded successfully.")
                 )
         );
+    }
+
+    /***
+     * onSelectHole(any): void
+     *
+     *     Event handler for selecting a hole radio button. Changes the active
+     *     hole to the selected one.
+     ***/
+    public onSelectHole(event: any) {
+        if (event.value !== undefined) {
+            // display only the selected hole
+            this.showHole(event.value.holeId);
+        } else {
+            // the course was selected, show course polygons
+            this.showCourse();
+        }
     }
 
     /***************************************************************************
@@ -680,7 +735,63 @@ export class HomeComponent {
         );
         this.googleMap.setCenter({ lat: this.lat, lng: this.lng });
         this.googleMap.setZoom(this.zoom);
+    }
 
+    /***************************************************************************
+     * Hole and course filtering.
+     **************************************************************************/
+
+    /***
+     * showHole(string): void
+     *
+     *     Filter to show only a specific hole's elements.
+     ***/
+    private showHole(id: string) {
+        // add the course elements as disabled
+        let features: any = [
+            ...this.generateFeature(this.currentCourse.elements, false)
+        ];
+        // add all the holes' elements and enable the current hole
+        this.holes.forEach(hole => {
+            features = [
+                ...features,
+                ...this.generateFeature(hole.elements, hole.holeId === id)
+            ]
+        });
+        // display the elements
+        this.activeElements = {
+            "type": "FeatureCollection",
+            "features": [
+                ...features
+            ]
+        }
+        this.updateDataLayer(this.activeElements);
+    }
+
+    /***
+     * showCourse(): void
+     *
+     *     Filter to show the course elements.
+     ***/
+    private showCourse() {
+        // add the course elements
+        let features: any = [...this.generateFeature(this.currentCourse
+            .elements)];
+        // add all the holes' elements
+        this.holes.forEach(hole => {
+            features = [
+                ...features,
+                ...this.generateFeature(hole.elements, false)
+            ]
+        });
+        // display the elements
+        this.activeElements = {
+            "type": "FeatureCollection",
+            "features": [
+                ...features
+            ]
+        }
+        this.updateDataLayer(this.activeElements);
     }
 
     /***************************************************************************
@@ -739,7 +850,7 @@ export class HomeComponent {
             case Call_t.C_HOLE_LOAD:
                 this.holes.push(body);
                 if (this.holes.length === this.currentCourse.holes.length) {
-                    this.showHoles();
+                    this.showCourse();
                 }
                 break;
             case Call_t.C_ELEMENT_CREATE:
@@ -791,9 +902,9 @@ export class HomeComponent {
     /***
      * generateFeature(Array<any>): void
      *
-     *     TODO No idea
+     *     Creates a drawable feature from a collection of GEOJSON objects.
      ***/
-    private generateFeature(collection: Array<any>) {
+    private generateFeature(collection: Array<any>, enabled: boolean = true) {
         let elements: Array<any> = [];
         if (collection !== undefined && collection !== null) {
             collection.forEach(
@@ -812,9 +923,11 @@ export class HomeComponent {
                                     "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
-                                    "holeId": element.holeId
+                                    "holeId": element.holeId,
+                                    "enabled": enabled,
+                                    "selected": false
                                 }
-                            }
+                            };
                     } else if (element.elementType == Element_t.E_POLY) {
                         value =
                             {
@@ -828,73 +941,18 @@ export class HomeComponent {
                                     "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
-                                    "holeId": element.holeId
+                                    "holeId": element.holeId,
+                                    "enabled": enabled,
+                                    "selected": false
                                 }
-                            }
+                            };
                     }
                     elements.push(value);
-                    this.courseId = element.courseId
+                    this.courseId = element.courseId;
                 }
             );
         }
         return elements;
     }
 
-    /***
-     * showHoles(): void
-     *
-     *     TODO No idea
-     ***/
-    private showHoles() {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .elements)];
-        this.holes.forEach(hole => {
-            tempHolder = [...tempHolder, ...this.generateFeature(hole
-                .elements)]
-        });
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...tempHolder
-            ]
-        }
-        this.updateDataLayer(this.activeElements);
-    }
-
-    /***
-     * filterHoles(string): void
-     *
-     *     TODO no idea
-     *     Possibly filter which holes to show?
-     ***/
-    private filterHoles(holeId: string) {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .elements)];
-        this.holes.forEach(hole => {
-            if (hole.holeId === holeId) {
-                tempHolder = [...tempHolder, ...this.generateFeature(hole
-                    .elements)]
-            }
-        });
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...tempHolder
-            ]
-        }
-        this.updateDataLayer(this.activeElements);
-    }
-
-    /***
-     * updateHoles(any): void
-     *
-     *     TODO no idea
-     ***/
-    public updateHoles(event: any) {
-        if (event.value !== undefined) {
-            this.filterHoles(event.value.holeId);
-        } else {
-            this.showHoles();
-        }
-    }
 }
