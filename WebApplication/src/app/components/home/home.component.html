@@ -97,7 +97,7 @@
                             </mat-list-item>
                         </mat-list>
                         <div *ngIf="currentCourse.holes !== undefined">
-                            <mat-radio-group (change)="updateHoles($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
+                            <mat-radio-group (change)="onSelectHole($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
                                 <mat-radio-button class="hole-radio-button" [value]="undefined">
                                     Course
                                 </mat-radio-button>
@@ -159,27 +159,6 @@
                                 </button>
                             </mat-list-item>
 
-                        </mat-list>
-                    </mat-card>
-
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>
-                                Map options
-                            </mat-card-title>
-                        </mat-card-header>
-
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onToggleDraggable()" color="{{mapDraggable ? 'primary' : 'accent'}}">
-                                    Map Draggable
-                                </button>
-                            </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-button (click)="onResetMap()" color="warn">
-                                    Reset Map
-                                </button>
-                            </mat-list-item>
                         </mat-list>
                     </mat-card>
                 </mat-accordion>
