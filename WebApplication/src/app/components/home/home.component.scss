@@ -25,15 +25,26 @@ mat-accordion mat-card{
     height: 97%;
     padding: 0;
 }
+
 .controls{
     position: absolute;
     z-index: 2;
     right: 80px;
     bottom: 80px;
 }
+
 #course-selector{
     width: 200px;
     margin-left: 10px;
+}
+
+.course-Edit-Menu {
+    width: 300px;
+    margin-right: 30px;
+}
+
+#addCourseIconButton{
+    padding: 20px;
 }
 
 .mapper {
@@ -98,4 +109,15 @@ h1.example-app-name {
 .addButton{
     user-select: none;
     cursor: pointer;
+}
+.example-spacer {
+    flex: 1 1 auto;
+}
+
+.small-spacer {
+    width: 20px;
+}
+
+.course-name-input{
+    width: 300px;
 }
