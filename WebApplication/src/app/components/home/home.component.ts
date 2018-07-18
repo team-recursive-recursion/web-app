@@ -37,6 +37,9 @@ export class HomeComponent {
 
     removedFeatures: Array<any> = []; // list of elements to be deleted
 
+    // marker images
+    imageTee: any;
+
     courses: Course[] = [];
     currentCourse: GolfCourse;
     courseId: string;
@@ -208,7 +211,7 @@ export class HomeComponent {
                         clickable: enabled,
                         draggable: selected,
                         editable: selected,
-                        visible: true,
+                        visible: enabled,
                         zIndex: 0
                         /*
                         cursor: Mouse cursor to show on hover.
@@ -426,12 +429,12 @@ export class HomeComponent {
                     } else {
                         type = feature.properties["polygonType"];
                     }
+                    var eid: string = feature.properties["elementId"];
                     var geoJson: string = JSON.stringify(feature.geometry);
                     var courseId = feature.properties["courseId"];
                     var holeId = feature.properties["holeId"];
 
-                    // perform the correct action for new, deleted and updated
-                    // polygons
+                    // perform the correct action for new and updated elements
                     switch (feature.properties.state) {
                         case State_t.S_NEW:
                             if (feature.properties.elementType ==
@@ -447,21 +450,25 @@ export class HomeComponent {
                             break;
 
                         case State_t.S_UPDATE:
-                            /*value['elementId'] =
-                                feature.properties.elementId;
-                            this.api.updatePolygon(
-                                feature.properties.elementId, value)
-                                .subscribe(
-                                    // TODO somehow remove feature and value
-                                    // as parameter
-                                    result => this.onResult(result.headers,
-                                        result.json(), C_POLY_UPDATE, feature),
-                                    error => this.onFail(error.status,
-                                        error.headers, error.text(),
-                                        C_POLY_UPDATE),
-                                    () => console.log("Poly saved successfully")
-                                );*/
-                            // TODO: implement update
+                            let call;
+                            if (feature.properties.elementType ==
+                                    Element_t.E_POLY) {
+                                call = this.api.polygonUpdate(eid, geoJson,
+                                        feature.properties);
+                            } else if (feature.properties.elementType ==
+                                    Element_t.E_POINT) {
+                                call = this.api.pointUpdate(eid, geoJson,
+                                        feature.properties);
+                            }
+                            call.subscribe(
+                                result => this.onResult(result.headers,
+                                    result.json(),
+                                    Call_t.C_ELEMENT_UPDATE, feature),
+                                error => this.onFail(error.status,
+                                    error.headers, error.text(),
+                                    Call_t.C_ELEMENT_UPDATE),
+                                () => console.log("Element saved successfully")
+                            );
                             break;
                     }
                     console.log("Success: Course saved");
@@ -864,8 +871,9 @@ export class HomeComponent {
                 break;
             case Call_t.C_ELEMENT_CREATE:
             case Call_t.C_ELEMENT_UPDATE:
-                console.log("BODY:",body);
-                this.onElementSaved(body, feature);
+                if (body != null) {
+                    this.onElementSaved(body, feature);
+                }
                 break;
         }
     }
