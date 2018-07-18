@@ -67,7 +67,10 @@ import {
         NavMenuComponent,
         LoginComponent,
         RegisterComponent,
-        HomeComponent
+        HomeComponent,
+        SmdFabSpeedDialComponent,
+        SmdFabSpeedDialActions,
+        SmdFabSpeedDialTrigger
     ],
     imports: [
         CommonModule,
