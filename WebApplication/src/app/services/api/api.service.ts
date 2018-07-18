@@ -165,6 +165,20 @@ export class ApiService {
         return this.http.delete(url);
     }
 
+    pointUpdate(eid: string, geoJson: string, properties: any) {
+        var url = this.url + "/api/points/" + eid;
+        return this.http.put(url,
+            {
+                "ElementId": eid,
+                "HoleId": properties.holeId,
+                "CourseId": properties.courseId,
+                "PointType": properties.pointType,
+                "Info": properties.info,
+                "GeoJson": geoJson
+            }
+        );
+    }
+
     /***
      * API calls: polygons
      ***/
@@ -207,6 +221,19 @@ export class ApiService {
     polygonDelete(eid: string) {
         var url = this.url + "/api/polygons/" + eid;
         return this.http.delete(url);
+    }
+
+    polygonUpdate(eid: string, geoJson: string, properties: any) {
+        var url = this.url + "/api/polygons/" + eid;
+        return this.http.put(url,
+            {
+                "ElementId": eid,
+                "HoleId": properties.holeId,
+                "CourseId": properties.courseId,
+                "PolygonType": properties.polygonType,
+                "GeoJson": geoJson
+            }
+        );
     }
 
 }
