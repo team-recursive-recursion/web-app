@@ -50,12 +50,36 @@ $brand-purple: (
                 A700: white,
         )
 );
+$brand-warn: (
+        50: #f1f8e9,
+        100: #dcedc8,
+        200: #c5e1a5,
+        300: #aed581,
+        400: #9ccc65,
+        500: #e76333,
+        600: #7cb342,
+        700: #689f38,
+        800: #558b2f,
+        A200: #b2ff59,
+        A400: #76ff03,
+        A700: #64dd17,
+        contrast: (
+                500: white,
+                600: white,
+                700: white,
+                800: white,
+                900: white,
+                A700: white,
+        )
+);
+
+
 @include mat-core();
 
 // mandatory stuff for theming
 $primary-palette: mat-palette($brand-green);
 $accent-palette:  mat-palette($brand-purple);
-$warn-palette:  mat-palette($brand-purple);
+$warn-palette:  mat-palette($brand-warn);
 //$ae-warn-palette: mat-palette(red);
 
 // include the custom theme components into a theme object
@@ -64,7 +88,8 @@ $main-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
 //select primary and secondary colors
 $primary-color: map_get($primary-palette, 500);
 $secondary-color: map_get($accent-palette, 500);
-$warn-color: map_get($accent-palette, 100);
+$warn-color: map_get($warn-palette, 500);
+$delete-color: map_get($warn-palette, 500);
 
 // include the custom theme object into the angular material theme
 @include angular-material-theme($main-theme);
