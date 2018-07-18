@@ -16,9 +16,22 @@
         <button mat-icon-button (click)="snav.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
-        <h1 class="example-app-name">Mapper</h1>
-        <h1 *ngIf="currentCourse !== undefined" class="example-app-name"> - {{currentCourse.courseName}}</h1>
-
+        <button mat-button *ngIf="courses.length === 0" (click)="createCourse()">
+            Add course
+        </button>
+        <div *ngIf="courses.length !== 0">
+            <mat-select [(value)]="selected" #courseSelector id="course-selector">
+                <mat-option [value]="-1" *ngIf="courses.length !== 0">
+                    Select a course
+                </mat-option>
+                <mat-option *ngFor="let c of courses; let i = index" [value]="i" (click)="onLoadCourse(i)">
+                    {{c.courseName}}
+                </mat-option>
+            </mat-select>
+            <button mat-button (click)="createCourse($event)">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
     </mat-toolbar>
 
     <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
@@ -58,15 +71,6 @@
                         </mat-card-header>
 
                         <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="selected" #courseSelector id="course-selector">
-                                        <mat-option *ngFor="let c of courses; let i = index" [value]="i">
-                                            {{c.courseName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
                             <mat-list-item role="listitem">
                                 <button class="fill" mat-raised-button type="button" class="fill" (click)="onLoadCourse(selected)" id="changeCourse">
                                     Load
@@ -176,11 +180,26 @@
                 <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
                     #AgmMap [latitude]="lat" [longitude]="lng" [streetViewControl]="false" (mapClick)="mapInteractionClick($event)">
                 </agm-map>
-                <button (click)="fabInteractionClick($event)" class="controls" mat-fab>
-                    <mat-icon>
-                        {{button_state}}
-                    </mat-icon>
-                </button>
+                <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
+
+                <div class="controls">
+                    <smd-fab-speed-dial [(open)]="open" [direction]="direction" [animationMode]="animationMode" [fixed]="true">
+                        <smd-fab-trigger [spin]="spin">
+                            <button mat-fab (click)="fabInteractionClick($event)">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </smd-fab-trigger>
+
+                        <smd-fab-actions>
+                            <button mat-mini-fab color="accent" (click)="fabAddPolygon('action1')">
+                                <mat-icon>timeline</mat-icon>
+                            </button>
+                            <button mat-mini-fab (click)="fabAddPoint('action2')">
+                                <mat-icon>flag</mat-icon>
+                            </button>
+                        </smd-fab-actions>
+                    </smd-fab-speed-dial>
+                </div>
             </mat-card>
         </mat-sidenav-content>
     </mat-sidenav-container>

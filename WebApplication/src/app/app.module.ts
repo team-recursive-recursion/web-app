@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { SmdFabSpeedDialComponent, SmdFabSpeedDialActions, SmdFabSpeedDialTrigger } from "./components/smd-fab-speed-dial"
 
 import {
     MatAutocompleteModule,
