@@ -5,6 +5,12 @@
         The template for the controls and map for mapping.
 -->
 
+<div id="search-div">
+    <mat-form-field class="fill">
+        <input matInput type="text" placeholder="Search" id="search-input">
+    </mat-form-field>
+</div>
+
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
     <mat-toolbar color="primary" class="example-toolbar">
         <button mat-icon-button (click)="snav.toggle()">
@@ -172,7 +178,7 @@
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
                 <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
-                    #AgmMap [latitude]="lat" [longitude]="lng" (mapClick)="mapInteractionClick($event)">
+                    #AgmMap [latitude]="lat" [longitude]="lng" [streetViewControl]="false" (mapClick)="mapInteractionClick($event)">
                 </agm-map>
                 <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
 
