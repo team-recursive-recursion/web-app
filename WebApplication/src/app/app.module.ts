@@ -19,6 +19,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { SmdFabSpeedDialComponent, SmdFabSpeedDialActions, SmdFabSpeedDialTrigger } from "./components/smd-fab-speed-dial"
 
 import {
   MatAutocompleteModule,
@@ -61,6 +62,9 @@ import {
 
 @NgModule({
   declarations: [
+    SmdFabSpeedDialComponent,
+    SmdFabSpeedDialActions,
+    SmdFabSpeedDialTrigger,
     AppComponent,
     NavComponent,
     ContentComponent,
@@ -119,7 +123,8 @@ import {
     BrowserModule,
     BrowserAnimationsModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog'
+      apiKey: 'AIzaSyBnbeKYeCMSTPhkws7du0gvv_eSEp02Kog',
+      libraries: ["drawing"]
     })
   ],
   providers: [

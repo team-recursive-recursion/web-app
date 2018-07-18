@@ -34,6 +34,7 @@ export class HomeComponent {
 
     // selected items
     selectedFeature: any = null;
+    dataLayer: any = null;
 
     removedFeatures: Array<any> = []; // list of elements to be deleted
 
@@ -50,7 +51,7 @@ export class HomeComponent {
     pointInfo: string;
 
     url: any;
-    selected: number = 0;
+    selected: number = -1;
     button_state: string = "add";
     // Map -- objects
     geoJsonObject: any;
@@ -68,6 +69,21 @@ export class HomeComponent {
     mobileQuery: MediaQueryList;
 
     activeElements: any;
+
+    open: boolean = true;
+    spin: boolean = false;
+    direction: string = 'up';
+    animationMode: string = 'scale';
+
+    private _fixed: boolean = true;
+    get fixed() { return this._fixed; }
+    set fixed(fixed: boolean) {
+        this._fixed = fixed;
+        if (this._fixed) {
+            this.open = true;
+        }
+    }
+
 
     private _mobileQueryListener: () => void;
 
@@ -102,13 +118,31 @@ export class HomeComponent {
     }
 
     mapInteractionClick(event) {
-        // for (var i = 0; i < this.features.length; i++) {
-        // this.googleMap.data.remove(this.features[i]);
-        // });
     }
 
     fabInteractionClick(event) {
-        // console.log(event);
+        console.log(this.googleMap.data.getDrawingMode());
+    }
+
+    fabAddPolygon(){
+        this.open = true;
+        this.googleMap.data.setDrawingMode("Polygon");
+
+    }
+
+    fabAddPoint(){
+        this.open = true;
+        this.googleMap.data.setDrawingMode("Point");
+
+    }
+
+    createCourse(){
+        console.log("Create course");
+    }
+
+
+    createHole(){
+        console.log("Create course");
     }
 
     ngAfterViewInit() {
@@ -137,6 +171,8 @@ export class HomeComponent {
     private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
+            this.dataLayer = new google.maps.Data();
+            this.dataLayer.setMap(map);
             this.googleMap.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
