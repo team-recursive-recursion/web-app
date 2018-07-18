@@ -140,6 +140,7 @@ export class HomeComponent {
             this.googleMap.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
+            this.setUpSearch();
         });
     }
 
@@ -224,6 +225,50 @@ export class HomeComponent {
             }
         });
 
+    }
+
+    /***
+     * setUpSearch(): void
+     *
+     *     Creates the search bar and enables the events.
+     ***/
+    private setUpSearch(): void {
+        // create and link the search input
+        var map = this.googleMap;
+        var div = document.getElementById("search-div");
+        var input = document.getElementById("search-input");
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(div);
+
+        // bias search results to places in the current viewbox
+        map.addListener('bounds_changed', function() {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // add event for place selection
+        searchBox.addListener('places_changed', function() {
+            var places = searchBox.getPlaces();
+            if (places.length == 0) {
+                return;
+            }
+
+            // get the location.
+            var bounds = new google.maps.LatLngBounds();
+            // add bounds for each selected place
+            places.forEach(place => {
+                if (!place.geometry) {
+                    console.log("Place contains no usable geometry");
+                    return;
+                }
+                // focus on the area
+                if (place.geometry.viewport) {
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            map.fitBounds(bounds);
+        });
     }
 
     /***
