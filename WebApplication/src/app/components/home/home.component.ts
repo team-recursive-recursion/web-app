@@ -6,7 +6,7 @@
 
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone }
-        from '@angular/core';
+    from '@angular/core';
 import { Router } from '@angular/router';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
@@ -256,11 +256,14 @@ export class HomeComponent {
                     };
                 } else {
                     // TODO styling for points
+                    var iconLocation = (feature.getProperty('pointType') == 1) ? "./assets/flag.png" : "./assets/tee.png";
+                    // ourMap.data.revertStyle();
                     return {
                         clickable: enabled,
                         draggable: selected,
                         editable: selected,
                         visible: enabled,
+                        icon: iconLocation,
                         zIndex: 0
                         /*
                         cursor: Mouse cursor to show on hover.
