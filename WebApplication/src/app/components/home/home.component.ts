@@ -251,14 +251,24 @@ export class HomeComponent {
                         zIndex: polyType
                     };
                 } else {
-                    var iconLocation = (feature.getProperty('pointType') == 1) ? "./assets/flag.png" : "./assets/tee.png";
-                    // ourMap.data.revertStyle();
+                    var icon;
+                    switch (feature.getProperty("pointType")) {
+                        case Point_t.P_HOLE:
+                            icon = "./assets/flag.png";
+                            break;
+                        case Point_t.P_TEE:
+                            icon = "./assets/tee.png";
+                            break;
+                        default:
+                            icon = "";
+                            break;
+                    }
                     return {
                         clickable: enabled,
                         draggable: selected,
                         editable: selected,
                         visible: enabled,
-                        icon: iconLocation,
+                        icon: icon,
                         zIndex: 0
                     };
                 }
@@ -979,7 +989,7 @@ export class HomeComponent {
                 this.onLoadHoles();
                 this.updateDataLayer(this.activeElements);
                 // show the holes navbar
-                this.navbar.toggle();
+                this.navbar.open();
                 break;
             case Call_t.C_COURSE_DELETE:
                 window.alert("Delete successful");
