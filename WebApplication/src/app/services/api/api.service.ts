@@ -38,6 +38,8 @@ export class ApiService {
 
     usersMatch(email: string, password: string) {
         var url = this.url + "/api/users/match";
+        var SHA256 = require("crypto-js/sha256");
+        password = SHA256(password).toString();
         return this.http.post(url,
                 {"Email": email, "Password": password}
         );
@@ -46,6 +48,8 @@ export class ApiService {
     usersCreate(email: string, firstname: string, lastname: string,
             password: string) {
         var url = this.url + "/api/users";
+        var SHA256 = require("crypto-js/sha256");
+        password = SHA256(password).toString();
         return this.http.post(url,
                 {"Email": email, "Name": firstname, "Surname": lastname,
                 "Password": password}
