@@ -52,7 +52,6 @@ export class HomeComponent {
     holeName: any[] = [];
     selectedHole: any;
     courseName: string;
-    pointInfo: string;
 
     url: any;
     selected: number = -1;
@@ -61,8 +60,6 @@ export class HomeComponent {
     geoJsonObject: any;
     googleMap: any = null;
     features: any;
-    polyType: number = 0;
-    pointType: number = 0;
 
     lat: number = -25.658712;
     lng: number = 28.140347;
@@ -88,14 +85,7 @@ export class HomeComponent {
         }
     }
 
-
     private _mobileQueryListener: () => void;
-
-    pointTypes = [
-        { "pointName": 'Pin', "ptype": Point_t.P_PIN },
-        { "pointName": 'Hole', "ptype": Point_t.P_HOLE },
-        { "pointName": 'Tee', "ptype": Point_t.P_TEE }
-    ];
 
     constructor(private api: ApiService, private globals: GlobalsService,
         private router: Router,
@@ -361,20 +351,19 @@ export class HomeComponent {
     private onMapFeatureAdd(e: any) {
         // ignore the loaded elements
         if (e.feature.getProperty("elementId") === undefined) {
-            // flag the element as new with the proper type and course/hole IDs
             if (this.currentCourse !== undefined) {
+                // determine the type of element added
                 let mapDrawingMode = this.getMapDrawingMode();
                 if (mapDrawingMode !== undefined) {
                     this.ngZone.run(() => {
                         if (mapDrawingMode == "polygon") {
                             // bring up the polygon dialog
-                            const dialogRef = this.dialog.open(PolygonDialog, {
-                                //width: '250px',
-                                data: {}
-                            });
+                            const dialogRef = this.dialog.open(PolygonDialog);
                             dialogRef.afterClosed().subscribe(result => {
-                                if (result) {
-                                    // TODO
+                                if (result.done) {
+                                    // assign polygon properties
+                                    this.setPolygonProperties(e.feature,
+                                            result.type);
                                 } else {
                                     // delete the feature
                                     this.googleMap.data.remove(e.feature);
@@ -383,13 +372,12 @@ export class HomeComponent {
 
                         } else if (mapDrawingMode == "marker") {
                             // bring up the point dialog
-                            const dialogRef = this.dialog.open(PointDialog, {
-                                //width: '250px',
-                                data: {}
-                            });
+                            const dialogRef = this.dialog.open(PointDialog);
                             dialogRef.afterClosed().subscribe(result => {
-                                if (result) {
-                                    // TODO
+                                if (result.done) {
+                                    // assign point properties
+                                    this.setPointProperties(e.feature,
+                                            result.type, result.info);
                                 } else {
                                     // delete the feature
                                     this.googleMap.data.remove(e.feature);
@@ -397,41 +385,6 @@ export class HomeComponent {
                             });
                         }
                     });
-                }
-
-
-                if (mapDrawingMode !== undefined) {
-                    e.feature.setProperty("state", State_t.S_NEW);
-                    e.feature.setProperty("elementId", null);
-                    e.feature.setProperty("courseId",
-                        this.currentCourse.courseId);
-                    if (this.selectedHole !== undefined) {
-                        e.feature.setProperty("holeId",
-                            this.selectedHole.holeId);
-                    } else {
-                        e.feature.setProperty("holeId", null);
-                    }
-                    // assign polygon or point properties
-                    e.feature.setProperty("enabled", true);
-                    e.feature.setProperty("selected", true);
-                    if (mapDrawingMode == "polygon") {
-                        e.feature.setProperty("elementType", Element_t.E_POLY);
-                        e.feature.setProperty("polygonType", this.polyType);
-                    } else if (mapDrawingMode == "marker") {
-                        e.feature.setProperty("elementType", Element_t.E_POINT);
-                        e.feature.setProperty("pointType", this.pointType);
-                        // get point info
-                        var info: string = this.pointInfo;
-                        if (info == "Point Info" || info === undefined) {
-                            info = "";
-                        }
-                        e.feature.setProperty("info", info);
-                    }
-                    // update selection
-                    if (this.selectedFeature != null) {
-                        this.selectedFeature.setProperty("selected", false);
-                    }
-                    this.selectedFeature = e.feature;
                 }
             } else {
                 // remove the invalid feature
@@ -442,6 +395,63 @@ export class HomeComponent {
             // go to select mode
             this.googleMap.data.setDrawingMode(null);
         }
+    }
+
+    /***
+     * setPolygonProperties(any, number): void
+     *
+     *     Adds the appropriate properties to the polygon based on the current
+     *     state and given polygon type.
+     ***/
+    private setPolygonProperties(feature: any, type: number): void {
+        // assign element properties
+        feature.setProperty("state", State_t.S_NEW);
+        feature.setProperty("elementId", null);
+        feature.setProperty("courseId", this.currentCourse.courseId);
+        if (this.selectedHole !== undefined) {
+            feature.setProperty("holeId", this.selectedHole.holeId);
+        } else {
+            feature.setProperty("holeId", null);
+        }
+        // assign polygon properties
+        feature.setProperty("enabled", true);
+        feature.setProperty("selected", true);
+        feature.setProperty("elementType", Element_t.E_POLY);
+        feature.setProperty("polygonType", type);
+        // update selection
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+        }
+        this.selectedFeature = feature;
+    }
+
+    /***
+     * setPointProperties(any, number, string): void
+     *
+     *     Adds the appropriate properties to the polygon based on the current
+     *     state and given polygon type.
+     ***/
+    private setPointProperties(feature: any, type: number, info: string): void {
+        // assign element properties
+        feature.setProperty("state", State_t.S_NEW);
+        feature.setProperty("elementId", null);
+        feature.setProperty("courseId", this.currentCourse.courseId);
+        if (this.selectedHole !== undefined) {
+            feature.setProperty("holeId", this.selectedHole.holeId);
+        } else {
+            feature.setProperty("holeId", null);
+        }
+        // assign point properties
+        feature.setProperty("enabled", true);
+        feature.setProperty("selected", true);
+        feature.setProperty("elementType", Element_t.E_POINT);
+        feature.setProperty("pointType", type);
+        feature.setProperty("info", info);
+        // update selection
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+        }
+        this.selectedFeature = feature;
     }
 
     /***

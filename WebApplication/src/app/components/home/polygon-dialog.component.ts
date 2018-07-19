@@ -28,9 +28,18 @@ export class PolygonDialog {
             @Inject(MAT_DIALOG_DATA) public data: any)
     {}
 
+    onCancelClick(): void {
+        this.dialogRef.close({done: false});
+    }
+
     onDoneClick(): void {
         if (this.polyType != -1) {
-            this.dialogRef.close(true);
+            this.dialogRef.close(
+                {
+                    done: true,
+                    type: this.polyType
+                }
+            );
         } else {
             // TODO ?
         }

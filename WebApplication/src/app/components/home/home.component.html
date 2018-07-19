@@ -73,53 +73,6 @@
                             </mat-radio-group>
                         </div>
                     </mat-card>
-
-                    <mat-card>
-                        <mat-card-title>
-                            Elements
-                        </mat-card-title>
-
-                        <mat-list role="list">
-                            <mat-card-header>
-                                <mat-card-title>
-                                    Polygons
-                                </mat-card-title>
-                            </mat-card-header>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="polyType">
-                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
-                                            {{t.typeName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-card-header>
-                                <mat-card-title>
-                                    Points
-                                </mat-card-title>
-                            </mat-card-header>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="pointType">
-                                        <mat-option *ngFor="let t of pointTypes; let i = index" [value]="i">
-                                            {{t.pointName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Point Info" [(ngModel)]="pointInfo">
-                                </mat-form-field>
-                            </mat-list-item>
-
-                        </mat-list>
-                    </mat-card>
                 </mat-accordion>
             </mat-list>
         </mat-sidenav>

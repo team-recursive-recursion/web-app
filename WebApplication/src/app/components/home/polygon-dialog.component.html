@@ -18,7 +18,7 @@
         </mat-select>
     </mat-dialog-content>
     <mat-dialog-actions>
-        <button mat-button [mat-dialog-close]="false">Cancel</button>
+        <button mat-button (click)="onCancelClick()">Cancel</button>
         <button mat-button (click)="onDoneClick()">Done</button>
     </mat-dialog-actions>
 </div>
