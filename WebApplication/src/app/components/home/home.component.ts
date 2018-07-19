@@ -5,7 +5,7 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone }
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone, ApplicationRef }
     from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -13,7 +13,7 @@ import {
     LatLngBounds, LatLngBoundsLiteral, DataLayerManager
 } from '@agm/core';
 import { FormControl } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSidenav } from '@angular/material';
 import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
@@ -35,6 +35,7 @@ declare var google: any;
 })
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
+    @ViewChild('snav') navbar: MatSidenav;
 
     // selected items
     selectedFeature: any = null;
@@ -87,10 +88,15 @@ export class HomeComponent {
 
     private _mobileQueryListener: () => void;
 
-    constructor(private api: ApiService, private globals: GlobalsService,
+    constructor(
+        private api: ApiService,
+        private globals: GlobalsService,
         private router: Router,
-        changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
-        public dialog: MatDialog, private ngZone: NgZone) {
+        private ngZone: NgZone,
+        private appRef: ApplicationRef,
+        changeDetectorRef: ChangeDetectorRef,
+        media: MediaMatcher,
+        public dialog: MatDialog) {
 
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -193,6 +199,8 @@ export class HomeComponent {
         this.googleMap.data.addListener('setgeometry', e =>
             this.onMapGeometrySet(e));
         this.googleMap.data.addListener('click', e =>
+            this.onFeatureClick(e));
+        this.googleMap.addListener('click', e =>
             this.onMapClick(e));
     }
 
@@ -239,13 +247,10 @@ export class HomeComponent {
                         visible: true,
                         fillColor: color,
                         fillOpacity: 0.3,
-                        //strokeColor: ,
-                        //strokeOpacity: ,
                         strokeWeight: 1,
                         zIndex: polyType
                     };
                 } else {
-                    // TODO styling for points
                     var iconLocation = (feature.getProperty('pointType') == 1) ? "./assets/flag.png" : "./assets/tee.png";
                     // ourMap.data.revertStyle();
                     return {
@@ -255,12 +260,6 @@ export class HomeComponent {
                         visible: enabled,
                         icon: iconLocation,
                         zIndex: 0
-                        /*
-                        cursor: Mouse cursor to show on hover.
-                        icon: Icon to show for the point geometry.
-                        shape: Defines the image map used for hit detection.
-                        title: Rollover text.
-                        */
                     };
                 }
             }
@@ -315,12 +314,23 @@ export class HomeComponent {
     /***
      * setSelectedFeature(any): void
      *
-     *     Sets the currently selected feature and updates the controls to
-     *     reflect the selected feature.
+     *     Sets the currently selected feature.
      ***/
     private setSelectedFeature(f: any) {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+        }
         this.selectedFeature = f;
-        // TODO update controls
+        this.selectedFeature.setProperty("selected", true);
+        this.appRef.tick();
+    }
+
+    private removeSelectedFeature() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+            this.appRef.tick();
+        }
     }
 
     /***************************************************************************
@@ -419,10 +429,7 @@ export class HomeComponent {
         feature.setProperty("elementType", Element_t.E_POLY);
         feature.setProperty("polygonType", type);
         // update selection
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-        }
-        this.selectedFeature = feature;
+        this.setSelectedFeature(feature);
     }
 
     /***
@@ -448,10 +455,7 @@ export class HomeComponent {
         feature.setProperty("pointType", type);
         feature.setProperty("info", info);
         // update selection
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-        }
-        this.selectedFeature = feature;
+        this.setSelectedFeature(feature);
     }
 
     /***
@@ -471,19 +475,25 @@ export class HomeComponent {
     }
 
     /***
-     * onMapClick(any): void
+     * onFeatureClick(any): void
      *
      *     Event handler for map element clicks. The handler sets the current
      *     selected feature to the clicked one.
      ***/
-    private onMapClick(e: any) {
+    private onFeatureClick(e: any) {
         if (e.feature != this.selectedFeature) {
-            if (this.selectedFeature != null) {
-                this.selectedFeature.setProperty('selected', false);
-            }
-            e.feature.setProperty('selected', true);
             this.setSelectedFeature(e.feature);
         }
+    }
+
+    /***
+     * onMapClick(any): void
+     *
+     *     Event handler for map clicks.
+     ***/
+    private onMapClick(e: any) {
+        // deselect the selected feature
+        this.removeSelectedFeature();
     }
 
     /***************************************************************************
@@ -527,6 +537,7 @@ export class HomeComponent {
     public onLoadCourse(index: number) {
         // receive course info
         if (index == -1) {
+            this.navbar.close();
             this.resetMap();
         } else {
             this.api.courseGet(this.courses[index].courseId)
@@ -734,13 +745,13 @@ export class HomeComponent {
      *     list.
      */
     public onDeleteElement() {
-        if (this.selectedFeature !== null) {
+        if (this.selectedFeature != null) {
             this.googleMap.data.remove(this.selectedFeature);
             if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
                 this.removedFeatures.push(this.selectedFeature);
                 this.selectedFeature.setProperty("state", State_t.S_DELETE);
             }
-            this.selectedFeature = null;
+            this.removeSelectedFeature();
         }
     }
 
@@ -797,11 +808,8 @@ export class HomeComponent {
      *     hole to the selected one.
      ***/
     public onSelectHole(event: any) {
-        // unselect everything
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-            this.selectedFeature = null;
-        }
+        // unselect the selected feature
+        this.removeSelectedFeature();
         if (event.value !== undefined) {
             // enable the features of the hole
             this.googleMap.data.forEach(feature => {
@@ -872,7 +880,7 @@ export class HomeComponent {
         this.selectedHole = undefined;
         this.currentCourse = undefined;
         this.holes = [];
-        this.selectedFeature = null;
+        this.removeSelectedFeature();
         this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
@@ -970,6 +978,8 @@ export class HomeComponent {
                 }
                 this.onLoadHoles();
                 this.updateDataLayer(this.activeElements);
+                // show the holes navbar
+                this.navbar.toggle();
                 break;
             case Call_t.C_COURSE_DELETE:
                 window.alert("Delete successful");

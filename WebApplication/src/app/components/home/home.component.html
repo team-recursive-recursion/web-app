@@ -14,8 +14,9 @@
 
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
     <mat-toolbar color="primary" class="example-toolbar">
-        <button mat-icon-button (click)="snav.toggle()">
-            <mat-icon>menu</mat-icon>
+        <button *ngIf="currentCourse != null && currentCourse.holes !== undefined"
+                mat-icon-button (click)="snav.toggle()">
+            <mat-icon>golf_course</mat-icon>
         </button>
         <div *ngIf="courses.length !== 0">
             <mat-select [(value)]="selected" #courseSelector id="course-selector">
@@ -42,7 +43,7 @@
     </mat-toolbar>
 
     <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
-        <mat-sidenav #snav opened="true" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+        <mat-sidenav #snav opened="false" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
             <mat-list>
                 <mat-accordion>
                     <mat-card *ngIf="currentCourse !== undefined">
@@ -97,7 +98,7 @@
                                 <mat-icon>refresh</mat-icon>
                             </button>
                             <button mat-mini-fab color="warn" *ngIf="selectedFeature !== null" (click)="onDeleteElement()">
-                                <mat-icon>remove</mat-icon>
+                                <mat-icon>delete</mat-icon>
                             </button>
                             <button mat-mini-fab color="primary" (click)="fabAddPolygon('action1')">
                                 <mat-icon>timeline</mat-icon>
