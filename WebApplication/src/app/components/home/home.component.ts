@@ -5,8 +5,8 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit }
-    from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone }
+        from '@angular/core';
 import { Router } from '@angular/router';
 import {
     GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
@@ -23,6 +23,8 @@ import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
+import { PolygonDialog } from './polygon-dialog.component';
+import { PointDialog } from './point-dialog.component';
 
 
 declare var google: any;
@@ -89,23 +91,16 @@ export class HomeComponent {
 
     private _mobileQueryListener: () => void;
 
-    terrainTypes = [
-        { "typeName": 'Rough', "ttype": Polygon_t.P_ROUGH },
-        { "typeName": 'Fairway', "ttype": Polygon_t.P_FAIR },
-        { "typeName": 'Green', "ttype": Polygon_t.P_GREEN },
-        { "typeName": 'Bunker', "ttype": Polygon_t.P_BUNKER },
-        { "typeName": 'Water Hazard', "ttype": Polygon_t.P_WATER }
-    ];
-
     pointTypes = [
         { "pointName": 'Pin', "ptype": Point_t.P_PIN },
         { "pointName": 'Hole', "ptype": Point_t.P_HOLE },
         { "pointName": 'Tee', "ptype": Point_t.P_TEE }
     ];
+
     constructor(private api: ApiService, private globals: GlobalsService,
         private router: Router,
         changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
-        public dialog: MatDialog) {
+        public dialog: MatDialog, private ngZone: NgZone) {
 
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -126,11 +121,31 @@ export class HomeComponent {
         this.onLoadCourse(index)
     }
 
+    /***
+     * fabAddPolygon(): void
+     *
+     *     Event listener for floating polygon button click. Deselects the
+     *     selected feature and enters polygon drawing mode.
+     ***/
     fabAddPolygon() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+        }
         this.googleMap.data.setDrawingMode("Polygon");
     }
 
+    /***
+     * fabAddPoint(): void
+     *
+     *     Event listener for floating point button click. Deselects the
+     *     selected feature and enters marker drawing mode.
+     ***/
     fabAddPoint() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+        }
         this.googleMap.data.setDrawingMode("Point");
     }
 
@@ -347,6 +362,42 @@ export class HomeComponent {
             if (this.currentCourse !== undefined) {
                 let mapDrawingMode = this.getMapDrawingMode();
                 if (mapDrawingMode !== undefined) {
+                    this.ngZone.run(() => {
+                        if (mapDrawingMode == "polygon") {
+                            // bring up the polygon dialog
+                            const dialogRef = this.dialog.open(PolygonDialog, {
+                                //width: '250px',
+                                data: {}
+                            });
+                            dialogRef.afterClosed().subscribe(result => {
+                                if (result) {
+                                    // TODO
+                                } else {
+                                    // delete the feature
+                                    this.googleMap.data.remove(e.feature);
+                                }
+                            });
+
+                        } else if (mapDrawingMode == "marker") {
+                            // bring up the point dialog
+                            const dialogRef = this.dialog.open(PointDialog, {
+                                //width: '250px',
+                                data: {}
+                            });
+                            dialogRef.afterClosed().subscribe(result => {
+                                if (result) {
+                                    // TODO
+                                } else {
+                                    // delete the feature
+                                    this.googleMap.data.remove(e.feature);
+                                }
+                            });
+                        }
+                    });
+                }
+
+
+                if (mapDrawingMode !== undefined) {
                     e.feature.setProperty("state", State_t.S_NEW);
                     e.feature.setProperty("elementId", null);
                     e.feature.setProperty("courseId",
@@ -385,6 +436,8 @@ export class HomeComponent {
                 // TODO nice message
                 window.alert("Please load or create a course first.");
             }
+            // go to select mode
+            this.googleMap.data.setDrawingMode(null);
         }
     }
 
@@ -843,33 +896,6 @@ export class HomeComponent {
         );
         this.googleMap.data.addGeoJson(this.geoJsonObject);
     }
-
-    /***
-     * showHole(string): void
-     *
-     *     Filter to show only a specific hole's elements.
-     ***/
-    /*private showHole(id: string) {
-        // add the course elements as disabled
-        let features: any = [
-            ...this.generateFeature(this.currentCourse.elements, false)
-        ];
-        // add all the holes' elements and enable the current hole
-        this.holes.forEach(hole => {
-            features = [
-                ...features,
-                ...this.generateFeature(hole.elements, hole.holeId === id)
-            ]
-        });
-        // display the elements
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...features
-            ]
-        }
-        this.updateDataLayer(this.activeElements);
-    }*/
 
     /***
      * displayCourse(): void
