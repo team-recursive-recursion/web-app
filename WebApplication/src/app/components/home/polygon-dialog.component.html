@@ -1,0 +1,24 @@
+<!--
+    Filename: polygon-dialog.component.html
+    Author  : Duncan Tilley
+
+        The template for the polygon element dialog.
+-->
+
+<div role="dialog">
+    <h2 mat-dialog-title>Polygon Properties</h2>
+    <mat-dialog-content>
+        <mat-select [(value)]="polyType">
+            <mat-option [value]="-1">
+                Polygon Type
+            </mat-option>
+            <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
+                {{t.typeName}}
+            </mat-option>
+        </mat-select>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button (click)="onCancelClick()">Cancel</button>
+        <button mat-button (click)="onDoneClick()">Done</button>
+    </mat-dialog-actions>
+</div>

@@ -38,6 +38,8 @@ export class ApiService {
 
     usersMatch(email: string, password: string) {
         var url = this.url + "/api/users/match";
+        var SHA256 = require("crypto-js/sha256");
+        password = SHA256(password).toString();
         return this.http.post(url,
                 {"Email": email, "Password": password}
         );
@@ -46,6 +48,8 @@ export class ApiService {
     usersCreate(email: string, firstname: string, lastname: string,
             password: string) {
         var url = this.url + "/api/users";
+        var SHA256 = require("crypto-js/sha256");
+        password = SHA256(password).toString();
         return this.http.post(url,
                 {"Email": email, "Name": firstname, "Surname": lastname,
                 "Password": password}
@@ -165,6 +169,20 @@ export class ApiService {
         return this.http.delete(url);
     }
 
+    pointUpdate(eid: string, geoJson: string, properties: any) {
+        var url = this.url + "/api/points/" + eid;
+        return this.http.put(url,
+            {
+                "ElementId": eid,
+                "HoleId": properties.holeId,
+                "CourseId": properties.courseId,
+                "PointType": properties.pointType,
+                "Info": properties.info,
+                "GeoJson": geoJson
+            }
+        );
+    }
+
     /***
      * API calls: polygons
      ***/
@@ -207,6 +225,19 @@ export class ApiService {
     polygonDelete(eid: string) {
         var url = this.url + "/api/polygons/" + eid;
         return this.http.delete(url);
+    }
+
+    polygonUpdate(eid: string, geoJson: string, properties: any) {
+        var url = this.url + "/api/polygons/" + eid;
+        return this.http.put(url,
+            {
+                "ElementId": eid,
+                "HoleId": properties.holeId,
+                "CourseId": properties.courseId,
+                "PolygonType": properties.polygonType,
+                "GeoJson": geoJson
+            }
+        );
     }
 
 }

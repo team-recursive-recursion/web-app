@@ -5,22 +5,26 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit }
-        from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone, ApplicationRef }
+    from '@angular/core';
 import { Router } from '@angular/router';
-import { GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
-    LatLngBounds, LatLngBoundsLiteral, DataLayerManager } from '@agm/core';
+import {
+    GoogleMapsAPIWrapper, AgmMap, AgmDataLayer, PolygonManager,
+    LatLngBounds, LatLngBoundsLiteral, DataLayerManager
+} from '@agm/core';
 import { FormControl } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSidenav } from '@angular/material';
 import { element } from 'protractor';
 
 import { Course, GolfCourse, Hole, Elements, Polygon }
-        from '../../interfaces/course.interface';
+    from '../../interfaces/course.interface';
 import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
-        from '../../interfaces/enum.interface';
+    from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
+import { PolygonDialog } from './polygon-dialog.component';
+import { PointDialog } from './point-dialog.component';
 
 
 declare var google: any;
@@ -31,11 +35,16 @@ declare var google: any;
 })
 export class HomeComponent {
     @ViewChild('AgmMap') agmMap: AgmMap;
+    @ViewChild('snav') navbar: MatSidenav;
 
     // selected items
     selectedFeature: any = null;
+    dataLayer: any = null;
 
     removedFeatures: Array<any> = []; // list of elements to be deleted
+
+    // marker images
+    imageTee: any;
 
     courses: Course[] = [];
     currentCourse: GolfCourse;
@@ -44,17 +53,14 @@ export class HomeComponent {
     holeName: any[] = [];
     selectedHole: any;
     courseName: string;
-    pointInfo: string;
 
     url: any;
-    selected: number = 0;
+    selected: number = -1;
     button_state: string = "add";
     // Map -- objects
     geoJsonObject: any;
     googleMap: any = null;
     features: any;
-    polyType: number = 0;
-    pointType: number = 0;
 
     lat: number = -25.658712;
     lng: number = 28.140347;
@@ -66,25 +72,31 @@ export class HomeComponent {
 
     activeElements: any;
 
+    open: boolean = true;
+    spin: boolean = false;
+    direction: string = 'up';
+    animationMode: string = 'scale';
+
+    private _fixed: boolean = true;
+    get fixed() { return this._fixed; }
+    set fixed(fixed: boolean) {
+        this._fixed = fixed;
+        if (this._fixed) {
+            this.open = true;
+        }
+    }
+
     private _mobileQueryListener: () => void;
 
-    terrainTypes = [
-        { "typeName": 'Rough', "ttype": Polygon_t.P_ROUGH },
-        { "typeName": 'Fairway', "ttype": Polygon_t.P_FAIR },
-        { "typeName": 'Green', "ttype": Polygon_t.P_GREEN },
-        { "typeName": 'Bunker', "ttype": Polygon_t.P_BUNKER },
-        { "typeName": 'Water Hazard', "ttype": Polygon_t.P_WATER }
-    ];
-
-    pointTypes = [
-        {"pointName": 'Pin', "ptype": Point_t.P_PIN},
-        {"pointName": 'Hole', "ptype": Point_t.P_HOLE},
-        {"pointName": 'Tee', "ptype": Point_t.P_TEE}
-    ];
-    constructor(private api: ApiService, private globals: GlobalsService,
-            private router: Router,
-            changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
-            public dialog: MatDialog) {
+    constructor(
+        private api: ApiService,
+        private globals: GlobalsService,
+        private router: Router,
+        private ngZone: NgZone,
+        private appRef: ApplicationRef,
+        changeDetectorRef: ChangeDetectorRef,
+        media: MediaMatcher,
+        public dialog: MatDialog) {
 
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -99,13 +111,46 @@ export class HomeComponent {
     }
 
     mapInteractionClick(event) {
-        // for (var i = 0; i < this.features.length; i++) {
-        // this.googleMap.data.remove(this.features[i]);
-        // });
     }
 
-    fabInteractionClick(event) {
-        // console.log(event);
+    fabReloadMap(index: number) {
+        this.onLoadCourse(index)
+    }
+
+    /***
+     * fabAddPolygon(): void
+     *
+     *     Event listener for floating polygon button click. Deselects the
+     *     selected feature and enters polygon drawing mode.
+     ***/
+    fabAddPolygon() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+        }
+        this.googleMap.data.setDrawingMode("Polygon");
+    }
+
+    /***
+     * fabAddPoint(): void
+     *
+     *     Event listener for floating point button click. Deselects the
+     *     selected feature and enters marker drawing mode.
+     ***/
+    fabAddPoint() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+        }
+        this.googleMap.data.setDrawingMode("Point");
+    }
+
+    createCourse() {
+        console.log("Create course");
+    }
+
+    createHole() {
+        console.log("Create hole");
     }
 
     ngAfterViewInit() {
@@ -128,15 +173,18 @@ export class HomeComponent {
 
     /***
      * setupMap
-     *                   _         _
-     *     TODO Whatever  \_(o-o)_/
+     *
+     *     Sets up the initial map controls and styling.
      ***/
     private setupMap() {
         this.agmMap.mapReady.subscribe(map => {
             this.googleMap = map;
-            this.googleMap.data.setControls(['Point', 'Polygon']);
+            this.dataLayer = new google.maps.Data();
+            this.dataLayer.setMap(map);
+            //this.googleMap.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
-            this.styleFeatures();
+            this.setUpStyling();
+            this.setUpSearch();
         });
     }
 
@@ -147,84 +195,152 @@ export class HomeComponent {
      ***/
     private setUpMapEvents() {
         this.googleMap.data.addListener("addfeature", e =>
-                this.onMapFeatureAdd(e));
+            this.onMapFeatureAdd(e));
         this.googleMap.data.addListener('setgeometry', e =>
-                this.onMapGeometrySet(e));
+            this.onMapGeometrySet(e));
         this.googleMap.data.addListener('click', e =>
-                this.onMapClick(e));
+            this.onFeatureClick(e));
+        this.googleMap.addListener('click', e =>
+            this.onMapClick(e));
     }
 
     /***
-     * styleFeatures
+     * setUpStyling(): void
      *
-     *     Function that sets the color of the Polygon according to its
-     *     polygonType property.
+     *     Function that sets the color and style of features according to its
+     *     type and enabled properties.
      ***/
-    private styleFeatures() {
+    private setUpStyling() {
         this.googleMap.data.setStyle(function (feature) {
-            const polyType = feature.getProperty('polygonType');
-            let color = '#336699';
-            if (polyType == 0) {
-                color = '#463E3E';
+            let enabled = feature.getProperty('enabled');
+            let selected = feature.getProperty('selected');
+            if (feature.getGeometry() != null) {
+                if (feature.getGeometry().getType() == "Polygon") {
+                    // styling for polygons
+                    const polyType = feature.getProperty('polygonType');
+                    // choose the color based on enabled and the type
+                    let color = '#2E2E2E';
+                    if (enabled) {
+                        switch (polyType) {
+                            case 0:
+                                color = '#1D442D';
+                                break;
+                            case 1:
+                                color = '#73A15D';
+                                break;
+                            case 2:
+                                color = '#BADA55';
+                                break;
+                            case 3:
+                                color = '#C2B280';
+                                break;
+                            case 4:
+                                color = '#336699';
+                                break;
+                        }
+                    }
+                    // return the styling
+                    return {
+                        clickable: enabled,
+                        draggable: selected,
+                        editable: selected,
+                        visible: true,
+                        fillColor: color,
+                        fillOpacity: 0.3,
+                        strokeWeight: 1,
+                        zIndex: polyType
+                    };
+                } else {
+                    var icon;
+                    switch (feature.getProperty("pointType")) {
+                        case Point_t.P_HOLE:
+                            icon = "./assets/flag.png";
+                            break;
+                        case Point_t.P_TEE:
+                            icon = "./assets/tee.png";
+                            break;
+                        default:
+                            icon = "";
+                            break;
+                    }
+                    return {
+                        clickable: enabled,
+                        draggable: selected,
+                        editable: selected,
+                        visible: enabled,
+                        icon: icon,
+                        zIndex: 0
+                    };
+                }
             }
-            if (polyType == 1) {
-                color = '#73A15D';
-            }
-            if (polyType == 2) {
-                color = '#BADA55';
-            }
-            if (polyType == 3) {
-                color = '#C2B280';
-            }
-            return {
-                draggable: true,
-                editable: true,
-                fillColor: color,
-                strokeWeight: 1
-            };
         });
 
     }
 
     /***
-     * updateDataLayer(any): void
+     * setUpSearch(): void
      *
-     *     Updates the items on the map to new items.
+     *     Creates the search bar and enables the events.
      ***/
-    public updateDataLayer(geoJson: any) {
-        console.log(geoJson);
-        this.geoJsonObject = geoJson;
-        if (this.geoJsonObject !== undefined &&
-                this.geoJsonObject.features.length !== 0) {
-            const bounds: LatLngBounds = new google.maps.LatLngBounds();
-            this.geoJsonObject.features.forEach(
-                feature => {
-                    if (feature.geometry.coordinates[0].forEach != null) {
+    private setUpSearch(): void {
+        // create and link the search input
+        var map = this.googleMap;
+        var div = document.getElementById("search-div");
+        var input = document.getElementById("search-input");
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(div);
 
-                        feature.geometry.coordinates[0].forEach(
-                            lngLat => bounds.extend(
-                                new google.maps.LatLng(lngLat[1], lngLat[0]))
-                        );
-                    }
+        // bias search results to places in the current viewbox
+        map.addListener('bounds_changed', function () {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // add event for place selection
+        searchBox.addListener('places_changed', function () {
+            var places = searchBox.getPlaces();
+            if (places.length == 0) {
+                return;
+            }
+
+            // get the location.
+            var bounds = new google.maps.LatLngBounds();
+            // add bounds for each selected place
+            places.forEach(place => {
+                if (!place.geometry) {
+                    console.log("Place contains no usable geometry");
+                    return;
                 }
-            );
-            this.googleMap.fitBounds(bounds);
-        }
-        this.googleMap.data.forEach(
-            feature => this.googleMap.data.remove(feature)
-        );
-        this.googleMap.data.addGeoJson(this.geoJsonObject);
+                // focus on the area
+                if (place.geometry.viewport) {
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            map.fitBounds(bounds);
+        });
     }
 
     /***
      * setSelectedFeature(any): void
      *
-     *     Sets the currently selected feature and updates the controls to
-     *     reflect the selected feature.
+     *     Sets the currently selected feature.
      ***/
     private setSelectedFeature(f: any) {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+        }
         this.selectedFeature = f;
-        // TODO update controls
+        this.selectedFeature.setProperty("selected", true);
+        this.appRef.tick();
+    }
+
+    private removeSelectedFeature() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.setProperty("selected", false);
+            this.selectedFeature = null;
+            this.appRef.tick();
+        }
     }
 
     /***************************************************************************
@@ -232,13 +348,14 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
+     * getMapDrawingMode(): string
      *
+     *     Returns the current drawing manager mode, i.e. whether the user is
+     *     adding a point or a polygon.
+     *     Returns "polygon" or "marker".
      ***/
-    private getMapDrawingMode() {
-        // REALLY UGLY WAY TO GET THE CURRENT DRAWINGMANAGERMODE
-        //                      _         _
-        //                       \_(o-o)_/
-
+    private getMapDrawingMode(): string {
+        // TODO get a better way to do this?
         let obj = this.googleMap.data.gm_bindings_.drawingMode;
         for (var a in this.googleMap.data.gm_bindings_.drawingMode) {
             return obj[a].kd.getDrawingManagerMode();
@@ -254,34 +371,40 @@ export class HomeComponent {
     private onMapFeatureAdd(e: any) {
         // ignore the loaded elements
         if (e.feature.getProperty("elementId") === undefined) {
-            // flag the element as new with the proper type and course/hole IDs
             if (this.currentCourse !== undefined) {
+                // determine the type of element added
                 let mapDrawingMode = this.getMapDrawingMode();
                 if (mapDrawingMode !== undefined) {
-                    e.feature.setProperty("state", State_t.S_NEW);
-                    e.feature.setProperty("elementId", null);
-                    e.feature.setProperty("courseId",
-                            this.currentCourse.courseId);
-                    if (this.selectedHole !== undefined) {
-                        e.feature.setProperty("holeId",
-                                this.selectedHole.holeId);
-                    } else {
-                        e.feature.setProperty("holeId", null);
-                    }
-                    // assign polygon or point properties
-                    if (mapDrawingMode == "polygon") {
-                        e.feature.setProperty("elementType", Element_t.E_POLY);
-                        e.feature.setProperty("polygonType", this.polyType);
-                    } else if (mapDrawingMode == "marker") {
-                        e.feature.setProperty("elementType", Element_t.E_POINT);
-                        e.feature.setProperty("pointType", this.pointType);
-                        // get point info
-                        var info: string = this.pointInfo;
-                        if (info == "Point Info" || info === undefined) {
-                            info = "";
+                    this.ngZone.run(() => {
+                        if (mapDrawingMode == "polygon") {
+                            // bring up the polygon dialog
+                            const dialogRef = this.dialog.open(PolygonDialog);
+                            dialogRef.afterClosed().subscribe(result => {
+                                if (result.done) {
+                                    // assign polygon properties
+                                    this.setPolygonProperties(e.feature,
+                                            result.type);
+                                } else {
+                                    // delete the feature
+                                    this.googleMap.data.remove(e.feature);
+                                }
+                            });
+
+                        } else if (mapDrawingMode == "marker") {
+                            // bring up the point dialog
+                            const dialogRef = this.dialog.open(PointDialog);
+                            dialogRef.afterClosed().subscribe(result => {
+                                if (result.done) {
+                                    // assign point properties
+                                    this.setPointProperties(e.feature,
+                                            result.type, result.info);
+                                } else {
+                                    // delete the feature
+                                    this.googleMap.data.remove(e.feature);
+                                }
+                            });
                         }
-                        e.feature.setProperty("info", info);
-                    }
+                    });
                 }
             } else {
                 // remove the invalid feature
@@ -289,7 +412,60 @@ export class HomeComponent {
                 // TODO nice message
                 window.alert("Please load or create a course first.");
             }
+            // go to select mode
+            this.googleMap.data.setDrawingMode(null);
         }
+    }
+
+    /***
+     * setPolygonProperties(any, number): void
+     *
+     *     Adds the appropriate properties to the polygon based on the current
+     *     state and given polygon type.
+     ***/
+    private setPolygonProperties(feature: any, type: number): void {
+        // assign element properties
+        feature.setProperty("state", State_t.S_NEW);
+        feature.setProperty("elementId", null);
+        feature.setProperty("courseId", this.currentCourse.courseId);
+        if (this.selectedHole !== undefined) {
+            feature.setProperty("holeId", this.selectedHole.holeId);
+        } else {
+            feature.setProperty("holeId", null);
+        }
+        // assign polygon properties
+        feature.setProperty("enabled", true);
+        feature.setProperty("selected", true);
+        feature.setProperty("elementType", Element_t.E_POLY);
+        feature.setProperty("polygonType", type);
+        // update selection
+        this.setSelectedFeature(feature);
+    }
+
+    /***
+     * setPointProperties(any, number, string): void
+     *
+     *     Adds the appropriate properties to the polygon based on the current
+     *     state and given polygon type.
+     ***/
+    private setPointProperties(feature: any, type: number, info: string): void {
+        // assign element properties
+        feature.setProperty("state", State_t.S_NEW);
+        feature.setProperty("elementId", null);
+        feature.setProperty("courseId", this.currentCourse.courseId);
+        if (this.selectedHole !== undefined) {
+            feature.setProperty("holeId", this.selectedHole.holeId);
+        } else {
+            feature.setProperty("holeId", null);
+        }
+        // assign point properties
+        feature.setProperty("enabled", true);
+        feature.setProperty("selected", true);
+        feature.setProperty("elementType", Element_t.E_POINT);
+        feature.setProperty("pointType", type);
+        feature.setProperty("info", info);
+        // update selection
+        this.setSelectedFeature(feature);
     }
 
     /***
@@ -309,16 +485,25 @@ export class HomeComponent {
     }
 
     /***
-     * onMapClick(any): void
+     * onFeatureClick(any): void
      *
      *     Event handler for map element clicks. The handler sets the current
      *     selected feature to the clicked one.
      ***/
-    private onMapClick(e: any) {
-        // TODO menu maybe?
+    private onFeatureClick(e: any) {
         if (e.feature != this.selectedFeature) {
             this.setSelectedFeature(e.feature);
         }
+    }
+
+    /***
+     * onMapClick(any): void
+     *
+     *     Event handler for map clicks.
+     ***/
+    private onMapClick(e: any) {
+        // deselect the selected feature
+        this.removeSelectedFeature();
     }
 
     /***************************************************************************
@@ -341,7 +526,10 @@ export class HomeComponent {
                         Call_t.C_COURSE_CREATE),
                     error => this.onFail(error.status, error.headers,
                         error.text(), Call_t.C_COURSE_CREATE),
-                    () => console.log("Course created successfully.")
+                    () => {
+                        this.courseName = "";
+                        console.log("Course created successfully.")
+                    }
                 );
         } else {
             // TODO nice message
@@ -358,14 +546,19 @@ export class HomeComponent {
      ***/
     public onLoadCourse(index: number) {
         // receive course info
-        this.api.courseGet(this.courses[index].courseId)
-            .subscribe(
-                result => this.onResult(result.headers, result.json(),
-                    Call_t.C_COURSE_LOAD),
-                error => this.onFail(error.status, error.headers,
-                    error.text(), Call_t.C_COURSE_LOAD),
-                () => console.log("Course loaded successfully.")
-            );
+        if (index == -1) {
+            this.navbar.close();
+            this.resetMap();
+        } else {
+            this.api.courseGet(this.courses[index].courseId)
+                .subscribe(
+                    result => this.onResult(result.headers, result.json(),
+                        Call_t.C_COURSE_LOAD),
+                    error => this.onFail(error.status, error.headers,
+                        error.text(), Call_t.C_COURSE_LOAD),
+                    () => console.log("Course loaded successfully.")
+                );
+        }
     }
 
     /***
@@ -408,42 +601,46 @@ export class HomeComponent {
                     } else {
                         type = feature.properties["polygonType"];
                     }
+                    var eid: string = feature.properties["elementId"];
                     var geoJson: string = JSON.stringify(feature.geometry);
                     var courseId = feature.properties["courseId"];
                     var holeId = feature.properties["holeId"];
 
-                    // perform the correct action for new, deleted and updated
-                    // polygons
+                    // perform the correct action for new and updated elements
                     switch (feature.properties.state) {
                         case State_t.S_NEW:
                             if (feature.properties.elementType ==
-                                    Element_t.E_POLY) {
+                                Element_t.E_POLY) {
                                 this.createPolygon(holeId, courseId, type,
-                                        geoJson, feature);
+                                    geoJson, feature);
                             } else if (feature.properties.elementType ==
-                                    Element_t.E_POINT) {
+                                Element_t.E_POINT) {
                                 let info = feature.properties["info"];
                                 this.createPoint(holeId, courseId, type, info,
-                                        geoJson, feature);
+                                    geoJson, feature);
                             }
                             break;
 
                         case State_t.S_UPDATE:
-                            /*value['elementId'] =
-                                feature.properties.elementId;
-                            this.api.updatePolygon(
-                                feature.properties.elementId, value)
-                                .subscribe(
-                                    // TODO somehow remove feature and value
-                                    // as parameter
-                                    result => this.onResult(result.headers,
-                                        result.json(), C_POLY_UPDATE, feature),
-                                    error => this.onFail(error.status,
-                                        error.headers, error.text(),
-                                        C_POLY_UPDATE),
-                                    () => console.log("Poly saved successfully")
-                                );*/
-                            // TODO: implement update
+                            let call;
+                            if (feature.properties.elementType ==
+                                Element_t.E_POLY) {
+                                call = this.api.polygonUpdate(eid, geoJson,
+                                    feature.properties);
+                            } else if (feature.properties.elementType ==
+                                Element_t.E_POINT) {
+                                call = this.api.pointUpdate(eid, geoJson,
+                                    feature.properties);
+                            }
+                            call.subscribe(
+                                result => this.onResult(result.headers,
+                                    result.json(),
+                                    Call_t.C_ELEMENT_UPDATE, feature),
+                                error => this.onFail(error.status,
+                                    error.headers, error.text(),
+                                    Call_t.C_ELEMENT_UPDATE),
+                                () => console.log("Element saved successfully")
+                            );
                             break;
                     }
                     console.log("Success: Course saved");
@@ -459,7 +656,7 @@ export class HomeComponent {
      *     through a API call.
      ***/
     private createPolygon(holeId: string, courseId: string, type: number,
-            geoJson: string, feature: any) {
+        geoJson: string, feature: any) {
 
         var http;
         if (holeId !== undefined && holeId !== null) {
@@ -495,7 +692,7 @@ export class HomeComponent {
      *     through a API call.
      ***/
     private createPoint(holeId: string, courseId: string, type: number,
-            info: string, geoJson: string, feature: any) {
+        info: string, geoJson: string, feature: any) {
 
         var http;
         if (holeId !== undefined && holeId !== null) {
@@ -543,7 +740,10 @@ export class HomeComponent {
                         Call_t.C_COURSE_DELETE),
                     error => this.onFail(error.status, error.headers,
                         error.text(), Call_t.C_COURSE_DELETE),
-                    () => console.log("Course created successfully.")
+                    () => {
+                        console.log("Course deleted successfully.");
+                        this.resetMap();
+                    }
                 );
         }
     }
@@ -555,22 +755,18 @@ export class HomeComponent {
      *     list.
      */
     public onDeleteElement() {
-        if (this.selectedFeature !== null) {
+        if (this.selectedFeature != null) {
             this.googleMap.data.remove(this.selectedFeature);
             if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
                 this.removedFeatures.push(this.selectedFeature);
                 this.selectedFeature.setProperty("state", State_t.S_DELETE);
             }
-            this.selectedFeature = null;
+            this.removeSelectedFeature();
         }
     }
 
-    /***************************************************************************
-     * Create and load handler for Holes.
-     **************************************************************************/
-
     /***
-    * onAddHoles
+    * onAddHole(): void
     *
     *     Function that creates a new Hole for the current Course using the
     *     API.
@@ -615,6 +811,36 @@ export class HomeComponent {
         );
     }
 
+    /***
+     * onSelectHole(any): void
+     *
+     *     Event handler for selecting a hole radio button. Changes the active
+     *     hole to the selected one.
+     ***/
+    public onSelectHole(event: any) {
+        // unselect the selected feature
+        this.removeSelectedFeature();
+        if (event.value !== undefined) {
+            // enable the features of the hole
+            this.googleMap.data.forEach(feature => {
+                if (feature.getProperty("holeId") == event.value.holeId) {
+                    feature.setProperty("enabled", true);
+                } else {
+                    feature.setProperty("enabled", false);
+                }
+            });
+        } else {
+            // enable the features of the course
+            this.googleMap.data.forEach(feature => {
+                if (feature.getProperty("holeId") == null) {
+                    feature.setProperty("enabled", true);
+                } else {
+                    feature.setProperty("enabled", false);
+                }
+            });
+        }
+    }
+
     /***************************************************************************
      * Client side saving and updating handlers for Polygons.
      **************************************************************************/
@@ -652,35 +878,80 @@ export class HomeComponent {
     }
 
     /***************************************************************************
-     * Other event handlers.
+     * Display and data updating
      **************************************************************************/
 
     /***
-     * onToggleDraggable(): void
-     *
-     *     Toggles the draggable option of the map.
-     ***/
-    public onToggleDraggable() {
-        this.mapDraggable = !this.mapDraggable;
-    }
-
-    /***
-     * onResetMap(): void
+     * resetMap(): void
      *
      *     Removes all drawn items on the map.
      ***/
-    public onResetMap() {
+    public resetMap() {
         this.selectedHole = undefined;
         this.currentCourse = undefined;
         this.holes = [];
-        this.selected = 0;
-
+        this.removeSelectedFeature();
         this.googleMap.data.forEach(
             feature => this.googleMap.data.remove(feature)
         );
         this.googleMap.setCenter({ lat: this.lat, lng: this.lng });
         this.googleMap.setZoom(this.zoom);
+    }
 
+    /***
+     * updateDataLayer(any): void
+     *
+     *     Updates the items on the map to new items.
+     ***/
+    public updateDataLayer(geoJson: any) {
+        console.log(geoJson);
+        this.geoJsonObject = geoJson;
+        if (this.geoJsonObject !== undefined &&
+            this.geoJsonObject.features.length !== 0) {
+            const bounds: LatLngBounds = new google.maps.LatLngBounds();
+            this.geoJsonObject.features.forEach(
+                feature => {
+                    if (feature.geometry.coordinates[0].forEach != null) {
+
+                        feature.geometry.coordinates[0].forEach(
+                            lngLat => bounds.extend(
+                                new google.maps.LatLng(lngLat[1], lngLat[0]))
+                        );
+                    }
+                }
+            );
+            this.googleMap.fitBounds(bounds);
+        }
+        this.googleMap.data.forEach(
+            feature => this.googleMap.data.remove(feature)
+        );
+        this.googleMap.data.addGeoJson(this.geoJsonObject);
+    }
+
+    /***
+     * displayCourse(): void
+     *
+     *     Reset the map to display all the elements
+     ***/
+    private displayCourse() {
+        // add the course elements
+        let features: any = [...this.generateFeature(this.currentCourse
+            .elements)];
+        // add all the holes' elements
+        this.holes.forEach(hole => {
+            features = [
+                ...features,
+                ...this.generateFeature(hole.elements, false)
+            ]
+        });
+        // display the elements
+        this.activeElements = {
+            "type": "FeatureCollection",
+            "features": [
+                ...features
+            ]
+        }
+        this.updateDataLayer(this.activeElements);
     }
 
     /***************************************************************************
@@ -693,7 +964,7 @@ export class HomeComponent {
      *     Function to be called after each successful API call.
      ***/
     private onResult(headers: any, body: any, callType: Call_t,
-            feature: any = null) {
+        feature: any = null) {
         switch (callType) {
             case Call_t.C_COURSES_LOAD:
                 for (var i = 0; i < body.length; ++i) {
@@ -702,11 +973,14 @@ export class HomeComponent {
                 break;
             case Call_t.C_COURSE_CREATE:
                 this.courses.push(body);
-                this.onResetMap();
+                this.resetMap();
                 this.currentCourse = body;
                 this.selected = this.courses.indexOf(body);
+                // show the navbar
+                this.navbar.open();
                 break;
             case Call_t.C_COURSE_LOAD:
+                this.resetMap();
                 this.currentCourse = body;
                 this.activeElements = {
                     "type": "FeatureCollection",
@@ -716,6 +990,8 @@ export class HomeComponent {
                 }
                 this.onLoadHoles();
                 this.updateDataLayer(this.activeElements);
+                // show the holes navbar
+                this.navbar.open();
                 break;
             case Call_t.C_COURSE_DELETE:
                 window.alert("Delete successful");
@@ -729,6 +1005,8 @@ export class HomeComponent {
                     }
                     ++i;
                 }
+                // hide the navbar
+                this.navbar.close();
                 break;
             case Call_t.C_HOLE_CREATE:
                 if (this.currentCourse.holes === null) {
@@ -739,13 +1017,14 @@ export class HomeComponent {
             case Call_t.C_HOLE_LOAD:
                 this.holes.push(body);
                 if (this.holes.length === this.currentCourse.holes.length) {
-                    this.showHoles();
+                    this.displayCourse();
                 }
                 break;
             case Call_t.C_ELEMENT_CREATE:
             case Call_t.C_ELEMENT_UPDATE:
-                console.log("BODY:",body);
-                this.onElementSaved(body, feature);
+                if (body != null) {
+                    this.onElementSaved(body, feature);
+                }
                 break;
         }
     }
@@ -791,9 +1070,9 @@ export class HomeComponent {
     /***
      * generateFeature(Array<any>): void
      *
-     *     TODO No idea
+     *     Creates a drawable feature from a collection of GEOJSON objects.
      ***/
-    private generateFeature(collection: Array<any>) {
+    private generateFeature(collection: Array<any>, enabled: boolean = true) {
         let elements: Array<any> = [];
         if (collection !== undefined && collection !== null) {
             collection.forEach(
@@ -812,9 +1091,11 @@ export class HomeComponent {
                                     "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
-                                    "holeId": element.holeId
+                                    "holeId": element.holeId,
+                                    "enabled": enabled,
+                                    "selected": false
                                 }
-                            }
+                            };
                     } else if (element.elementType == Element_t.E_POLY) {
                         value =
                             {
@@ -828,73 +1109,18 @@ export class HomeComponent {
                                     "elementType": element.elementType,
                                     "elementId": element.elementId,
                                     "courseId": element.courseId,
-                                    "holeId": element.holeId
+                                    "holeId": element.holeId,
+                                    "enabled": enabled,
+                                    "selected": false
                                 }
-                            }
+                            };
                     }
                     elements.push(value);
-                    this.courseId = element.courseId
+                    this.courseId = element.courseId;
                 }
             );
         }
         return elements;
     }
 
-    /***
-     * showHoles(): void
-     *
-     *     TODO No idea
-     ***/
-    private showHoles() {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .elements)];
-        this.holes.forEach(hole => {
-            tempHolder = [...tempHolder, ...this.generateFeature(hole
-                .elements)]
-        });
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...tempHolder
-            ]
-        }
-        this.updateDataLayer(this.activeElements);
-    }
-
-    /***
-     * filterHoles(string): void
-     *
-     *     TODO no idea
-     *     Possibly filter which holes to show?
-     ***/
-    private filterHoles(holeId: string) {
-        let tempHolder: any = [...this.generateFeature(this.currentCourse
-            .elements)];
-        this.holes.forEach(hole => {
-            if (hole.holeId === holeId) {
-                tempHolder = [...tempHolder, ...this.generateFeature(hole
-                    .elements)]
-            }
-        });
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...tempHolder
-            ]
-        }
-        this.updateDataLayer(this.activeElements);
-    }
-
-    /***
-     * updateHoles(any): void
-     *
-     *     TODO no idea
-     ***/
-    public updateHoles(event: any) {
-        if (event.value !== undefined) {
-            this.filterHoles(event.value.holeId);
-        } else {
-            this.showHoles();
-        }
-    }
 }

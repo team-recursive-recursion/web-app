@@ -5,80 +5,47 @@
         The template for the controls and map for mapping.
 -->
 
+<!-- Search bar -->
+<div id="search-div">
+    <mat-form-field class="fill">
+        <input matInput type="text" placeholder="Search" id="search-input">
+    </mat-form-field>
+</div>
+
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
     <mat-toolbar color="primary" class="example-toolbar">
-        <button mat-icon-button (click)="snav.toggle()">
-            <mat-icon>menu</mat-icon>
+        <button *ngIf="currentCourse != null && currentCourse.holes !== undefined"
+                mat-icon-button (click)="snav.toggle()">
+            <mat-icon>golf_course</mat-icon>
         </button>
-        <h1 class="example-app-name">Mapper</h1>
-        <h1 *ngIf="currentCourse !== undefined" class="example-app-name"> - {{currentCourse.courseName}}</h1>
+        <div *ngIf="courses.length !== 0">
+            <mat-select [(value)]="selected" #courseSelector id="course-selector">
+                <mat-option [value]="-1" *ngIf="courses.length !== 0" (click)="onLoadCourse(-1)">
+                    Select a course
+                </mat-option>
+                <mat-option *ngFor="let c of courses; let i = index" [value]="i" (click)="onLoadCourse(i)">
+                    {{c.courseName}}
+                </mat-option>
+            </mat-select>
+
+        </div>
+        <span class="small-spacer"></span>
+        <button mat-mini-fab color="accent" *ngIf="selected !== -1 && courses.length !== 0" (click)="onDeleteCourse(selected)">
+            <mat-icon>delete_forever</mat-icon>
+        </button>
+        <span class="example-spacer"></span>
+        <input class="course-name-input" matInput placeholder="New Course Name" ([ngModel])="courseName" #courseName>
+        <span class="small-spacer"></span>
+        <button mat-mini-fab color="accent" (click)="onCreateCourse(courseName.value)">
+            <mat-icon>add</mat-icon>
+        </button>
 
     </mat-toolbar>
 
     <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
-        <mat-sidenav #snav opened="true" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+        <mat-sidenav #snav opened="false" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
             <mat-list>
                 <mat-accordion>
-
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>
-                                Add Course
-                            </mat-card-title>
-                        </mat-card-header>
-
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Course Name" ([ngModel])="courseName" #courseName>
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-list-item role="listitem">
-                                <button mat-raised-button class="fill" (click)="onCreateCourse(courseName.value)">
-                                    Add
-                                </button>
-
-                            </mat-list-item>
-
-                        </mat-list>
-                    </mat-card>
-
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>
-                                Your Courses:
-                            </mat-card-title>
-                        </mat-card-header>
-
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="selected" #courseSelector id="course-selector">
-                                        <mat-option *ngFor="let c of courses; let i = index" [value]="i">
-                                            {{c.courseName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button type="button" class="fill" (click)="onLoadCourse(selected)" id="changeCourse">
-                                    Load
-                                </button>
-                            </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onSaveCourse()">
-                                    Save
-                                </button>
-                            </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <button color="warn" class="fill" mat-button type="button" class="fill" id="deleteCourse" (click)="onDeleteCourse(selected)">
-                                    Delete
-                                </button>
-                            </mat-list-item>
-                        </mat-list>
-                    </mat-card>
-
                     <mat-card *ngIf="currentCourse !== undefined">
                         <mat-card-header>
                             <mat-card-title>
@@ -97,7 +64,7 @@
                             </mat-list-item>
                         </mat-list>
                         <div *ngIf="currentCourse.holes !== undefined">
-                            <mat-radio-group (change)="updateHoles($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
+                            <mat-radio-group (change)="onSelectHole($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
                                 <mat-radio-button class="hole-radio-button" [value]="undefined">
                                     Course
                                 </mat-radio-button>
@@ -107,81 +74,6 @@
                             </mat-radio-group>
                         </div>
                     </mat-card>
-
-                    <mat-card>
-                        <mat-card-title>
-                            Elements
-                        </mat-card-title>
-
-
-                        <mat-list role="list">
-                            <mat-card-header>
-                                <mat-card-title>
-                                    Polygons
-                                </mat-card-title>
-                            </mat-card-header>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="polyType">
-                                        <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
-                                            {{t.typeName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-card-header>
-                                <mat-card-title>
-                                    Points
-                                </mat-card-title>
-                            </mat-card-header>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field>
-                                    <mat-select [(value)]="pointType">
-                                        <mat-option *ngFor="let t of pointTypes; let i = index" [value]="i">
-                                            {{t.pointName}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Point Info" [(ngModel)]="pointInfo">
-                                </mat-form-field>
-                            </mat-list-item>
-
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onDeleteElement()">
-                                    Delete Element
-                                </button>
-                            </mat-list-item>
-
-                        </mat-list>
-                    </mat-card>
-
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>
-                                Map options
-                            </mat-card-title>
-                        </mat-card-header>
-
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-raised-button (click)="onToggleDraggable()" color="{{mapDraggable ? 'primary' : 'accent'}}">
-                                    Map Draggable
-                                </button>
-                            </mat-list-item>
-                            <mat-list-item role="listitem">
-                                <button class="fill" mat-button (click)="onResetMap()" color="warn">
-                                    Reset Map
-                                </button>
-                            </mat-list-item>
-                        </mat-list>
-                    </mat-card>
                 </mat-accordion>
             </mat-list>
         </mat-sidenav>
@@ -189,13 +81,34 @@
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
                 <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
-                    #AgmMap [latitude]="lat" [longitude]="lng" (mapClick)="mapInteractionClick($event)">
+                    #AgmMap [latitude]="lat" [longitude]="lng" [streetViewControl]="false" (mapClick)="mapInteractionClick($event)">
                 </agm-map>
-                <button (click)="fabInteractionClick($event)" class="controls" mat-fab>
-                    <mat-icon>
-                        {{button_state}}
-                    </mat-icon>
-                </button>
+                <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
+
+                <div class="controls" *ngIf="selected !== -1 && courses.length !== 0">
+                    <smd-fab-speed-dial [(open)]="open" [direction]="direction" [animationMode]="animationMode" [fixed]="true">
+                        <smd-fab-trigger [spin]="spin">
+                            <button mat-fab (click)="onSaveCourse()">
+                                <mat-icon>save</mat-icon>
+                            </button>
+                        </smd-fab-trigger>
+
+                        <smd-fab-actions>
+                            <button mat-mini-fab color="accent" *ngIf="selected !== -1" (click)="onLoadCourse(selected)">
+                                <mat-icon>refresh</mat-icon>
+                            </button>
+                            <button mat-mini-fab color="primary" (click)="fabAddPolygon('action1')">
+                                <mat-icon>timeline</mat-icon>
+                            </button>
+                            <button mat-mini-fab color="primary" (click)="fabAddPoint('action2')">
+                                <mat-icon>flag</mat-icon>
+                            </button>
+                            <button mat-mini-fab color="warn" *ngIf="selectedFeature !== null" (click)="onDeleteElement()">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </smd-fab-actions>
+                    </smd-fab-speed-dial>
+                </div>
             </mat-card>
         </mat-sidenav-content>
     </mat-sidenav-container>
