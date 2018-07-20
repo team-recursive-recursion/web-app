@@ -181,7 +181,7 @@ export class HomeComponent {
             this.googleMap = map;
             this.dataLayer = new google.maps.Data();
             this.dataLayer.setMap(map);
-            this.googleMap.data.setControls(['Point', 'Polygon']);
+            //this.googleMap.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
@@ -976,6 +976,8 @@ export class HomeComponent {
                 this.resetMap();
                 this.currentCourse = body;
                 this.selected = this.courses.indexOf(body);
+                // show the navbar
+                this.navbar.open();
                 break;
             case Call_t.C_COURSE_LOAD:
                 this.resetMap();
@@ -1003,6 +1005,8 @@ export class HomeComponent {
                     }
                     ++i;
                 }
+                // hide the navbar
+                this.navbar.close();
                 break;
             case Call_t.C_HOLE_CREATE:
                 if (this.currentCourse.holes === null) {

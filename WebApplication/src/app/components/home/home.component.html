@@ -97,14 +97,14 @@
                             <button mat-mini-fab color="accent" *ngIf="selected !== -1" (click)="onLoadCourse(selected)">
                                 <mat-icon>refresh</mat-icon>
                             </button>
-                            <button mat-mini-fab color="warn" *ngIf="selectedFeature !== null" (click)="onDeleteElement()">
-                                <mat-icon>delete</mat-icon>
-                            </button>
                             <button mat-mini-fab color="primary" (click)="fabAddPolygon('action1')">
                                 <mat-icon>timeline</mat-icon>
                             </button>
                             <button mat-mini-fab color="primary" (click)="fabAddPoint('action2')">
                                 <mat-icon>flag</mat-icon>
+                            </button>
+                            <button mat-mini-fab color="warn" *ngIf="selectedFeature !== null" (click)="onDeleteElement()">
+                                <mat-icon>delete</mat-icon>
                             </button>
                         </smd-fab-actions>
                     </smd-fab-speed-dial>
