@@ -10,8 +10,9 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegisterComponent } from './components/register/register.component';
-import { PolygonDialog } from './components/home/polygon-dialog.component';
-import { PointDialog } from './components/home/point-dialog.component';
+import { PolygonDialog } from './components/home/dialog/polygon-dialog.component';
+import { PointDialog } from './components/home/dialog/point-dialog.component';
+import { HoleDialog } from './components/home/dialog/hole-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
@@ -72,6 +73,7 @@ import {
         HomeComponent,
         PolygonDialog,
         PointDialog,
+        HoleDialog,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialActions,
         SmdFabSpeedDialTrigger
@@ -135,7 +137,7 @@ import {
         ApiService,
         GlobalsService
     ],
-    entryComponents: [PolygonDialog, PointDialog],
+    entryComponents: [PolygonDialog, PointDialog, HoleDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

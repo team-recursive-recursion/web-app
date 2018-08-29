@@ -1,0 +1,32 @@
+<!--
+    Filename: point-dialog.component.html
+    Author  : Duncan Tilley
+
+        The template for the hole element dialog.
+-->
+
+<div role="dialog">
+    <h2 mat-dialog-title>Hole Properties</h2>
+    <mat-dialog-content>
+        <mat-list role="list">
+            <mat-list-item class="fill">
+                <input matInput placeholder="Hole Name" [(ngModel)]="name">
+            </mat-list-item>
+            <mat-list-item>
+                <mat-select [(value)]="par">
+                    <mat-option [value]="-1">Par</mat-option>
+                    <mat-option [value]="1">1</mat-option>
+                    <mat-option [value]="2">2</mat-option>
+                    <mat-option [value]="3">3</mat-option>
+                    <mat-option [value]="4">4</mat-option>
+                    <mat-option [value]="5">5</mat-option>
+                    <mat-option [value]="6">6</mat-option>
+                </mat-select>
+            </mat-list-item>
+        </mat-list>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button (click)="onCancelClick()">Cancel</button>
+        <button mat-button (click)="onDoneClick()">Done</button>
+    </mat-dialog-actions>
+</div>

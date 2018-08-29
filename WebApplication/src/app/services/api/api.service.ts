@@ -1,6 +1,6 @@
 /***
  * Filename: api.service.ts
- * Author  : Duncan Tilley, Christiaan H Nel
+ * Author  : Duncan Tilley
  * Class   : ApiService
  *
  *     This service encapsulates API requests and should be used instead of
@@ -65,10 +65,13 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    coursesCreate(uid: string, name: string) {
+    coursesCreate(uid: string, name: string, info: string) {
         var url = this.url + "/api/users/" + uid + "/courses";
         return this.http.post(url,
-            {"CourseName": name}
+            {
+                "CourseName": name,
+                "Info": info
+            }
         );
     }
 
@@ -91,10 +94,13 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    holesCreate(cid: string, name: string) {
+    holesCreate(cid: string, name: string, info: string) {
         var url = this.url + "/api/courses/" + cid + "/holes";
         return this.http.post(url,
-            {"Name": name}
+            {
+                "Name": name,
+                "Info": info
+            }
         );
     }
 

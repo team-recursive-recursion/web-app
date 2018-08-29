@@ -1,12 +1,12 @@
 /***
- * Filename: home.component.ts
+ * Filename: polygon-dialog.component.ts
  * Author  : Duncan Tilley
  * Class   : PolygonDialog / <polygon-dialog>
  ***/
 
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Polygon_t } from '../../interfaces/enum.interface';
+import { Polygon_t } from '../../../interfaces/enum.interface';
 
 @Component({
     selector: 'polygon-dialog',
