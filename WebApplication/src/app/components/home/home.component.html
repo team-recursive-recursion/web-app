@@ -53,16 +53,7 @@
                             </mat-card-title>
                         </mat-card-header>
 
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Hole Name" [(ngModel)]="newHoleName">
-                                </mat-form-field>
-                                <mat-icon class="addButton" (click)="onAddHole()">
-                                    {{button_state}}
-                                </mat-icon>
-                            </mat-list-item>
-                        </mat-list>
+                        <!-- hole selection list -->
                         <div *ngIf="currentCourse.holes !== undefined">
                             <mat-radio-group (change)="onSelectHole($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
                                 <mat-radio-button class="hole-radio-button" [value]="undefined">
@@ -73,6 +64,21 @@
                                 </mat-radio-button>
                             </mat-radio-group>
                         </div>
+
+                        <!-- hole management buttons -->
+                        <mat-list role="list">
+                            <mat-list-item role="listitem">
+                                <button mat-icon-button (click)="onAddHole()">
+                                    <mat-icon>add_circle</mat-icon>
+                                </button>
+                                <button mat-icon-button [disabled]="selectedHole === undefined" (click)="onEditHole()">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button [disabled]="selectedHole === undefined" (click)="onRemoveHole()">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </mat-list-item>
+                        </mat-list>
                     </mat-card>
                 </mat-accordion>
             </mat-list>

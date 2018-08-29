@@ -23,9 +23,9 @@ import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
-import { PolygonDialog } from './polygon-dialog.component';
-import { PointDialog } from './point-dialog.component';
-
+import { PolygonDialog } from './dialog/polygon-dialog.component';
+import { PointDialog } from './dialog/point-dialog.component';
+import { HoleDialog } from './dialog/hole-dialog.component';
 
 declare var google: any;
 @Component({
@@ -56,7 +56,6 @@ export class HomeComponent {
 
     url: any;
     selected: number = -1;
-    button_state: string = "add";
     // Map -- objects
     geoJsonObject: any;
     googleMap: any = null;
@@ -67,7 +66,6 @@ export class HomeComponent {
     zoom: number = 20;
     mapType: string = "satellite";
     mapDraggable: boolean = true;
-    newHoleName: string;
     mobileQuery: MediaQueryList;
 
     activeElements: any;
@@ -520,7 +518,7 @@ export class HomeComponent {
     public onCreateCourse(name: string) {
         if (name != "" && name != "Course Name") {
             // create new course
-            this.api.coursesCreate(this.globals.getUid(), name)
+            this.api.coursesCreate(this.globals.getUid(), name, "") // TODO info
                 .subscribe(
                     result => this.onResult(result.headers, result.json(),
                         Call_t.C_COURSE_CREATE),
@@ -766,28 +764,59 @@ export class HomeComponent {
     }
 
     /***
-    * onAddHole(): void
-    *
-    *     Function that creates a new Hole for the current Course using the
-    *     API.
-    *     On success, call onResult.
-    *     On failure, call onFail.
-    ***/
+     * onAddHole(): void
+     *
+     *     Function that creates a new Hole for the current Course using the
+     *     API.
+     *     On success, call onResult.
+     *     On failure, call onFail.
+     ***/
     public onAddHole() {
-        if (this.newHoleName != "" && this.newHoleName !== undefined &&
-            this.newHoleName != "Hole Name") {
-            this.api.holesCreate(this.currentCourse.courseId, this.newHoleName)
-                .subscribe(
-                    result => this.onResult(result.headers, result.json(),
-                        Call_t.C_HOLE_CREATE),
-                    error => this.onFail(error.status, error.headers,
-                        error.text(), Call_t.C_HOLE_CREATE),
-                    () => console.log("Hole added successfully.")
-                );
-        } else {
-            // TODO nice message
-            window.alert("Please enter a Hole name");
-        }
+        // bring up the hole dialog
+        const dialogRef = this.dialog.open(HoleDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.done) {
+                // create hole
+                this.api.holesCreate(this.currentCourse.courseId, result.name,
+                        result.par)
+                    .subscribe(
+                        result => this.onResult(result.headers, result.json(),
+                            Call_t.C_HOLE_CREATE),
+                        error => this.onFail(error.status, error.headers,
+                            error.text(), Call_t.C_HOLE_CREATE),
+                        () => console.log("Hole added successfully.")
+                    );
+            }
+        });
+    }
+
+    /***
+     * onEditHole(): void
+     *
+     *     Function that edits an existing hole using the API.
+     *     On success, call onResult.
+     *     On failure, call onFail.
+     ***/
+    public onEditHole() {
+        // bring up the hole dialog
+        const dialogRef = this.dialog.open(HoleDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.done) {
+                // update hole
+                // TODO
+            }
+        });
+    }
+
+    /***
+     * onRemoveHole(): void
+     *
+     *     Function that removes an existing hole using the API.
+     *     On success, call onResult.
+     *     On failure, call onFail.
+     ***/
+    public onRemoveHole() {
+        // TODO
     }
 
     /***
