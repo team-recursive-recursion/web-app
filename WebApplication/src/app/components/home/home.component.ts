@@ -5,7 +5,10 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone, ApplicationRef }
+import {
+    Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone,
+    ApplicationRef, ValueProvider
+}
     from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -74,6 +77,8 @@ export class HomeComponent {
     spin: boolean = false;
     direction: string = 'up';
     animationMode: string = 'scale';
+    
+    locationPoints: any;
 
     private _fixed: boolean = true;
     get fixed() { return this._fixed; }
@@ -1150,6 +1155,31 @@ export class HomeComponent {
             );
         }
         return elements;
+    }
+
+    /***
+     * 
+     * @param {Array<any>} collection
+     *     
+     *  Show location points on map 
+     */
+    private showLocationPoints(collection: Array<any>){
+        let points: Array<any> = [];
+        if (collection !== undefined && collection !== null) {
+            collection.forEach(
+                points =>{
+                let value;
+                value = {
+                    "point":{
+                       "lat":points.lat,
+                       "lon":points.lon 
+                        }
+                    };
+                    points.push(value);
+                }
+            );
+        }
+        return points;
     }
 
 }
