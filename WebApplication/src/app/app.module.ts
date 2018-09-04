@@ -16,6 +16,8 @@ import { HoleDialog } from './components/home/dialog/hole-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
+import { SocketService } from './services/socket/socket.service';
+import { LocationService } from './services/location/location.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
@@ -135,7 +137,9 @@ import {
     providers: [
         GoogleMapsAPIWrapper,
         ApiService,
-        GlobalsService
+        GlobalsService,
+        SocketService,
+        LocationService
     ],
     entryComponents: [PolygonDialog, PointDialog, HoleDialog],
     bootstrap: [AppComponent]

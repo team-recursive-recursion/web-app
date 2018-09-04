@@ -22,6 +22,7 @@ import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
     from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
+import { LocationService } from '../../services/location/location.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
 import { PolygonDialog } from './dialog/polygon-dialog.component';
 import { PointDialog } from './dialog/point-dialog.component';
@@ -60,6 +61,7 @@ export class HomeComponent {
     geoJsonObject: any;
     googleMap: any = null;
     features: any;
+    drawingMode: string;
 
     lat: number = -25.658712;
     lng: number = 28.140347;
@@ -89,6 +91,7 @@ export class HomeComponent {
     constructor(
         private api: ApiService,
         private globals: GlobalsService,
+        private liveLoc: LocationService,
         private router: Router,
         private ngZone: NgZone,
         private appRef: ApplicationRef,
@@ -112,7 +115,7 @@ export class HomeComponent {
     }
 
     fabReloadMap(index: number) {
-        this.onLoadCourse(index)
+        this.onLoadCourse(index);
     }
 
     /***
@@ -127,6 +130,7 @@ export class HomeComponent {
             this.selectedFeature = null;
         }
         this.googleMap.data.setDrawingMode("Polygon");
+        this.drawingMode = "Polygon";
     }
 
     /***
@@ -141,6 +145,7 @@ export class HomeComponent {
             this.selectedFeature = null;
         }
         this.googleMap.data.setDrawingMode("Point");
+        this.drawingMode = "Point";
     }
 
     createCourse() {
@@ -183,6 +188,7 @@ export class HomeComponent {
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
+            this.setUpLocations();
         });
     }
 
@@ -320,6 +326,19 @@ export class HomeComponent {
     }
 
     /***
+     * setUpLocations(): void
+     *
+     *     Creates the socket connection to the Mapper API for listening to
+     *     live location data.
+     ***/
+    private setUpLocations(): void {
+        this.liveLoc.locations.subscribe(loc => {
+                console.log("Locations received: " + loc);
+            }
+        );
+    }
+
+    /***
      * setSelectedFeature(any): void
      *
      *     Sets the currently selected feature.
@@ -346,21 +365,6 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
-     * getMapDrawingMode(): string
-     *
-     *     Returns the current drawing manager mode, i.e. whether the user is
-     *     adding a point or a polygon.
-     *     Returns "polygon" or "marker".
-     ***/
-    private getMapDrawingMode(): string {
-        // TODO get a better way to do this?
-        let obj = this.googleMap.data.gm_bindings_.drawingMode;
-        for (var a in this.googleMap.data.gm_bindings_.drawingMode) {
-            return obj[a].kd.getDrawingManagerMode();
-        }
-    }
-
-    /***
      * onMapFeatureAdd(any): void
      *
      *     Event handler for new & loaded elements on the map. The handler adds
@@ -371,39 +375,36 @@ export class HomeComponent {
         if (e.feature.getProperty("elementId") === undefined) {
             if (this.currentCourse !== undefined) {
                 // determine the type of element added
-                let mapDrawingMode = this.getMapDrawingMode();
-                if (mapDrawingMode !== undefined) {
-                    this.ngZone.run(() => {
-                        if (mapDrawingMode == "polygon") {
-                            // bring up the polygon dialog
-                            const dialogRef = this.dialog.open(PolygonDialog);
-                            dialogRef.afterClosed().subscribe(result => {
-                                if (result.done) {
-                                    // assign polygon properties
-                                    this.setPolygonProperties(e.feature,
-                                            result.type);
-                                } else {
-                                    // delete the feature
-                                    this.googleMap.data.remove(e.feature);
-                                }
-                            });
+                this.ngZone.run(() => {
+                    if (this.drawingMode == "Polygon") {
+                        // bring up the polygon dialog
+                        const dialogRef = this.dialog.open(PolygonDialog);
+                        dialogRef.afterClosed().subscribe(result => {
+                            if (result.done) {
+                                // assign polygon properties
+                                this.setPolygonProperties(e.feature,
+                                        result.type);
+                            } else {
+                                // delete the feature
+                                this.googleMap.data.remove(e.feature);
+                            }
+                        });
 
-                        } else if (mapDrawingMode == "marker") {
-                            // bring up the point dialog
-                            const dialogRef = this.dialog.open(PointDialog);
-                            dialogRef.afterClosed().subscribe(result => {
-                                if (result.done) {
-                                    // assign point properties
-                                    this.setPointProperties(e.feature,
-                                            result.type, result.info);
-                                } else {
-                                    // delete the feature
-                                    this.googleMap.data.remove(e.feature);
-                                }
-                            });
-                        }
-                    });
-                }
+                    } else if (this.drawingMode == "Point") {
+                        // bring up the point dialog
+                        const dialogRef = this.dialog.open(PointDialog);
+                        dialogRef.afterClosed().subscribe(result => {
+                            if (result.done) {
+                                // assign point properties
+                                this.setPointProperties(e.feature,
+                                        result.type, result.info);
+                            } else {
+                                // delete the feature
+                                this.googleMap.data.remove(e.feature);
+                            }
+                        });
+                    }
+                });
             } else {
                 // remove the invalid feature
                 this.googleMap.data.remove(e.feature);
