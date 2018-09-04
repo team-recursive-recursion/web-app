@@ -22,6 +22,7 @@ import { EmptyClass, Call_t, State_t, Point_t, Element_t, Polygon_t }
     from '../../interfaces/enum.interface';
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
+import { LocationService } from '../../services/location/location.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
 import { PolygonDialog } from './dialog/polygon-dialog.component';
 import { PointDialog } from './dialog/point-dialog.component';
@@ -89,6 +90,7 @@ export class HomeComponent {
     constructor(
         private api: ApiService,
         private globals: GlobalsService,
+        private liveLoc: LocationService,
         private router: Router,
         private ngZone: NgZone,
         private appRef: ApplicationRef,
@@ -112,7 +114,7 @@ export class HomeComponent {
     }
 
     fabReloadMap(index: number) {
-        this.onLoadCourse(index)
+        this.onLoadCourse(index);
     }
 
     /***
@@ -183,6 +185,7 @@ export class HomeComponent {
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
+            this.setUpLocations();
         });
     }
 
@@ -317,6 +320,19 @@ export class HomeComponent {
             });
             map.fitBounds(bounds);
         });
+    }
+
+    /***
+     * setUpLocations(): void
+     *
+     *     Creates the socket connection to the Mapper API for listening to
+     *     live location data.
+     ***/
+    private setUpLocations(): void {
+        this.liveLoc.locations.subscribe(loc => {
+                console.log("Locations received: " + loc);
+            }
+        );
     }
 
     /***
