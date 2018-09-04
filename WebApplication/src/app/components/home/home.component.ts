@@ -989,7 +989,7 @@ export class HomeComponent {
      *     Reset the map to display all the elements
      ***/
     private displayCourse() {
-        this.addDummyPoints();
+        //this.addDummyPoints();
 
         // add the course elements
         let features: any = [...this.generateFeature(this.currentCourse
@@ -1008,7 +1008,7 @@ export class HomeComponent {
                 ...features
             ]
         }
-        this.updateDataLayer(this.showLocationPoints(this.locationPoints));
+        //this.updateDataLayer(this.showLocationPoints(this.locationPoints));
         this.updateDataLayer(this.activeElements);
     }
 
