@@ -13,6 +13,21 @@ import * as Rx from 'rxjs/Rx';
 export class SocketService {
 
     private subject: Rx.Subject<MessageEvent>;
+    private connected: boolean;
+
+    constructor() {
+        this.subject = null;
+        this.connected = false;
+    }
+
+    /***
+     * isConnected(): boolean
+     *
+     *     Returns true if a successfull websocket connection has been made.
+     ***/
+    public isConnected(): boolean {
+        return this.connected;
+    }
 
     /***
      * connect(string): Rx.Subject<MessageEvent>
@@ -26,7 +41,6 @@ export class SocketService {
         // create the connection subject
         if (!this.subject) {
             this.subject = this.create(url);
-            console.log("Successfully connected: " + url);
         }
         return this.subject;
     }
@@ -35,12 +49,22 @@ export class SocketService {
      * create(string): Rx.Subject<MessageEvent>
      *
      *     Creates the connection subject.
-     *
-     *     TODO error checking?
      ***/
     private create(url: string): Rx.Subject<MessageEvent> {
+        // create the web socket
+        let parent = this;
         let ws = new WebSocket(url);
+        ws.onerror = function() {
+            parent.connected = false;
+        };
+        ws.onopen = function() {
+            parent.connected = true;
+        };
+        ws.onclose = function() {
+            parent.connected = false;
+        }
 
+        // create the socket observer
         let observable = Rx.Observable.create(
             (obs: Rx.Observer<MessageEvent>) => {
                 ws.onmessage = obs.next.bind(obs);
@@ -56,6 +80,7 @@ export class SocketService {
                 }
             }
         };
+
         return Rx.Subject.create(observer, observable);
     }
 
