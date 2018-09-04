@@ -30,6 +30,7 @@ import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
 import { PolygonDialog } from './dialog/polygon-dialog.component';
 import { PointDialog } from './dialog/point-dialog.component';
 import { HoleDialog } from './dialog/hole-dialog.component';
+import { CourseDialog } from './dialog/course-dialog.component';
 
 declare var google: any;
 @Component({
@@ -79,7 +80,7 @@ export class HomeComponent {
     spin: boolean = false;
     direction: string = 'up';
     animationMode: string = 'scale';
-    
+
     locationPoints: any;
 
     private _fixed: boolean = true;
@@ -515,30 +516,29 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
-     * onCreateCourse(string): void
+     * onCreateCourse(): void
      *
      *     Function that creates a new Course using the API.
      *     On success, call onResult.
      *     On failure, call onFail.
      ***/
-    public onCreateCourse(name: string) {
-        if (name != "" && name != "Course Name") {
-            // create new course
-            this.api.coursesCreate(this.globals.getUid(), name, "") // TODO info
-                .subscribe(
-                    result => this.onResult(result.headers, result.json(),
-                        Call_t.C_COURSE_CREATE),
-                    error => this.onFail(error.status, error.headers,
-                        error.text(), Call_t.C_COURSE_CREATE),
-                    () => {
-                        this.courseName = "";
-                        console.log("Course created successfully.")
-                    }
-                );
-        } else {
-            // TODO nice message
-            window.alert("Please enter a course name");
-        }
+    public onCreateCourse() {
+        // bring up the course dialog
+        const dialogRef = this.dialog.open(CourseDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.done) {
+                // create course
+                this.api.coursesCreate(this.globals.getUid(), result.name,
+                        result.info)
+                    .subscribe(
+                        result => this.onResult(result.headers, result.json(),
+                            Call_t.C_COURSE_CREATE),
+                        error => this.onFail(error.status, error.headers,
+                            error.text(), Call_t.C_COURSE_CREATE),
+                        () => console.log("Course created successfully.")
+                    );
+            }
+        });
     }
 
     /***
@@ -962,7 +962,7 @@ export class HomeComponent {
         );
         this.googleMap.data.addGeoJson(this.geoJsonObject);
     }
-    
+
     private addDummyPoints(){
         this.locationPoints[1]={
             "type": "Feature",
@@ -981,7 +981,7 @@ export class HomeComponent {
                 "selected": false
             }
         };
-        
+
     }
     /***
      * displayCourse(): void
@@ -990,7 +990,7 @@ export class HomeComponent {
      ***/
     private displayCourse() {
         this.addDummyPoints();
-        
+
         // add the course elements
         let features: any = [...this.generateFeature(this.currentCourse
             .elements)];
@@ -1182,7 +1182,7 @@ export class HomeComponent {
     }
 
     /**
-     * 
+     *
      * @param {Array<any>} collection
      * @param {boolean} enabled
      * @returns {Array<any>}

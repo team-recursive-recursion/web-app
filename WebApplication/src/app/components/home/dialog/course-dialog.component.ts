@@ -1,22 +1,22 @@
 /***
- * Filename: hole-dialog.component.ts
+ * Filename: course-dialog.component.ts
  * Author  : Duncan Tilley
- * Class   : HoleDialog / <hole-dialog>
+ * Class   : CourseDialog / <course-dialog>
  ***/
 
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
-    selector: 'hole-dialog',
-    templateUrl: './hole-dialog.component.html'
+    selector: 'course-dialog',
+    templateUrl: './course-dialog.component.html'
 })
-export class HoleDialog {
+export class CourseDialog {
 
-    name: string = "";
-    par: number = 3;
+    name: string;
+    info: string;
 
-    constructor(public dialogRef: MatDialogRef<HoleDialog>,
+    constructor(public dialogRef: MatDialogRef<CourseDialog>,
             @Inject(MAT_DIALOG_DATA) public data: any)
     {}
 
@@ -25,13 +25,17 @@ export class HoleDialog {
     }
 
     onDoneClick(): void {
-        if (this.par != -1 && this.name !== undefined &&
-                this.name != "Hole Name" && this.name != "") {
+        var info = this.info;
+        if (info == undefined || info == "Optional Info") {
+            info = "";
+        }
+        if (this.name != "Course Name" && this.name != "" &&
+                this.name != undefined) {
             this.dialogRef.close(
                 {
                     done: true,
                     name: this.name,
-                    par: "" + this.par
+                    info: info
                 }
             );
         } else {
@@ -40,3 +44,4 @@ export class HoleDialog {
     }
 
 }
+

@@ -13,6 +13,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { PolygonDialog } from './components/home/dialog/polygon-dialog.component';
 import { PointDialog } from './components/home/dialog/point-dialog.component';
 import { HoleDialog } from './components/home/dialog/hole-dialog.component';
+import { CourseDialog } from './components/home/dialog/course-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
@@ -76,6 +77,7 @@ import {
         PolygonDialog,
         PointDialog,
         HoleDialog,
+        CourseDialog,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialActions,
         SmdFabSpeedDialTrigger
@@ -141,7 +143,7 @@ import {
         SocketService,
         LocationService
     ],
-    entryComponents: [PolygonDialog, PointDialog, HoleDialog],
+    entryComponents: [PolygonDialog, PointDialog, HoleDialog, CourseDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
