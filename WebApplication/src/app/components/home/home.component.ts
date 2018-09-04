@@ -5,7 +5,10 @@
  ***/
 
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone, ApplicationRef }
+import {
+    Component, ViewChild, ChangeDetectorRef, Inject, OnInit, NgZone,
+    ApplicationRef, ValueProvider
+}
     from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -76,6 +79,8 @@ export class HomeComponent {
     spin: boolean = false;
     direction: string = 'up';
     animationMode: string = 'scale';
+    
+    locationPoints: any;
 
     private _fixed: boolean = true;
     get fixed() { return this._fixed; }
@@ -957,13 +962,35 @@ export class HomeComponent {
         );
         this.googleMap.data.addGeoJson(this.geoJsonObject);
     }
-
+    
+    private addDummyPoints(){
+        this.locationPoints[1]={
+            "type": "Feature",
+            "geometry": {
+                "type":"Point",
+                "coordinates":[-25.658712, 28.140347]
+            },
+            "properties": {
+                "state": State_t.S_NONE,
+                "pointType": Point_t.P_LOCATION,
+                "elementType": null,
+                "elementId": null,
+                "courseId": null,
+                "holeId": null,
+                "enabled": true,
+                "selected": false
+            }
+        };
+        
+    }
     /***
      * displayCourse(): void
      *
      *     Reset the map to display all the elements
      ***/
     private displayCourse() {
+        this.addDummyPoints();
+        
         // add the course elements
         let features: any = [...this.generateFeature(this.currentCourse
             .elements)];
@@ -981,6 +1008,7 @@ export class HomeComponent {
                 ...features
             ]
         }
+        this.updateDataLayer(this.showLocationPoints(this.locationPoints));
         this.updateDataLayer(this.activeElements);
     }
 
@@ -1147,6 +1175,41 @@ export class HomeComponent {
                     }
                     elements.push(value);
                     this.courseId = element.courseId;
+                }
+            );
+        }
+        return elements;
+    }
+
+    /**
+     * 
+     * @param {Array<any>} collection
+     * @param {boolean} enabled
+     * @returns {Array<any>}
+     */
+    private showLocationPoints(collection: Array<any>, enabled: boolean = true){
+        let elements: Array<any> = [];
+        if (collection !== undefined && collection !== null) {
+            collection.forEach(
+                element =>{
+                let value;
+                value = {
+                    "type": "Feature",
+                    "geometry": {
+                        ...JSON.parse(element.geoJson)
+                    },
+                    "properties": {
+                        "state": State_t.S_NONE,
+                        "pointType": element['pointType'],
+                        "elementType": null,
+                        "elementId": null,
+                        "courseId": null,
+                        "holeId": null,
+                        "enabled": enabled,
+                        "selected": false
+                    }
+                };
+                    elements.push(value);
                 }
             );
         }

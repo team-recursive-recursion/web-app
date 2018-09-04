@@ -49,7 +49,8 @@ export enum Element_t {
 export enum Point_t {
     P_PIN =0,
     P_HOLE,
-    P_TEE
+    P_TEE,
+    P_LOCATION
 }
 
 export enum Polygon_t {
