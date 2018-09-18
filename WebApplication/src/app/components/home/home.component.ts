@@ -66,6 +66,7 @@ export class HomeComponent {
     googleMap: any = null;
     features: any;
     drawingMode: string;
+    viewMode: boolean = false;
 
     lat: number = -25.658712;
     lng: number = 28.140347;
@@ -223,6 +224,7 @@ export class HomeComponent {
     private setUpStyling() {
         this.googleMap.data.setStyle(function (feature) {
             let enabled = feature.getProperty('enabled');
+            let editable = feature.getProperty('editable');
             let selected = feature.getProperty('selected');
             if (feature.getGeometry() != null) {
                 if (feature.getGeometry().getType() == "Polygon") {
@@ -251,7 +253,7 @@ export class HomeComponent {
                     }
                     // return the styling
                     return {
-                        clickable: enabled,
+                        clickable: editable && enabled,
                         draggable: selected,
                         editable: selected,
                         visible: true,
@@ -274,7 +276,7 @@ export class HomeComponent {
                             break;
                     }
                     return {
-                        clickable: enabled,
+                        clickable: editable && enabled,
                         draggable: selected,
                         editable: selected,
                         visible: enabled,
@@ -876,6 +878,35 @@ export class HomeComponent {
         }
     }
 
+    /***
+     * onViewModeSwitch(): void
+     *
+     *     Event handler for switching between editing mode and live view mode.
+     ***/
+    public onViewModeSwitch() {
+        this.updateViewMode();
+    }
+
+    public updateViewMode() {
+        if (this.viewMode) {
+            // switch to viewing mode
+            this.removeSelectedFeature();
+            this.googleMap.data.setDrawingMode(null);
+            this.drawingMode = "None";
+            // TODO ask to save first
+            // disable selection of elements
+            this.googleMap.data.forEach(feature => {
+                feature.setProperty("editable", false);
+            });
+        } else {
+            // switch to edit mode
+            // enable selection of elements
+            this.googleMap.data.forEach(feature => {
+                feature.setProperty("editable", true);
+            });
+        }
+    }
+
     /***************************************************************************
      * Client side saving and updating handlers for Polygons.
      **************************************************************************/
@@ -978,6 +1009,7 @@ export class HomeComponent {
                 "courseId": null,
                 "holeId": null,
                 "enabled": true,
+                "editable": !this.viewMode,
                 "selected": false
             }
         };
@@ -1034,11 +1066,17 @@ export class HomeComponent {
                 this.resetMap();
                 this.currentCourse = body;
                 this.selected = this.courses.indexOf(body);
+                // go to edit mode
+                this.viewMode = false;
+                this.updateViewMode();
                 // show the navbar
                 this.navbar.open();
                 break;
             case Call_t.C_COURSE_LOAD:
                 this.resetMap();
+                // go to viewing mode
+                this.viewMode = true;
+                this.updateViewMode();
                 this.currentCourse = body;
                 this.activeElements = {
                     "type": "FeatureCollection",
@@ -1151,6 +1189,7 @@ export class HomeComponent {
                                     "courseId": element.courseId,
                                     "holeId": element.holeId,
                                     "enabled": enabled,
+                                    "editable": !this.viewMode,
                                     "selected": false
                                 }
                             };
@@ -1169,6 +1208,7 @@ export class HomeComponent {
                                     "courseId": element.courseId,
                                     "holeId": element.holeId,
                                     "enabled": enabled,
+                                    "editable": !this.viewMode,
                                     "selected": false
                                 }
                             };
@@ -1206,6 +1246,7 @@ export class HomeComponent {
                         "courseId": null,
                         "holeId": null,
                         "enabled": enabled,
+                        "editable": !this.viewMode,
                         "selected": false
                     }
                 };
