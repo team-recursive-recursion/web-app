@@ -12,8 +12,8 @@ import { ApiService } from '../../../services/api/api.service';
 import { ModelState } from '../../../interfaces/enum.interface';
 
 export enum ElementType {
-    POINT = 0,
-    AREA = 1
+    AREA = 0,
+    POINT = 1
 }
 
 export enum PointType {

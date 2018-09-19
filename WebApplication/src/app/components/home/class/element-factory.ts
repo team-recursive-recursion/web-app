@@ -34,7 +34,7 @@ export class ElementFactory {
                             ...JSON.parse(e.geoJson)
                         },
                         "properties": {
-                            "pointType": e.pointType, //e['pointType'],
+                            "pointType": e['pointType'],
                             "elementType": e.elementType,
                             "elementId": e.elementId,
                             "courseId": e.courseId,
@@ -58,7 +58,7 @@ export class ElementFactory {
                             ...JSON.parse(e.geoJson)
                         },
                         "properties": {
-                            "polygonType": e.polygonType, //e['polygonType'],
+                            "polygonType": e['polygonType'],
                             "elementType": e.elementType,
                             "elementId": e.elementId,
                             "courseId": e.courseId,

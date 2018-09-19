@@ -8,7 +8,7 @@
 
 import { AgmMap, LatLngBounds } from '@agm/core';
 import { Course } from './course';
-import { Element } from './element';
+import { Element, PointType, AreaType } from './element';
 import { Hole } from './hole';
 
 declare var google: any;
@@ -54,11 +54,26 @@ export class GoogleMap {
         this.updateDataLayer(
             {
                 "type": "FeatureCollection",
-                "features": [
-                    ...features
-                ]
+                "features": features
             }
         );
+    }
+
+    /***
+     * displayHole(Hole): void
+     *
+     *     Filters elements to make only the given hole active. Pass null as the
+     *     hole to enable course elements.
+     ***/
+    public displayHole(h: Hole) {
+        var id = (h != null) ? h.getId() : null;
+        this.map.data.forEach(feature => {
+            if (feature.getProperty('holeId') == id) {
+                feature.setProperty('enabled', true);
+            } else {
+                feature.setProperty('enabled', false);
+            }
+        });
     }
 
     /***
@@ -84,7 +99,7 @@ export class GoogleMap {
      *     certain properties.
      ***/
     private setUpStyling() {
-        /*this.map.data.setStyle(function (feature) {
+        this.map.data.setStyle(function (feature) {
             let enabled = feature.getProperty('enabled');
             let editable = feature.getProperty('editable');
             let selected = feature.getProperty('selected');
@@ -96,19 +111,19 @@ export class GoogleMap {
                     let color = '#2E2E2E';
                     if (enabled) {
                         switch (polyType) {
-                            case 0:
+                            case AreaType.ROUGH:
                                 color = '#1D442D';
                                 break;
-                            case 1:
+                            case AreaType.FAIR:
                                 color = '#73A15D';
                                 break;
-                            case 2:
+                            case AreaType.GREEN:
                                 color = '#BADA55';
                                 break;
-                            case 3:
+                            case AreaType.BUNKER:
                                 color = '#C2B280';
                                 break;
-                            case 4:
+                            case AreaType.WATER:
                                 color = '#336699';
                                 break;
                         }
@@ -127,10 +142,10 @@ export class GoogleMap {
                 } else {
                     var icon;
                     switch (feature.getProperty("pointType")) {
-                        case Point_t.P_HOLE:
+                        case PointType.HOLE:
                             icon = "./assets/flag.png";
                             break;
-                        case Point_t.P_TEE:
+                        case PointType.TEE:
                             icon = "./assets/tee.png";
                             break;
                         default:
@@ -147,7 +162,7 @@ export class GoogleMap {
                     };
                 }
             }
-        });*/
+        });
     }
 
     /***

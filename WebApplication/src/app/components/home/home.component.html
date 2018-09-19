@@ -109,7 +109,7 @@
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
                 <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
-                    #AgmMap [streetViewControl]="false" (mapClick)="mapInteractionClick($event)">
+                    #AgmMap [streetViewControl]="false">
                 </agm-map>
                 <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
 

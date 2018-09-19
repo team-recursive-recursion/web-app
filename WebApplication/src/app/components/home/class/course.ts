@@ -86,6 +86,15 @@ export class Course {
     }
 
     /***
+     * getHole(number) : Hole
+     *
+     *     Returns the hole at the given index.
+     ***/
+    public getHole(index: number) : Hole {
+        return this.holes[index];
+    }
+
+    /***
      * addHole(Hole) : number
      *
      *     Adds a hole to the course. Returns the index of the new hole.

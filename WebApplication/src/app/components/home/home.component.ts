@@ -161,17 +161,9 @@ export class HomeComponent {
                     // TODO
                     // go to viewing mode
                     /*this.viewMode = true;
-                    this.updateViewMode();
-                    this.currentCourse = body;
-                    this.activeElements = {
-                        "type": "FeatureCollection",
-                        "features": [
-                            ...this.generateFeature(this.currentCourse.elements)
-                        ]
-                    }
-                    this.onLoadHoles();
-                    this.updateDataLayer(this.activeElements);*/
+                    this.updateViewMode();*/
                     t.map.displayCourse(t.courseManager.activeCourse);
+                    t.holeIndex = -1;
                 },
                 // fail
                 function(status, header, body) {
@@ -360,28 +352,14 @@ export class HomeComponent {
      *     hole to the selected one.
      ***/
     public onSelectHole(index: number) {
-        // unselect the selected feature
-        window.alert(this.holeIndex);
-        /*this.removeSelectedFeature();
-        if (event.value !== undefined) {
-            // enable the features of the hole
-            this.googleMap.data.forEach(feature => {
-                if (feature.getProperty("holeId") == event.value.holeId) {
-                    feature.setProperty("enabled", true);
-                } else {
-                    feature.setProperty("enabled", false);
-                }
-            });
+        if (index >= 0) {
+            this.map.displayHole(this.courseManager.activeCourse
+                    .getHole(index));
         } else {
-            // enable the features of the course
-            this.googleMap.data.forEach(feature => {
-                if (feature.getProperty("holeId") == null) {
-                    feature.setProperty("enabled", true);
-                } else {
-                    feature.setProperty("enabled", false);
-                }
-            });
-        }*/
+            this.map.displayHole(null);
+        }
+        // unselect the selected feature
+        //this.removeSelectedFeature(); TODO ?
     }
 
     /***

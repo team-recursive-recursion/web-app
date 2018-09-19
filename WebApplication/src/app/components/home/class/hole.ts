@@ -86,6 +86,19 @@ export class Hole {
     }
 
     /***
+     * asFeatures() : Array<any>
+     *
+     *     Returns the collection of elements as drawable features.
+     ***/
+    public asFeatures() : Array<any> {
+        var features = [];
+        this.elements.forEach(e => {
+            features.push(e.feature);
+        });
+        return features;
+    }
+
+    /***
      * sync(api, function, function) : void
      *
      *     Pushes any local changes to the remote API. Calls the first given
@@ -99,6 +112,7 @@ export class Hole {
                     .subscribe(
                         result => {
                             this.setId(result.json().holeId);
+                            this.setState(ModelState.UNCHANGED);
                             this.syncElements(api, callDone);
                         },
 
@@ -118,19 +132,6 @@ export class Hole {
             default:
                 this.syncElements(api, callDone);
         }
-    }
-
-    /***
-     * asFeatures() : Array<any>
-     *
-     *     Returns the collection of elements as drawable features.
-     ***/
-    public asFeatures() : Array<any> {
-        var features = [];
-        this.elements.forEach(e => {
-            features.push(e.feature);
-        });
-        return features;
     }
 
     /***
@@ -167,7 +168,7 @@ export class Hole {
                     result => {
                             // parse elements
                             this.elements = ElementFactory.parseElementArray(
-                                result.json().elements, true, true);
+                                result.json().elements, false, true);
                             callDone();
                     },
 
