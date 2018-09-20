@@ -86,7 +86,8 @@ export class ElementFactory {
         // create element
         var point = new Point(ModelState.CREATED, enabled, editable, type);
         point.setInfo(info);
-        point.geometry = feature.geometry;
+        point.geometry = ElementFactory.toGeoJson(ElementType.POINT,
+                feature.getGeometry());
         point.courseId = course.getId();
         if (hole != null) {
             point.holeId = hole.getId();
@@ -109,7 +110,8 @@ export class ElementFactory {
             type: AreaType, course: Course, hole: Hole) {
         // create element
         var area = new Area(ModelState.CREATED, enabled, editable, type);
-        area.geometry = feature.geometry;
+        area.geometry = ElementFactory.toGeoJson(ElementType.AREA,
+                feature.getGeometry());
         area.courseId = course.getId();
         if (hole != null) {
             area.holeId = hole.getId();
@@ -120,6 +122,33 @@ export class ElementFactory {
         feature.setProperty("elementType", ElementType.AREA);
         feature.setProperty("element", area);
         return area;
+    }
+
+    /***
+     * toGeoJson(ElementType, any) : any
+     *
+     *     Converts the given map geometry into GeoJson.
+     ***/
+    private static toGeoJson(type: ElementType, geo: any) : any {
+        if (type == ElementType.POINT) {
+            // convert the point geometry
+            var coords = [geo.get().lng(), geo.get().lat()];
+            return {
+                'type': 'Point',
+                'coordinates': coords
+            }
+        } else {
+            // convert the polygon geometry
+            var coords = [];
+            geo.getArray()[0].getArray().forEach(c => {
+                coords.push([c.lng(), c.lat()])
+            });
+            coords.push(coords[0]);
+            return {
+                'type': 'Polygon',
+                'coordinates': [coords]
+            };
+        }
     }
 
 }

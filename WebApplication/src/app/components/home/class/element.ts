@@ -41,8 +41,8 @@ export abstract class Element {
     public editable: boolean;
 
     public geometry: any;
-    public courseId: string;
-    public holeId: string;
+    public courseId: string = null;
+    public holeId: string = null;
 
     /***
      * constructor(boolean, boolean)
@@ -142,8 +142,44 @@ export class Point extends Element {
     }
 
     public sync(api: ApiService, callDone: Function, callFail: Function) {
-        // TODO
-        callDone();
+        // sync point
+        switch (this.getState()) {
+            case ModelState.CREATED:
+                var call;
+                if (this.holeId != null) {
+                    call = api.holeCreatePoint(this.holeId, this.type,
+                            this.info, JSON.stringify(this.geometry));
+                } else {
+                    call = api.courseCreatePoint(this.courseId, this.type,
+                            this.info, JSON.stringify(this.geometry));
+                }
+                call.subscribe(
+
+                    result => {
+                        this.setId(result.json().elementId);
+                        this.setState(ModelState.UNCHANGED);
+                        callDone();
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Point created successfully")
+
+                );
+
+                break;
+            case ModelState.UPDATED:
+                // TODO
+                break;
+            case ModelState.DELETED:
+                // TODO
+                break;
+            default:
+                callDone();
+                break;
+        }
     }
 
 }
@@ -179,8 +215,46 @@ export class Area extends Element {
     }
 
     public sync(api: ApiService, callDone: Function, callFail: Function) {
-        // TODO
-        callDone();
+        // sync area
+        switch (this.getState()) {
+            case ModelState.CREATED:
+                console.log("GEOM:");
+                console.log(this.geometry);
+                var call;
+                if (this.holeId != null) {
+                    call = api.holeCreatePolygon(this.holeId, this.type,
+                            JSON.stringify(this.geometry));
+                } else {
+                    call = api.courseCreatePolygon(this.courseId, this.type,
+                            JSON.stringify(this.geometry));
+                }
+                call.subscribe(
+
+                    result => {
+                        this.setId(result.json().elementId);
+                        this.setState(ModelState.UNCHANGED);
+                        callDone();
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Area created successfully")
+
+                );
+
+                break;
+            case ModelState.UPDATED:
+                // TODO
+                break;
+            case ModelState.DELETED:
+                // TODO
+                break;
+            default:
+                callDone();
+                break;
+        }
     }
 
 }

@@ -216,38 +216,6 @@ export class HomeComponent {
                 () => console.log("Element deleted successfully")
             );
         });
-        this.removedFeatures = [];
-        // handle all existing features
-        this.googleMap.data.toGeoJson(
-            data => data.features.forEach(
-                feature => {
-                    // extract polygon properties
-
-                    var type: number;
-                    if (feature.geometry.type == "Point") {
-                        type = feature.properties["pointType"];
-                    } else {
-                        type = feature.properties["polygonType"];
-                    }
-                    var eid: string = feature.properties["elementId"];
-                    var geoJson: string = JSON.stringify(feature.geometry);
-                    var courseId = feature.properties["courseId"];
-                    var holeId = feature.properties["holeId"];
-
-                    // perform the correct action for new and updated elements
-                    switch (feature.properties.state) {
-                        case State_t.S_NEW:
-                            if (feature.properties.elementType ==
-                                Element_t.E_POLY) {
-                                this.createPolygon(holeId, courseId, type,
-                                    geoJson, feature);
-                            } else if (feature.properties.elementType ==
-                                Element_t.E_POINT) {
-                                let info = feature.properties["info"];
-                                this.createPoint(holeId, courseId, type, info,
-                                    geoJson, feature);
-                            }
-                            break;
 
                         case State_t.S_UPDATE:
                             let call;
@@ -562,43 +530,8 @@ export class HomeComponent {
      *     selected feature to the clicked one.
      ***/
     public onFeatureClick(feature: any) {
-
         var el = feature.getProperty("element");
         this.setSelectedFeature(feature);
-
-        /*function featureMatches(feature: any, element: Element) {
-            if (element.getId() != "") {
-                return feature.getProperty("elementId") == element.getId();
-            } else {
-                return feature == element.feature;
-            }
-        }
-
-        // get the active elements
-        var elements;
-        if (this.holeIndex >= 0) {
-            elements = this.courseManager.activeCourse.getHole(this.holeIndex)
-                    .getElements();
-        } else {
-            elements = this.courseManager.activeCourse.getElements();
-        }
-        // find the selected element
-        var found = false;
-        var i = 0;
-        while (!found && i < elements.length) {
-            if (featureMatches(feature, elements[i])) {
-                found = true;
-            } else {
-                ++i;
-            }
-        }
-        if (found) {
-            this.unselectElement();
-            feature.setProperty("selected", true);
-            this.setSelectedElement(elements[i]);
-        } else {
-            window.alert("Could not find clicked element");
-        }*/
     }
 
     /***
@@ -614,80 +547,6 @@ export class HomeComponent {
     /***************************************************************************
      * UI event handlers.
      **************************************************************************/
-
-    /***
-     * createPolygon(string, string, number, string, any) : void
-     *
-     *     Function that adds a new unsaved Polygon currently on the map
-     *     through a API call.
-     ***/
-    /*private createPolygon(holeId: string, courseId: string, type: number,
-        geoJson: string, feature: any) {
-
-        var http;
-        if (holeId !== undefined && holeId !== null) {
-            // post the polygon to the hole
-            http = this.api.holeCreatePolygon(
-                holeId,
-                type,
-                geoJson
-            );
-        } else {
-            // post the polygon to the course
-            http = this.api.courseCreatePolygon(
-                courseId,
-                type,
-                geoJson
-            );
-        }
-        http.subscribe(
-            result => this.onResult(result.headers,
-                result.json(),
-                Call_t.C_ELEMENT_CREATE, feature),
-            error => this.onFail(error.status,
-                error.headers, error.text(),
-                Call_t.C_ELEMENT_CREATE),
-            () => console.log("Poly saved successfully")
-        );
-        }*/
-
-    /***
-     * createPoint(string, string, number, string, string, any) : void
-     *
-     *     Function that adds a new unsaved Point currently on the map
-     *     through a API call.
-     ***/
-    /*private createPoint(holeId: string, courseId: string, type: number,
-        info: string, geoJson: string, feature: any) {
-
-        var http;
-        if (holeId !== undefined && holeId !== null) {
-            // post the point to the hole
-            http = this.api.holeCreatePoint(
-                holeId,
-                type,
-                info,
-                geoJson
-            );
-        } else {
-            // post the point to the course
-            http = this.api.courseCreatePoint(
-                courseId,
-                type,
-                info,
-                geoJson
-            );
-        }
-        http.subscribe(
-            result => this.onResult(result.headers,
-                result.json(),
-                Call_t.C_ELEMENT_CREATE, feature),
-            error => this.onFail(error.status,
-                error.headers, error.text(),
-                Call_t.C_ELEMENT_CREATE),
-            () => console.log("Point saved successfully")
-        );
-        }*/
 
     /***
      * onDeleteElement(): void
@@ -732,42 +591,6 @@ export class HomeComponent {
             this.googleMap.data.forEach(feature => {
                 feature.setProperty("editable", true);
             });
-        }
-    }*/
-
-    /***************************************************************************
-     * Client side saving and updating handlers for Polygons.
-     **************************************************************************/
-
-    /***
-     * onElementSaved
-     *
-     *     This function is called when an element is saved or updated. The
-     *     element's properties are set to the properties received from the
-     *     response.
-     ***/
-    /*private onElementSaved(body: any, feature: any) {
-        if (feature.properties === undefined) {
-            return;
-        }
-        if (feature !== undefined) {
-            if (feature.properties.state !== undefined) {
-                feature.properties.state = State_t.S_NONE;
-            }
-            feature.properties["elementType"] = body.elementType;
-            feature.properties["elementId"] = body.elementId;
-            feature.properties["courseId"] = body.courseId;
-            feature.properties["holeId"] = body.holeId;
-            if (body.elementType == Element_t.E_POLY) {
-                feature.properties["polygonType"] = body.polygonType;
-            } else {
-                feature.properties["pointType"] = body.pointType;
-                feature.properties["info"] = body.info;
-            }
-            // TODO explain below
-            if (body.holeId != null) {
-                this.holes.push(body);
-            }
         }
     }*/
 
