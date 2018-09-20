@@ -173,7 +173,7 @@ export class Hole {
                     result => {
                             // parse elements
                             this.elements = ElementFactory.parseElementArray(
-                                result.json().elements, false, true);
+                                result.json().elements, false, false);
                             callDone();
                     },
 

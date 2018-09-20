@@ -210,7 +210,7 @@ export class Course {
 
                         // parse the elements
                         this.elements = ElementFactory.parseElementArray(
-                                body.elements, true, true);
+                                body.elements, true, false);
 
                         // load holes
                         var numH = 0;

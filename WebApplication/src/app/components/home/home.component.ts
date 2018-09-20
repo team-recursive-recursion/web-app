@@ -100,7 +100,6 @@ export class HomeComponent {
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
         this.courseManager = new CourseManager(this.api, this.globals.getUid());
-        this.liveLoc = new LiveLocation(this.api);
     }
 
     /***
@@ -116,6 +115,7 @@ export class HomeComponent {
         } else {
             // set up the map
             this.map = new GoogleMap(this.agmMap, this);
+            this.liveLoc = new LiveLocation(this.api, this.map);
             // load courses
             this.courseManager.loadCourseList(
                 // success
@@ -162,11 +162,10 @@ export class HomeComponent {
                 function () {
                     t.map.clearMap();
                     t.navbar.open();
-                    // TODO
                     // go to viewing mode
-                    /*this.viewMode = true;
-                    this.updateViewMode();*/
-                    t.liveLoc.start(t.courseManager.activeCourse, 10000);
+                    t.viewMode = true;
+                    t.updateViewMode();
+                    // select no hole
                     t.map.displayCourse(t.courseManager.activeCourse);
                     t.holeIndex = -1;
                 },
@@ -244,9 +243,9 @@ export class HomeComponent {
                         t.map.clearMap();
                         t.navbar.open();
                         t.courseIndex = t.courseManager.courses.length - 1;
-                        // go to edit mode TODO
-                        //this.viewMode = false;
-                        //this.updateViewMode();
+                        // go to edit mode
+                        t.viewMode = false;
+                        t.updateViewMode();
                     },
                     // fail
                     function (status, header, body) {
@@ -374,42 +373,34 @@ export class HomeComponent {
         }
     }
 
-    /***************************************************************************
-     * Selection functions.
-     **************************************************************************/
-
     /***
-     * setSelectedFeature(any): void
+     * onViewModeSwitch(): void
      *
-     *     Sets the currently selected feature.
+     *     Event handler for switching between editing mode and live view mode.
      ***/
-    private setSelectedFeature(f: any) {
-        this.unselectFeature();
-        // select feature
-        f.getProperty('element').selected = true;
-        // force update
-        f.setProperty('update', false);
-        this.selectedFeature = f;
-        this.appRef.tick();
+    public onViewModeSwitch() {
+        this.updateViewMode();
     }
 
     /***
-     * unselectFeature() : void
+     * onDeleteElement(): void
      *
-     *     Unselects the currently selected feature.
+     *     Deletes the currently selected feature and adds it to the remove
+     *     list.
      */
-    private unselectFeature() {
+    /*public onDeleteElement() {
         if (this.selectedFeature != null) {
-            this.selectedFeature.getProperty('element').selected = false;
-            // force update
-            this.selectedFeature.setProperty('update', false);
-            this.selectedFeature = null;
-            this.appRef.tick();
+            this.googleMap.data.remove(this.selectedFeature);
+            if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
+                this.removedFeatures.push(this.selectedFeature);
+                this.selectedFeature.setProperty("state", State_t.S_DELETE);
+            }
+            this.removeSelectedFeature();
         }
-    }
+    }*/
 
     /***************************************************************************
-     * Map event handlers.
+     * Map event handlers
      **************************************************************************/
 
     /***
@@ -526,54 +517,62 @@ export class HomeComponent {
     }
 
     /***************************************************************************
-     * UI event handlers.
+     * Selection functions
      **************************************************************************/
 
     /***
-     * onDeleteElement(): void
+     * setSelectedFeature(any): void
      *
-     *     Deletes the currently selected feature and adds it to the remove
-     *     list.
-     */
-    /*public onDeleteElement() {
-        if (this.selectedFeature != null) {
-            this.googleMap.data.remove(this.selectedFeature);
-            if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
-                this.removedFeatures.push(this.selectedFeature);
-                this.selectedFeature.setProperty("state", State_t.S_DELETE);
-            }
-            this.removeSelectedFeature();
-        }
-    }*/
+     *     Sets the currently selected feature.
+     ***/
+    private setSelectedFeature(f: any) {
+        this.unselectFeature();
+        // select feature
+        f.getProperty('element').selected = true;
+        // force update
+        f.setProperty('update', false);
+        this.selectedFeature = f;
+        this.appRef.tick();
+    }
 
     /***
-     * onViewModeSwitch(): void
+     * unselectFeature() : void
      *
-     *     Event handler for switching between editing mode and live view mode.
-     ***/
-    /*public onViewModeSwitch() {
-        this.updateViewMode();
-    }*/
+     *     Unselects the currently selected feature.
+     */
+    private unselectFeature() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.getProperty('element').selected = false;
+            // force update
+            this.selectedFeature.setProperty('update', false);
+            this.selectedFeature = null;
+            this.appRef.tick();
+        }
+    }
 
-    /*public updateViewMode() {
+    /***************************************************************************
+     * View mode functions
+     **************************************************************************/
+
+    public updateViewMode() {
         if (this.viewMode) {
             // switch to viewing mode
-            this.removeSelectedFeature();
-            this.googleMap.data.setDrawingMode(null);
-            this.drawingMode = "None";
+            this.unselectFeature();
+            this.map.setDrawingMode(DrawMode.NONE);
             // TODO ask to save first
-            // disable selection of elements
-            this.googleMap.data.forEach(feature => {
-                feature.setProperty("editable", false);
-            });
+            // disable editing of elements
+            this.map.setEditable(false);
+            // start live view
+            this.liveLoc.start(this.courseManager.activeCourse, 10000);
         } else {
             // switch to edit mode
-            // enable selection of elements
-            this.googleMap.data.forEach(feature => {
-                feature.setProperty("editable", true);
-            });
+            // stop live view
+            this.liveLoc.stop();
+            this.map.clearLiveData();
+            // enable editing of elements
+            this.map.setEditable(true);
         }
-    }*/
+    }
 
     /***************************************************************************
      * Display and data updating

@@ -122,6 +122,49 @@ export class GoogleMap {
     }
 
     /***
+     * setEditable(boolean) : void
+     *
+     *     Enables or disables the editing of elements.
+     ***/
+    public setEditable(ed: boolean) {
+        this.map.data.forEach(feature => {
+            var el = feature.getProperty('element');
+            el.editable = ed;
+            // force feature update
+            feature.setProperty('update', false);
+        });
+    }
+
+    /***
+     * clearLiveData() : void
+     *
+     *     Removes all live data features from the map.
+     ***/
+    public clearLiveData() {
+        this.map.data.forEach(feature => {
+            var el: Element = feature.getProperty('element');
+            if (el.getElementType() == ElementType.POINT &&
+                    (<Point>el).getType() == PointType.LIVE) {
+                this.map.data.remove(feature);
+            }
+        });
+    }
+
+    /***
+     * addLiveData(Array<any>) : void
+     *
+     *     Adds the given live data feature list to the map.
+     ***/
+    public addLiveData(features: Array<any>) {
+        this.map.data.addGeoJson(
+            {
+                "type": "FeatureCollection",
+                "features": features
+            }
+        );
+    }
+
+    /***
      * setUpMapEvents() : void
      *
      *     Sets up the map event listeners.

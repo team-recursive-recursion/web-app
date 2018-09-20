@@ -32,8 +32,6 @@ export class ElementFactory {
                     element = new Point(ModelState.UNCHANGED, enabled, editable,
                             e.pointType);
                     (<Point> element).setInfo(e.info);
-                    console.log("POINT:");
-                    console.log(element);
                 } else if (e.elementType == ElementType.AREA) {
                     // create the area element
                     element = new Area(ModelState.UNCHANGED, enabled, editable,

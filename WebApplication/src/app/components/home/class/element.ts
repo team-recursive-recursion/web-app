@@ -20,7 +20,7 @@ export enum PointType {
     PIN = 0,
     HOLE,
     TEE,
-    LOCATION
+    LIVE
 }
 
 export enum AreaType {
