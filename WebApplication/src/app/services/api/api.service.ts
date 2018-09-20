@@ -9,6 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
+import { AreaType, PointType, ElementType } from '../../components/home/class/element';
 
 @Injectable()
 export class ApiService {
@@ -203,15 +204,17 @@ export class ApiService {
         return this.http.delete(url, this.createHeaders());
     }
 
-    public pointUpdate(eid: string, geoJson: string, properties: any) {
+    public pointUpdate(eid: string, geoJson: string, holeId: string,
+            courseId: string, type: PointType, info: string) {
         var url = this.url + "/api/points/" + eid;
         return this.http.put(url,
             {
+                "ElementType": ElementType.POINT,
                 "ElementId": eid,
-                "HoleId": properties.holeId,
-                "CourseId": properties.courseId,
-                "PointType": properties.pointType,
-                "Info": properties.info,
+                "HoleId": holeId,
+                "CourseId": courseId,
+                "PointType": type,
+                "Info": info,
                 "GeoJson": geoJson
             },
             this.createHeaders()
@@ -264,18 +267,29 @@ export class ApiService {
         return this.http.delete(url, this.createHeaders());
     }
 
-    public polygonUpdate(eid: string, geoJson: string, properties: any) {
+    public polygonUpdate(eid: string, geoJson: string, holeId: string,
+            courseId: string, type: AreaType) {
         var url = this.url + "/api/polygons/" + eid;
         return this.http.put(url,
             {
+                "ElementType": ElementType.AREA,
                 "ElementId": eid,
-                "HoleId": properties.holeId,
-                "CourseId": properties.courseId,
-                "PolygonType": properties.polygonType,
+                "HoleId": holeId,
+                "CourseId": courseId,
+                "PolygonType": type,
                 "GeoJson": geoJson
             },
             this.createHeaders()
         );
+    }
+
+    /***
+     * API calls: live location
+     ***/
+
+    public liveLocationsGet(cid: string) {
+        var url = this.url + "/api/courses/test/" + cid;
+        return this.http.get(url);
     }
 
 }

@@ -31,6 +31,10 @@ export enum AreaType {
     WATER
 }
 
+/*******************************************************************************
+ * ELEMENT
+ ******************************************************************************/
+
 export abstract class Element {
 
     private state: ModelState;
@@ -101,6 +105,10 @@ export abstract class Element {
 
 }
 
+/*******************************************************************************
+ * POINT
+ ******************************************************************************/
+
 export class Point extends Element {
 
     private type: PointType;
@@ -168,14 +176,28 @@ export class Point extends Element {
                     () => console.log("Point created successfully")
 
                 );
+                break;
 
-                break;
             case ModelState.UPDATED:
-                // TODO
+                api.pointUpdate(this.getId(), JSON.stringify(this.geometry),
+                        this.holeId, this.courseId, this.type, this.info)
+                    .subscribe(
+
+                        result => {},
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Point updated successfully")
+
+                    );
                 break;
+
             case ModelState.DELETED:
                 // TODO
                 break;
+
             default:
                 callDone();
                 break;
@@ -183,6 +205,10 @@ export class Point extends Element {
     }
 
 }
+
+/*******************************************************************************
+ * AREA
+ ******************************************************************************/
 
 export class Area extends Element {
 
@@ -218,8 +244,6 @@ export class Area extends Element {
         // sync area
         switch (this.getState()) {
             case ModelState.CREATED:
-                console.log("GEOM:");
-                console.log(this.geometry);
                 var call;
                 if (this.holeId != null) {
                     call = api.holeCreatePolygon(this.holeId, this.type,
@@ -246,11 +270,24 @@ export class Area extends Element {
 
                 break;
             case ModelState.UPDATED:
-                // TODO
+                api.polygonUpdate(this.getId(), JSON.stringify(this.geometry),
+                    this.holeId, this.courseId, this.type)
+                    .subscribe(
+
+                        result => {},
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Area updated successfully")
+
+                    );
                 break;
             case ModelState.DELETED:
                 // TODO
                 break;
+
             default:
                 callDone();
                 break;

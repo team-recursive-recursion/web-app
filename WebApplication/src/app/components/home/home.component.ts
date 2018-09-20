@@ -32,6 +32,7 @@ import { Element, Point, Area } from './class/element';
 import { Hole } from './class/hole';
 import { Course } from './class/course';
 import { ElementFactory } from './class/element-factory';
+import { LiveLocation } from './class/live-location';
 
 @Component({
     selector: 'HomeComponent',
@@ -45,6 +46,7 @@ export class HomeComponent {
     // map elements
     map: GoogleMap;
     courseManager: CourseManager;
+    liveLoc: LiveLocation;
 
     // selected items
     selectedFeature: any = null;
@@ -98,6 +100,7 @@ export class HomeComponent {
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
         this.courseManager = new CourseManager(this.api, this.globals.getUid());
+        this.liveLoc = new LiveLocation(this.api);
     }
 
     /***
@@ -148,6 +151,9 @@ export class HomeComponent {
      *     the active course to the selected one.
      ***/
     public onSelectCourse(index: number) {
+        // stop live locations
+        this.liveLoc.stop();
+
         var t = this;
         if (index >= 0) {
             this.unselectFeature();
@@ -160,6 +166,7 @@ export class HomeComponent {
                     // go to viewing mode
                     /*this.viewMode = true;
                     this.updateViewMode();*/
+                    t.liveLoc.start(t.courseManager.activeCourse, 10000);
                     t.map.displayCourse(t.courseManager.activeCourse);
                     t.holeIndex = -1;
                 },
@@ -214,35 +221,7 @@ export class HomeComponent {
                     error.headers, error.text(),
                     Call_t.C_ELEMENT_DELETE),
                 () => console.log("Element deleted successfully")
-            );
-        });
-
-                        case State_t.S_UPDATE:
-                            let call;
-                            if (feature.properties.elementType ==
-                                Element_t.E_POLY) {
-                                call = this.api.polygonUpdate(eid, geoJson,
-                                    feature.properties);
-                            } else if (feature.properties.elementType ==
-                                Element_t.E_POINT) {
-                                call = this.api.pointUpdate(eid, geoJson,
-                                    feature.properties);
-                            }
-                            call.subscribe(
-                                result => this.onResult(result.headers,
-                                    result.json(),
-                                    Call_t.C_ELEMENT_UPDATE, feature),
-                                error => this.onFail(error.status,
-                                    error.headers, error.text(),
-                                    Call_t.C_ELEMENT_UPDATE),
-                                () => console.log("Element saved successfully")
-                            );
-                            break;
-                    }
-                    console.log("Success: Course saved");
-                }
-            )
-        );*/
+            );*/
     }
 
     /***
@@ -346,6 +325,7 @@ export class HomeComponent {
                 var index = this.courseManager.activeCourse.createHole(
                         result.name, result.par);
                 this.holeIndex = index;
+                this.onSelectHole(index);
             }
         });
     }
@@ -513,14 +493,16 @@ export class HomeComponent {
      *     for update.
      ***/
     public onFeatureUpdate(feature: any) {
-        window.alert("Feature updated");
-        /*
-        if (e.feature != this.selectedFeature) {
-            this.setSelectedFeature(e.feature);
+        if (feature != this.selectedFeature) {
+            this.setSelectedFeature(feature);
         }
-        if (e.feature.getProperty("state") != State_t.S_NEW) {
-            e.feature.setProperty("state", State_t.S_UPDATE);
-        }*/
+        // update the element
+        var e: Element = feature.getProperty('element');
+        e.geometry = ElementFactory.toGeoJson(e.getElementType(),
+                feature.getGeometry());
+        if (e.getState() != ModelState.CREATED) {
+            e.setState(ModelState.UPDATED);
+        }
     }
 
     /***
@@ -530,7 +512,6 @@ export class HomeComponent {
      *     selected feature to the clicked one.
      ***/
     public onFeatureClick(feature: any) {
-        var el = feature.getProperty("element");
         this.setSelectedFeature(feature);
     }
 

@@ -32,6 +32,8 @@ export class ElementFactory {
                     element = new Point(ModelState.UNCHANGED, enabled, editable,
                             e.pointType);
                     (<Point> element).setInfo(e.info);
+                    console.log("POINT:");
+                    console.log(element);
                 } else if (e.elementType == ElementType.AREA) {
                     // create the area element
                     element = new Area(ModelState.UNCHANGED, enabled, editable,
@@ -129,7 +131,7 @@ export class ElementFactory {
      *
      *     Converts the given map geometry into GeoJson.
      ***/
-    private static toGeoJson(type: ElementType, geo: any) : any {
+    public static toGeoJson(type: ElementType, geo: any) : any {
         if (type == ElementType.POINT) {
             // convert the point geometry
             var coords = [geo.get().lng(), geo.get().lat()];

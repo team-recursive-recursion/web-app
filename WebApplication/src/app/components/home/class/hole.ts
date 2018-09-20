@@ -111,7 +111,12 @@ export class Hole {
                 api.holesCreate(this.course.getId(), this.name, this.info)
                     .subscribe(
                         result => {
-                            this.setId(result.json().holeId);
+                            // save the new ID
+                            var id = result.json().holeId;
+                            this.setId(id);
+                            this.elements.forEach(e => {
+                                e.holeId = id;
+                            });
                             this.setState(ModelState.UNCHANGED);
                             this.syncElements(api, callDone);
                         },
