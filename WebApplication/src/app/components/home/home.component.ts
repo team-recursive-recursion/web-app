@@ -20,17 +20,18 @@ import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
 import { LocationService } from '../../services/location/location.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
-import { PolygonDialog } from './dialog/polygon-dialog.component';
+import { AreaDialog } from './dialog/area-dialog.component';
 import { PointDialog } from './dialog/point-dialog.component';
 import { HoleDialog } from './dialog/hole-dialog.component';
 import { CourseDialog } from './dialog/course-dialog.component';
 
-import { GoogleMap } from './class/google-map';
+import { GoogleMap, DrawMode } from './class/google-map';
 import { ModelState } from '../../interfaces/enum.interface';
 import { CourseManager } from './class/course-manager';
 import { Element, Point, Area } from './class/element';
 import { Hole } from './class/hole';
 import { Course } from './class/course';
+import { ElementFactory } from './class/element-factory';
 
 @Component({
     selector: 'HomeComponent',
@@ -46,10 +47,7 @@ export class HomeComponent {
     courseManager: CourseManager;
 
     // selected items
-    selectedFeature: any = null;
-    dataLayer: any = null;
-
-    removedFeatures: Array<any> = []; // list of elements to be deleted
+    selectedElement: Element = null;
 
     url: any;
     courseIndex: number = -1;
@@ -115,7 +113,7 @@ export class HomeComponent {
             this.router.navigateByUrl("/login");
         } else {
             // set up the map
-            this.map = new GoogleMap(this.agmMap);
+            this.map = new GoogleMap(this.agmMap, this);
             // load courses
             this.courseManager.loadCourseList(
                 // success
@@ -153,6 +151,7 @@ export class HomeComponent {
     public onSelectCourse(index: number) {
         var t = this;
         if (index >= 0) {
+            this.unselectElement();
             this.courseManager.setActiveCourse(index, this.api,
                 // success
                 function () {
@@ -330,6 +329,7 @@ export class HomeComponent {
             this.courseManager.deleteActiveCourse(this.api,
                 // success
                 function() {
+                    t.unselectElement();
                     t.map.clearMap();
                     t.navbar.close();
                     t.courseIndex = -1;
@@ -358,8 +358,8 @@ export class HomeComponent {
         } else {
             this.map.displayHole(null);
         }
-        // unselect the selected feature
-        //this.removeSelectedFeature(); TODO ?
+        // unselect the selected element
+        this.unselectElement();
     }
 
     /***
@@ -410,349 +410,146 @@ export class HomeComponent {
         // TODO
     }
 
-    /*fabReloadMap(index: number) {
-        this.onLoadCourse(index);
-    }*/
-
     /***
-     * fabAddPolygon(): void
+     * onFabAdd(string) : void
      *
-     *     Event listener for floating polygon button click. Deselects the
-     *     selected feature and enters polygon drawing mode.
+     *     Event listener for pressing the add point or area floating buttons.
+     *     Sets the map to the appropriate drawing mode.
      ***/
-    /*fabAddPolygon() {
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-            this.selectedFeature = null;
+    onFabAdd(type: number) {
+        this.unselectElement();
+        if (type == 0) {
+            this.map.setDrawingMode(DrawMode.POINT);
+        } else {
+            this.map.setDrawingMode(DrawMode.AREA);
         }
-        this.googleMap.data.setDrawingMode("Polygon");
-        this.drawingMode = "Polygon";
-    }*/
-
-    /***
-     * fabAddPoint(): void
-     *
-     *     Event listener for floating point button click. Deselects the
-     *     selected feature and enters marker drawing mode.
-     ***/
-    /*fabAddPoint() {
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-            this.selectedFeature = null;
-        }
-        this.googleMap.data.setDrawingMode("Point");
-        this.drawingMode = "Point";
-    }*/
-
-    /***
-     * setupMap
-     *
-     *     Sets up the initial map controls and styling.
-     ***/
-    private setupMap() {
-        //this.agmMap.mapReady.subscribe(map => {
-            //this.googleMap = map;
-            //this.dataLayer = new google.maps.Data();
-            //this.dataLayer.setMap(map);
-            //this.googleMap.data.setControls(['Point', 'Polygon']);
-            //this.setUpMapEvents();
-            //this.setUpStyling();
-            //this.setUpSearch();
-            //this.setUpLocations();
-        //});
     }
 
-    /***
-     * setUpMapEvents
-     *
-     *     Function to set the Map Events listeners.
-     ***/
-    /*private setUpMapEvents() {
-        this.googleMap.data.addListener("addfeature", e =>
-            this.onMapFeatureAdd(e));
-        this.googleMap.data.addListener('setgeometry', e =>
-            this.onMapGeometrySet(e));
-        this.googleMap.data.addListener('click', e =>
-            this.onFeatureClick(e));
-        this.googleMap.addListener('click', e =>
-            this.onMapClick(e));
-    }*/
+    /***************************************************************************
+     * Selection functions.
+     **************************************************************************/
 
     /***
-     * setUpStyling(): void
-     *
-     *     Function that sets the color and style of features according to its
-     *     type and enabled properties.
-     ***/
-    /*private setUpStyling() {
-        this.googleMap.data.setStyle(function (feature) {
-            let enabled = feature.getProperty('enabled');
-            let editable = feature.getProperty('editable');
-            let selected = feature.getProperty('selected');
-            if (feature.getGeometry() != null) {
-                if (feature.getGeometry().getType() == "Polygon") {
-                    // styling for polygons
-                    const polyType = feature.getProperty('polygonType');
-                    // choose the color based on enabled and the type
-                    let color = '#2E2E2E';
-                    if (enabled) {
-                        switch (polyType) {
-                            case 0:
-                                color = '#1D442D';
-                                break;
-                            case 1:
-                                color = '#73A15D';
-                                break;
-                            case 2:
-                                color = '#BADA55';
-                                break;
-                            case 3:
-                                color = '#C2B280';
-                                break;
-                            case 4:
-                                color = '#336699';
-                                break;
-                        }
-                    }
-                    // return the styling
-                    return {
-                        clickable: editable && enabled,
-                        draggable: selected,
-                        editable: selected,
-                        visible: true,
-                        fillColor: color,
-                        fillOpacity: 0.3,
-                        strokeWeight: 1,
-                        zIndex: polyType
-                    };
-                } else {
-                    var icon;
-                    switch (feature.getProperty("pointType")) {
-                        case Point_t.P_HOLE:
-                            icon = "./assets/flag.png";
-                            break;
-                        case Point_t.P_TEE:
-                            icon = "./assets/tee.png";
-                            break;
-                        default:
-                            icon = "";
-                            break;
-                    }
-                    return {
-                        clickable: editable && enabled,
-                        draggable: selected,
-                        editable: selected,
-                        visible: enabled,
-                        icon: icon,
-                        zIndex: 0
-                    };
-                }
-            }
-        });
-
-    }*/
-
-    /***
-     * setUpSearch(): void
-     *
-     *     Creates the search bar and enables the events.
-     ***/
-    /*private setUpSearch(): void {
-        // create and link the search input
-        var map = this.googleMap;
-        var div = document.getElementById("search-div");
-        var input = document.getElementById("search-input");
-        var searchBox = new google.maps.places.SearchBox(input);
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(div);
-
-        // bias search results to places in the current viewbox
-        map.addListener('bounds_changed', function () {
-            searchBox.setBounds(map.getBounds());
-        });
-
-        // add event for place selection
-        searchBox.addListener('places_changed', function () {
-            var places = searchBox.getPlaces();
-            if (places.length == 0) {
-                return;
-            }
-
-            // get the location.
-            var bounds = new google.maps.LatLngBounds();
-            // add bounds for each selected place
-            places.forEach(place => {
-                if (!place.geometry) {
-                    console.log("Place contains no usable geometry");
-                    return;
-                }
-                // focus on the area
-                if (place.geometry.viewport) {
-                    bounds.union(place.geometry.viewport);
-                } else {
-                    bounds.extend(place.geometry.location);
-                }
-            });
-            map.fitBounds(bounds);
-        });
-    }*/
-
-    /***
-     * setUpLocations(): void
-     *
-     *     Creates the socket connection to the Mapper API for listening to
-     *     live location data.
-     ***/
-    /*private setUpLocations(): void {
-        this.liveLoc.locations.subscribe(loc => {
-                console.log("Locations received: " + loc);
-            }
-        );
-    }*/
-
-    /***
-     * setSelectedFeature(any): void
+     * setSelectedElement(Element): void
      *
      *     Sets the currently selected feature.
      ***/
-    /*private setSelectedFeature(f: any) {
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
+    private setSelectedElement(e: Element) {
+        if (this.selectedElement != null) {
+            this.selectedElement.setSelected(false);
         }
-        this.selectedFeature = f;
-        this.selectedFeature.setProperty("selected", true);
+        this.selectedElement = e;
+        this.selectedElement.setSelected(true);
         this.appRef.tick();
-    }*/
+    }
 
-    /*private removeSelectedFeature() {
-        if (this.selectedFeature != null) {
-            this.selectedFeature.setProperty("selected", false);
-            this.selectedFeature = null;
+    /***
+     * unselectElement() : void
+     *
+     *     Unselects the currently selected element.
+     */
+    private unselectElement() {
+        if (this.selectedElement != null) {
+            this.selectedElement.setSelected(false);
+            this.selectedElement = null;
             this.appRef.tick();
         }
-    }*/
+    }
 
     /***************************************************************************
      * Map event handlers.
      **************************************************************************/
 
     /***
-     * onMapFeatureAdd(any): void
+     * onFeatureAdd(any): void
      *
-     *     Event handler for new & loaded elements on the map. The handler adds
-     *     the necessary properties to new elements.
+     *     Event handler for new & loaded elements on the map. The handler
+     *     creates the element and adds it to the course.
      ***/
-    /*private onMapFeatureAdd(e: any) {
+    public onFeatureAdd(feature: any) {
+        var hole = null;
+        if (this.holeIndex >= 0) {
+            hole = this.courseManager.activeCourse.getHole(this.holeIndex);
+        }
         // ignore the loaded elements
-        if (e.feature.getProperty("elementId") === undefined) {
-            if (this.currentCourse !== undefined) {
+        if (feature.getProperty("elementId") === undefined) {
+            if (this.courseManager.activeCourse != null) {
                 // determine the type of element added
                 this.ngZone.run(() => {
-                    if (this.drawingMode == "Polygon") {
-                        // bring up the polygon dialog
-                        const dialogRef = this.dialog.open(PolygonDialog);
+                    if (this.map.getDrawingMode() == DrawMode.AREA) {
+                        // bring up the area dialog
+                        const dialogRef = this.dialog.open(AreaDialog);
                         dialogRef.afterClosed().subscribe(result => {
                             if (result.done) {
-                                // assign polygon properties
-                                this.setPolygonProperties(e.feature,
-                                        result.type);
+                                // create the area element
+                                var el = ElementFactory.parseArea(
+                                    feature, true, true, result.type,
+                                    this.courseManager.activeCourse, hole);
+                                if (hole != null) {
+                                    hole.addElement(el);
+                                } else {
+                                    this.courseManager.activeCourse
+                                            .addElement(el);
+                                }
+                                this.setSelectedElement(el);
                             } else {
                                 // delete the feature
-                                this.googleMap.data.remove(e.feature);
+                                this.map.removeFeature(feature);
                             }
                         });
 
-                    } else if (this.drawingMode == "Point") {
+                    } else if (this.map.getDrawingMode() == DrawMode.POINT) {
                         // bring up the point dialog
                         const dialogRef = this.dialog.open(PointDialog);
                         dialogRef.afterClosed().subscribe(result => {
                             if (result.done) {
-                                // assign point properties
-                                this.setPointProperties(e.feature,
-                                        result.type, result.info);
+                                // create the point element
+                                var el = ElementFactory.parsePoint(
+                                    feature, true, true, result.type,
+                                    result.info,
+                                    this.courseManager.activeCourse, hole);
+                                if (hole != null) {
+                                    hole.addElement(el);
+                                } else {
+                                    this.courseManager.activeCourse
+                                            .addElement(el);
+                                }
+                                this.setSelectedElement(el);
                             } else {
                                 // delete the feature
-                                this.googleMap.data.remove(e.feature);
+                                this.map.removeFeature(feature);
                             }
                         });
                     }
                 });
             } else {
                 // remove the invalid feature
-                this.googleMap.data.remove(e.feature);
+                this.map.removeFeature(feature);
                 // TODO nice message
                 window.alert("Please load or create a course first.");
             }
             // go to select mode
-            this.googleMap.data.setDrawingMode(null);
+            this.map.setDrawingMode(DrawMode.NONE);
         }
-    }*/
+    }
 
     /***
-     * setPolygonProperties(any, number): void
-     *
-     *     Adds the appropriate properties to the polygon based on the current
-     *     state and given polygon type.
-     ***/
-    /*private setPolygonProperties(feature: any, type: number): void {
-        // assign element properties
-        feature.setProperty("state", State_t.S_NEW);
-        feature.setProperty("elementId", null);
-        feature.setProperty("courseId", this.currentCourse.courseId);
-        if (this.selectedHole !== undefined) {
-            feature.setProperty("holeId", this.selectedHole.holeId);
-        } else {
-            feature.setProperty("holeId", null);
-        }
-        // assign polygon properties
-        feature.setProperty("enabled", true);
-        feature.setProperty("selected", true);
-        feature.setProperty("elementType", Element_t.E_POLY);
-        feature.setProperty("polygonType", type);
-        // update selection
-        this.setSelectedFeature(feature);
-    }*/
-
-    /***
-     * setPointProperties(any, number, string): void
-     *
-     *     Adds the appropriate properties to the polygon based on the current
-     *     state and given polygon type.
-     ***/
-    /*private setPointProperties(feature: any, type: number, info: string): void {
-        // assign element properties
-        feature.setProperty("state", State_t.S_NEW);
-        feature.setProperty("elementId", null);
-        feature.setProperty("courseId", this.currentCourse.courseId);
-        if (this.selectedHole !== undefined) {
-            feature.setProperty("holeId", this.selectedHole.holeId);
-        } else {
-            feature.setProperty("holeId", null);
-        }
-        // assign point properties
-        feature.setProperty("enabled", true);
-        feature.setProperty("selected", true);
-        feature.setProperty("elementType", Element_t.E_POINT);
-        feature.setProperty("pointType", type);
-        feature.setProperty("info", info);
-        // update selection
-        this.setSelectedFeature(feature);
-    }*/
-
-    /***
-     * onMapGeometrySet(any): void
+     * onFeatureUpdate(any): void
      *
      *     Event handler for updated elements on the map. The handler sets the
      *     current selected feature to the updated one and flags the feature
      *     for update.
      ***/
-    /*private onMapGeometrySet(e: any) {
+    public onFeatureUpdate(feature: any) {
+        window.alert("Feature updated");
+        /*
         if (e.feature != this.selectedFeature) {
             this.setSelectedFeature(e.feature);
         }
         if (e.feature.getProperty("state") != State_t.S_NEW) {
             e.feature.setProperty("state", State_t.S_UPDATE);
-        }
-    }*/
+        }*/
+    }
 
     /***
      * onFeatureClick(any): void
@@ -760,21 +557,23 @@ export class HomeComponent {
      *     Event handler for map element clicks. The handler sets the current
      *     selected feature to the clicked one.
      ***/
-    /*private onFeatureClick(e: any) {
-        if (e.feature != this.selectedFeature) {
-            this.setSelectedFeature(e.feature);
-        }
-    }*/
+    public onFeatureClick(feature: any) {
+        // TODO find clicked element
+        window.alert("Clicked feature");
+        // if (e.feature != this.selectedFeature) {
+        //     this.setSelectedFeature(e.feature);
+        // }
+    }
 
     /***
      * onMapClick(any): void
      *
      *     Event handler for map clicks.
      ***/
-    /*private onMapClick(e: any) {
+    public onMapClick(event: any) {
         // deselect the selected feature
-        this.removeSelectedFeature();
-    }*/
+        this.unselectElement();
+    }
 
     /***************************************************************************
      * UI event handlers.

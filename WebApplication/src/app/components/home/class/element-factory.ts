@@ -8,7 +8,9 @@
  ***/
 
 import { ModelState } from '../../../interfaces/enum.interface';
-import { Element, Point, Area, ElementType } from './element';
+import { Element, Point, Area, ElementType, PointType, AreaType } from './element';
+import { Course } from './course';
+import { Hole } from './hole';
 
 export class ElementFactory {
 
@@ -80,5 +82,64 @@ export class ElementFactory {
 
         return elements;
     }
+
+    /***
+     * parsePoint(any, boolean, boolean, Course, Hole): Point
+     *
+     *     Produces a point element from a new map feature. Leave the hole as
+     *     null for a course element.
+     ***/
+    public static parsePoint(feature: any, enabled: boolean, editable: boolean,
+            type: PointType, info: string, course: Course, hole: Hole) {
+        var point = new Point(ModelState.CREATED, enabled, editable, type);
+        // add properties to the feature
+        // assign element properties
+        feature.setProperty("elementId", null);
+        feature.setProperty("courseId", course.getId());
+        if (hole != null) {
+            feature.setProperty("holeId", hole.getId());
+        } else {
+            feature.setProperty("holeId", null)
+        }
+        // assign point properties
+        feature.setProperty("enabled", enabled);
+        feature.setProperty("editable", editable);
+        feature.setProperty("selected", true);
+        feature.setProperty("elementType", ElementType.POINT);
+        feature.setProperty("pointType", type);
+        feature.setProperty("info", info);
+        // add properties to element
+        point.setInfo(info);
+        point.feature = feature;
+        return point;
+    }
+
+    /***
+     * parseArea(any, boolean, boolean, Course, Hole): Point
+     *
+     *     Produces an area element from a new map feature. Leave the hole as
+     *     null for a course element.
+     ***/
+    public static parseArea(feature: any, enabled: boolean, editable: boolean,
+        type: AreaType, course: Course, hole: Hole) {
+    var area = new Area(ModelState.CREATED, enabled, editable, type);
+    // add properties to the feature
+    // assign element properties
+    feature.setProperty("elementId", null);
+    feature.setProperty("courseId", course.getId());
+    if (hole != null) {
+        feature.setProperty("holeId", hole.getId());
+    } else {
+        feature.setProperty("holeId", null)
+    }    // assign point properties
+    feature.setProperty("enabled", enabled);
+    feature.setProperty("editable", editable);
+    feature.setProperty("selected", true);
+    feature.setProperty("elementType", ElementType.AREA);
+    feature.setProperty("polygonType", type);
+    // add feature to element
+    area.feature = feature;
+    return area;
+}
 
 }

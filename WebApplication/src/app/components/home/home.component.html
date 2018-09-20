@@ -126,15 +126,15 @@
                             <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0" (click)="onSelectCourse(courseIndex)">
                                 <mat-icon>refresh</mat-icon>
                             </button>
-                            <!--button mat-mini-fab color="primary" *ngIf="!viewMode" (click)="fabAddPolygon('action1')">
+                            <button mat-mini-fab color="primary" (click)="onFabAdd(1)"> <!--*ngIf="!viewMode"-->
                                 <mat-icon>timeline</mat-icon>
                             </button>
-                            <button mat-mini-fab color="primary" *ngIf="!viewMode" (click)="fabAddPoint('action2')">
+                            <button mat-mini-fab color="primary" (click)="onFabAdd(0)"> <!--*ngIf="!viewMode"-->
                                 <mat-icon>flag</mat-icon>
                             </button>
-                            <button mat-mini-fab color="warn" *ngIf="!viewMode && selectedFeature !== null" (click)="onDeleteElement()">
+                            <button mat-mini-fab color="warn" *ngIf="selectedFeature != null" (click)="onDeleteElement()"> <!--*ngIf="!viewMode"-->
                                 <mat-icon>delete</mat-icon>
-                            </button-->
+                            </button>
                         </smd-fab-actions>
                     </smd-fab-speed-dial>
                 </div>

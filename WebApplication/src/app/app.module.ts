@@ -10,7 +10,7 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegisterComponent } from './components/register/register.component';
-import { PolygonDialog } from './components/home/dialog/polygon-dialog.component';
+import { AreaDialog } from './components/home/dialog/area-dialog.component';
 import { PointDialog } from './components/home/dialog/point-dialog.component';
 import { HoleDialog } from './components/home/dialog/hole-dialog.component';
 import { CourseDialog } from './components/home/dialog/course-dialog.component';
@@ -74,7 +74,7 @@ import {
         LoginComponent,
         RegisterComponent,
         HomeComponent,
-        PolygonDialog,
+        AreaDialog,
         PointDialog,
         HoleDialog,
         CourseDialog,
@@ -143,7 +143,7 @@ import {
         SocketService,
         LocationService
     ],
-    entryComponents: [PolygonDialog, PointDialog, HoleDialog, CourseDialog],
+    entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

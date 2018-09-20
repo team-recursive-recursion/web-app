@@ -2,6 +2,7 @@
  * Filename: google-map.ts
  * Author  : Duncan Tilley
  * Class   : GoogleMap
+ * Enum    : DrawMode
  *
  *     Encapsulates the functionality of the Google Maps API.
  ***/
@@ -10,20 +11,28 @@ import { AgmMap, LatLngBounds } from '@agm/core';
 import { Course } from './course';
 import { Element, PointType, AreaType } from './element';
 import { Hole } from './hole';
+import { HomeComponent } from '../home.component';
+
+export enum DrawMode {
+    POINT, AREA, NONE
+}
 
 declare var google: any;
 export class GoogleMap {
 
     private agmMap: AgmMap;
-    private map: any = null;
+    private map: any;
+    private mode: DrawMode = DrawMode.NONE;
+    private comp: HomeComponent;
 
     /***
      * constructor()
      *
      *     Sets up the Google map.
      ***/
-    public constructor(agmMap: AgmMap) {
+    public constructor(agmMap: AgmMap, comp: HomeComponent) {
         this.agmMap = agmMap;
+        this.comp = comp;
         this.agmMap.mapReady.subscribe(map => {
             this.map = map;
             this.map.data.setControls(['Point', 'Polygon']);
@@ -45,6 +54,15 @@ export class GoogleMap {
     }
 
     /***
+     * removeFeature(any) : void
+     *
+     *     Removes the given feature from the map.
+     ***/
+    public removeFeature(feature: any) {
+        this.map.data.remove(feature);
+    }
+
+    /***
      * displayCourse(Course): void
      *
      *    Displays all of the elements of the given course on the map.
@@ -57,6 +75,7 @@ export class GoogleMap {
                 "features": features
             }
         );
+        this.setDrawingMode(DrawMode.NONE);
     }
 
     /***
@@ -77,19 +96,46 @@ export class GoogleMap {
     }
 
     /***
+     * getDrawingMode() : DrawMode
+     ***/
+    public getDrawingMode() : DrawMode {
+        return this.mode;
+    }
+
+    /***
+     * setDrawingMode(DrawMode) : void
+     *
+     *     Sets the map to the given drawing mode.
+     ***/
+    public setDrawingMode(mode: DrawMode) {
+        switch (mode) {
+            case DrawMode.POINT:
+                this.map.data.setDrawingMode("Point");
+                break;
+            case DrawMode.AREA:
+                this.map.data.setDrawingMode("Polygon");
+                break;
+            case DrawMode.NONE:
+                this.map.data.setDrawingMode(null);
+                break;
+        }
+        this.mode = mode;
+    }
+
+    /***
      * setUpMapEvents() : void
      *
      *     Sets up the map event listeners.
      ***/
     private setUpMapEvents() {
-        /*this.map.data.addListener("addfeature", e =>
-            this.onMapFeatureAdd(e));
+        this.map.data.addListener("addfeature", e =>
+            this.comp.onFeatureAdd(e.feature));
         this.map.data.addListener('setgeometry', e =>
-            this.onMapGeometrySet(e));
+            this.comp.onFeatureUpdate(e.feature));
         this.map.data.addListener('click', e =>
-            this.onFeatureClick(e));
+            this.comp.onFeatureClick(e.feature));
         this.map.addListener('click', e =>
-            this.onMapClick(e));*/
+            this.comp.onMapClick(e));
     }
 
     /***
