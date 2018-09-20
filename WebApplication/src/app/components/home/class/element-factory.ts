@@ -18,7 +18,7 @@ export class ElementFactory {
      * parseElementArray(any, boolean, boolean): Array<Element>
      *
      *     Produces an array of elements from raw JSON received from the Mapper
-     *     API. Also produces features that can be displayed on the map.
+     *     API.
      ***/
     public static parseElementArray(json: Array<any>, enabled: boolean,
             editable: boolean) : Array<Element> {
@@ -26,61 +26,53 @@ export class ElementFactory {
 
         if (json !== undefined && json !== null) {
             json.forEach(e => {
-                var feature: any;
                 var element: Element;
                 if (e.elementType == ElementType.POINT) {
-                    // create the point feature
-                    feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            ...JSON.parse(e.geoJson)
-                        },
-                        "properties": {
-                            "pointType": e['pointType'],
-                            "elementType": e.elementType,
-                            "elementId": e.elementId,
-                            "courseId": e.courseId,
-                            "holeId": e.holeId,
-                            "enabled": enabled,
-                            "editable": editable,
-                            "selected": false
-                        }
-                    };
                     // create the point element
                     element = new Point(ModelState.UNCHANGED, enabled, editable,
                             e.pointType);
                     (<Point> element).setInfo(e.info);
-                    element.setId(e.elementId);
-                    element.feature = feature;
                 } else if (e.elementType == ElementType.AREA) {
-                    // create the area feature
-                    feature = {
-                        "type": "Feature",
-                        "geometry": {
-                            ...JSON.parse(e.geoJson)
-                        },
-                        "properties": {
-                            "polygonType": e['polygonType'],
-                            "elementType": e.elementType,
-                            "elementId": e.elementId,
-                            "courseId": e.courseId,
-                            "holeId": e.holeId,
-                            "enabled": enabled,
-                            "editable": editable,
-                            "selected": false
-                        }
-                    };
                     // create the area element
                     element = new Area(ModelState.UNCHANGED, enabled, editable,
                             e.polygonType);
-                    element.setId(e.elementId);
-                    element.feature = feature;
                 }
+                // add element properties
+                element.setId(e.elementId);
+                element.courseId = e.courseId;
+                element.holeId = e.holeId;
+                element.geometry = JSON.parse(e.geoJson);
                 elements.push(element);
             });
         }
 
         return elements;
+    }
+
+    /***
+     * createFeatures(Array<Element>) : Array<any>
+     *
+     *     Creates drawable features from the given elements.
+     ***/
+    public static createFeatures(elements : Array<Element>) : Array<any> {
+        var features: Array<any> = [];
+
+        elements.forEach(e => {
+            var feature = {
+                "type": "Feature",
+                "geometry": {
+                    ...e.geometry
+                },
+                "properties": {
+                    "elementType": e.getElementType(),
+                    "element": e,
+                    "update": false
+                }
+            };
+            features.push(feature);
+        });
+
+        return features;
     }
 
     /***
@@ -91,26 +83,19 @@ export class ElementFactory {
      ***/
     public static parsePoint(feature: any, enabled: boolean, editable: boolean,
             type: PointType, info: string, course: Course, hole: Hole) {
+        // create element
         var point = new Point(ModelState.CREATED, enabled, editable, type);
-        // add properties to the feature
-        // assign element properties
-        feature.setProperty("elementId", null);
-        feature.setProperty("courseId", course.getId());
-        if (hole != null) {
-            feature.setProperty("holeId", hole.getId());
-        } else {
-            feature.setProperty("holeId", null)
-        }
-        // assign point properties
-        feature.setProperty("enabled", enabled);
-        feature.setProperty("editable", editable);
-        feature.setProperty("selected", true);
-        feature.setProperty("elementType", ElementType.POINT);
-        feature.setProperty("pointType", type);
-        feature.setProperty("info", info);
-        // add properties to element
         point.setInfo(info);
-        point.feature = feature;
+        point.geometry = feature.geometry;
+        point.courseId = course.getId();
+        if (hole != null) {
+            point.holeId = hole.getId();
+        } else {
+            point.holeId = null;
+        }
+        // set feature properties
+        feature.setProperty("elementType", ElementType.POINT);
+        feature.setProperty("element", point);
         return point;
     }
 
@@ -121,25 +106,20 @@ export class ElementFactory {
      *     null for a course element.
      ***/
     public static parseArea(feature: any, enabled: boolean, editable: boolean,
-        type: AreaType, course: Course, hole: Hole) {
-    var area = new Area(ModelState.CREATED, enabled, editable, type);
-    // add properties to the feature
-    // assign element properties
-    feature.setProperty("elementId", null);
-    feature.setProperty("courseId", course.getId());
-    if (hole != null) {
-        feature.setProperty("holeId", hole.getId());
-    } else {
-        feature.setProperty("holeId", null)
-    }    // assign point properties
-    feature.setProperty("enabled", enabled);
-    feature.setProperty("editable", editable);
-    feature.setProperty("selected", true);
-    feature.setProperty("elementType", ElementType.AREA);
-    feature.setProperty("polygonType", type);
-    // add feature to element
-    area.feature = feature;
-    return area;
-}
+            type: AreaType, course: Course, hole: Hole) {
+        // create element
+        var area = new Area(ModelState.CREATED, enabled, editable, type);
+        area.geometry = feature.geometry;
+        area.courseId = course.getId();
+        if (hole != null) {
+            area.holeId = hole.getId();
+        } else {
+            area.holeId = null;
+        }
+        // set feature properties
+        feature.setProperty("elementType", ElementType.AREA);
+        feature.setProperty("element", area);
+        return area;
+    }
 
 }

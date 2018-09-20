@@ -9,7 +9,7 @@
 
 import { AgmMap, LatLngBounds } from '@agm/core';
 import { Course } from './course';
-import { Element, PointType, AreaType } from './element';
+import { Element, PointType, AreaType, ElementType, Area, Point } from './element';
 import { Hole } from './hole';
 import { HomeComponent } from '../home.component';
 
@@ -87,11 +87,10 @@ export class GoogleMap {
     public displayHole(h: Hole) {
         var id = (h != null) ? h.getId() : null;
         this.map.data.forEach(feature => {
-            if (feature.getProperty('holeId') == id) {
-                feature.setProperty('enabled', true);
-            } else {
-                feature.setProperty('enabled', false);
-            }
+            var el = feature.getProperty('element');
+            el.enabled = (el.holeId == id);
+            // force feature update
+            feature.setProperty("update", false);
         });
     }
 
@@ -146,17 +145,15 @@ export class GoogleMap {
      ***/
     private setUpStyling() {
         this.map.data.setStyle(function (feature) {
-            let enabled = feature.getProperty('enabled');
-            let editable = feature.getProperty('editable');
-            let selected = feature.getProperty('selected');
-            if (feature.getGeometry() != null) {
-                if (feature.getGeometry().getType() == "Polygon") {
+            let element: Element = feature.getProperty('element');
+            if (element !== undefined) {
+                if (element.getElementType() == ElementType.AREA) {
                     // styling for polygons
-                    const polyType = feature.getProperty('polygonType');
+                    const type = (<Area>element).getType();
                     // choose the color based on enabled and the type
                     let color = '#2E2E2E';
-                    if (enabled) {
-                        switch (polyType) {
+                    if (element.enabled) {
+                        switch (type) {
                             case AreaType.ROUGH:
                                 color = '#1D442D';
                                 break;
@@ -176,18 +173,18 @@ export class GoogleMap {
                     }
                     // return the styling
                     return {
-                        clickable: editable && enabled,
-                        draggable: selected,
-                        editable: selected,
+                        clickable: element.editable && element.enabled,
+                        draggable: element.selected,
+                        editable: element.selected,
                         visible: true,
                         fillColor: color,
                         fillOpacity: 0.3,
                         strokeWeight: 1,
-                        zIndex: polyType
+                        zIndex: type
                     };
                 } else {
                     var icon;
-                    switch (feature.getProperty("pointType")) {
+                    switch ((<Point>element).getType()) {
                         case PointType.HOLE:
                             icon = "./assets/flag.png";
                             break;
@@ -199,10 +196,10 @@ export class GoogleMap {
                             break;
                     }
                     return {
-                        clickable: editable && enabled,
-                        draggable: selected,
-                        editable: selected,
-                        visible: enabled,
+                        clickable: element.editable && element.enabled,
+                        draggable: element.selected,
+                        editable: element.selected,
+                        visible: element.enabled,
                         icon: icon,
                         zIndex: 0
                     };

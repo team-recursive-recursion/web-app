@@ -36,7 +36,13 @@ export abstract class Element {
     private state: ModelState;
     private id: string;
 
-    public feature: any;
+    public selected: boolean;
+    public enabled: boolean;
+    public editable: boolean;
+
+    public geometry: any;
+    public courseId: string;
+    public holeId: string;
 
     /***
      * constructor(boolean, boolean)
@@ -46,6 +52,9 @@ export abstract class Element {
     constructor(state: ModelState, enabled: boolean, editable: boolean) {
         this.state = state;
         this.id = "";
+        this.enabled = enabled;
+        this.editable = editable;
+        this.selected = false;
     }
 
     /***
@@ -70,18 +79,6 @@ export abstract class Element {
         } else {
             console.log("Cannot change existing element ID");
         }
-    }
-
-    public setSelected(sel: boolean) {
-        this.feature.setProperty("selected", sel);
-    }
-
-    public setEnabled(en: boolean) {
-        this.feature.setProperty("enabled", en);
-    }
-
-    public setEditable(ed: boolean) {
-        this.feature.setProperty("editable", ed);
     }
 
     /***

@@ -76,6 +76,10 @@ export class Course {
         this.name = n;
     }
 
+    public getElements() : Array<Element> {
+        return this.elements;
+    }
+
     /***
      * addElement(Element) : void
      *
@@ -133,10 +137,7 @@ export class Course {
      *     Returns the collection of elements as drawable features.
      ***/
     public asFeatures() : Array<any> {
-        var features = [];
-        this.elements.forEach(e => {
-            features.push(e.feature);
-        });
+        var features = ElementFactory.createFeatures(this.elements);
         this.holes.forEach(h => {
             features = [
                 ...features,

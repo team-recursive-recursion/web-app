@@ -47,7 +47,7 @@ export class HomeComponent {
     courseManager: CourseManager;
 
     // selected items
-    selectedElement: Element = null;
+    selectedFeature: any = null;
 
     url: any;
     courseIndex: number = -1;
@@ -87,7 +87,6 @@ export class HomeComponent {
     constructor(
         private api: ApiService,
         private globals: GlobalsService,
-        private liveLoc: LocationService,
         private router: Router,
         private ngZone: NgZone,
         private appRef: ApplicationRef,
@@ -151,7 +150,7 @@ export class HomeComponent {
     public onSelectCourse(index: number) {
         var t = this;
         if (index >= 0) {
-            this.unselectElement();
+            this.unselectFeature();
             this.courseManager.setActiveCourse(index, this.api,
                 // success
                 function () {
@@ -329,7 +328,7 @@ export class HomeComponent {
             this.courseManager.deleteActiveCourse(this.api,
                 // success
                 function() {
-                    t.unselectElement();
+                    t.unselectFeature();
                     t.map.clearMap();
                     t.navbar.close();
                     t.courseIndex = -1;
@@ -355,11 +354,13 @@ export class HomeComponent {
         if (index >= 0) {
             this.map.displayHole(this.courseManager.activeCourse
                     .getHole(index));
+            this.appRef.tick();
         } else {
             this.map.displayHole(null);
+            this.appRef.tick();
         }
         // unselect the selected element
-        this.unselectElement();
+        this.unselectFeature();
     }
 
     /***
@@ -417,7 +418,7 @@ export class HomeComponent {
      *     Sets the map to the appropriate drawing mode.
      ***/
     onFabAdd(type: number) {
-        this.unselectElement();
+        this.unselectFeature();
         if (type == 0) {
             this.map.setDrawingMode(DrawMode.POINT);
         } else {
@@ -430,28 +431,31 @@ export class HomeComponent {
      **************************************************************************/
 
     /***
-     * setSelectedElement(Element): void
+     * setSelectedFeature(any): void
      *
      *     Sets the currently selected feature.
      ***/
-    private setSelectedElement(e: Element) {
-        if (this.selectedElement != null) {
-            this.selectedElement.setSelected(false);
-        }
-        this.selectedElement = e;
-        this.selectedElement.setSelected(true);
+    private setSelectedFeature(f: any) {
+        this.unselectFeature();
+        // select feature
+        f.getProperty('element').selected = true;
+        // force update
+        f.setProperty('update', false);
+        this.selectedFeature = f;
         this.appRef.tick();
     }
 
     /***
-     * unselectElement() : void
+     * unselectFeature() : void
      *
-     *     Unselects the currently selected element.
+     *     Unselects the currently selected feature.
      */
-    private unselectElement() {
-        if (this.selectedElement != null) {
-            this.selectedElement.setSelected(false);
-            this.selectedElement = null;
+    private unselectFeature() {
+        if (this.selectedFeature != null) {
+            this.selectedFeature.getProperty('element').selected = false;
+            // force update
+            this.selectedFeature.setProperty('update', false);
+            this.selectedFeature = null;
             this.appRef.tick();
         }
     }
@@ -491,7 +495,7 @@ export class HomeComponent {
                                     this.courseManager.activeCourse
                                             .addElement(el);
                                 }
-                                this.setSelectedElement(el);
+                                this.setSelectedFeature(feature);
                             } else {
                                 // delete the feature
                                 this.map.removeFeature(feature);
@@ -514,7 +518,7 @@ export class HomeComponent {
                                     this.courseManager.activeCourse
                                             .addElement(el);
                                 }
-                                this.setSelectedElement(el);
+                                this.setSelectedFeature(feature);
                             } else {
                                 // delete the feature
                                 this.map.removeFeature(feature);
@@ -558,11 +562,43 @@ export class HomeComponent {
      *     selected feature to the clicked one.
      ***/
     public onFeatureClick(feature: any) {
-        // TODO find clicked element
-        window.alert("Clicked feature");
-        // if (e.feature != this.selectedFeature) {
-        //     this.setSelectedFeature(e.feature);
-        // }
+
+        var el = feature.getProperty("element");
+        this.setSelectedFeature(feature);
+
+        /*function featureMatches(feature: any, element: Element) {
+            if (element.getId() != "") {
+                return feature.getProperty("elementId") == element.getId();
+            } else {
+                return feature == element.feature;
+            }
+        }
+
+        // get the active elements
+        var elements;
+        if (this.holeIndex >= 0) {
+            elements = this.courseManager.activeCourse.getHole(this.holeIndex)
+                    .getElements();
+        } else {
+            elements = this.courseManager.activeCourse.getElements();
+        }
+        // find the selected element
+        var found = false;
+        var i = 0;
+        while (!found && i < elements.length) {
+            if (featureMatches(feature, elements[i])) {
+                found = true;
+            } else {
+                ++i;
+            }
+        }
+        if (found) {
+            this.unselectElement();
+            feature.setProperty("selected", true);
+            this.setSelectedElement(elements[i]);
+        } else {
+            window.alert("Could not find clicked element");
+        }*/
     }
 
     /***
@@ -572,7 +608,7 @@ export class HomeComponent {
      ***/
     public onMapClick(event: any) {
         // deselect the selected feature
-        this.unselectElement();
+        this.unselectFeature();
     }
 
     /***************************************************************************

@@ -76,6 +76,10 @@ export class Hole {
         this.name = n;
     }
 
+    public getElements() : Array<Element> {
+        return this.elements;
+    }
+
     /***
      * addElement(Element) : void
      *
@@ -91,11 +95,7 @@ export class Hole {
      *     Returns the collection of elements as drawable features.
      ***/
     public asFeatures() : Array<any> {
-        var features = [];
-        this.elements.forEach(e => {
-            features.push(e.feature);
-        });
-        return features;
+        return ElementFactory.createFeatures(this.elements);
     }
 
     /***
