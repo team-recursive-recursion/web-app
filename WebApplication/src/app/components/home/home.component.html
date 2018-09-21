@@ -13,79 +13,109 @@
 </div>
 
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
+
+    <!-- Tool bar -->
     <mat-toolbar color="primary" class="example-toolbar">
-        <button *ngIf="currentCourse != null && currentCourse.holes !== undefined"
+
+        <!-- Hole sidebar toggle button -->
+        <button *ngIf="courseManager.activeCourse != null"
                 mat-icon-button (click)="snav.toggle()">
             <mat-icon>golf_course</mat-icon>
         </button>
-        <div *ngIf="courses.length !== 0">
-            <mat-select [(value)]="selected" #courseSelector id="course-selector">
-                <mat-option [value]="-1" *ngIf="courses.length !== 0" (click)="onLoadCourse(-1)">
+
+        <!-- Course selection dropdown -->
+        <div *ngIf="courseManager.courses.length > 0">
+            <mat-select [(value)]="courseIndex" #courseSelector id="course-selector">
+                <mat-option [value]="-1" (click)="onSelectCourse(-1)">
                     Select a course
                 </mat-option>
-                <mat-option *ngFor="let c of courses; let i = index" [value]="i" (click)="onLoadCourse(i)">
-                    {{c.courseName}}
+                <mat-option *ngFor="let c of courseManager.courses; let i = index" [value]="i" (click)="onSelectCourse(i)">
+                    {{c.name}}
                 </mat-option>
             </mat-select>
-
         </div>
+
+        <!-- Course edit buttons -->
         <span class="small-spacer"></span>
-        <button mat-mini-fab color="accent" *ngIf="selected !== -1 && courses.length !== 0" (click)="onDeleteCourse(selected)">
+        <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0 && courseManager.courses.length > 0" (click)="onDeleteCourse(courseIndex)">
             <mat-icon>delete_forever</mat-icon>
         </button>
-        <span class="example-spacer"></span>
-        <input class="course-name-input" matInput placeholder="New Course Name" ([ngModel])="courseName" #courseName>
         <span class="small-spacer"></span>
-        <button mat-mini-fab color="accent" (click)="onCreateCourse(courseName.value)">
+        <button mat-mini-fab color="accent" (click)="onCreateCourse()">
             <mat-icon>add</mat-icon>
         </button>
+
+        <span style="flex: 1 1 auto"></span>
+
+        <!-- View mode toggle -->
+        <div *ngIf="courseManager.activeCourse != null">
+            <mat-icon>edit</mat-icon>
+            <mat-slide-toggle style="margin:0.3em" [color]="primary" [(ngModel)]="viewMode"
+                    (change)="onViewModeSwitch()">
+            </mat-slide-toggle>
+            <mat-icon>visibility</mat-icon>
+        </div>
 
     </mat-toolbar>
 
     <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+
+        <!-- Navigation bar -->
         <mat-sidenav #snav opened="false" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
             <mat-list>
                 <mat-accordion>
-                    <mat-card *ngIf="currentCourse !== undefined">
+
+                    <!-- Hole selection -->
+                    <mat-card *ngIf="courseManager.activeCourse !== null">
                         <mat-card-header>
                             <mat-card-title>
                                 Course Holes
                             </mat-card-title>
                         </mat-card-header>
 
-                        <mat-list role="list">
-                            <mat-list-item role="listitem">
-                                <mat-form-field class="fill">
-                                    <input matInput placeholder="Hole Name" [(ngModel)]="newHoleName">
-                                </mat-form-field>
-                                <mat-icon class="addButton" (click)="onAddHole()">
-                                    {{button_state}}
-                                </mat-icon>
-                            </mat-list-item>
-                        </mat-list>
-                        <div *ngIf="currentCourse.holes !== undefined">
-                            <mat-radio-group (change)="onSelectHole($event)" class="hole-radio-group" [(ngModel)]="selectedHole">
-                                <mat-radio-button class="hole-radio-button" [value]="undefined">
+                        <!-- Hole list -->
+                        <div>
+                            <mat-radio-group [(ngModel)]="holeIndex" (change)="onSelectHole($event.value)" class="hole-radio-group">
+                                <mat-radio-button class="hole-radio-button" [value]="-1">
                                     Course
                                 </mat-radio-button>
-                                <mat-radio-button class="hole-radio-button" *ngFor="let hole of currentCourse.holes" [value]="hole">
-                                    {{hole.name}}
-                                </mat-radio-button>
+                                <ng-container *ngFor="let h of courseManager.activeCourse.holes; let i = index">
+                                    <mat-radio-button *ngIf="h.isVisible()" class="hole-radio-button" [value]="i">
+                                        {{h.name}}
+                                    </mat-radio-button>
+                                </ng-container>
                             </mat-radio-group>
                         </div>
+
+                        <!-- Hole management buttons -->
+                        <mat-list role="list" *ngIf="!viewMode">
+                            <mat-list-item role="listitem">
+                                <button mat-icon-button (click)="onCreateHole()">
+                                    <mat-icon>add_circle</mat-icon>
+                                </button>
+                                <!--button mat-icon-button [disabled]="holeIndex == -1" (click)="onEditHole()">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button [disabled]="holeIndex == -1" (click)="onDeleteHole()">
+                                    <mat-icon>delete</mat-icon>
+                                </button-->
+                            </mat-list-item>
+                        </mat-list>
                     </mat-card>
                 </mat-accordion>
             </mat-list>
         </mat-sidenav>
 
+        <!-- Navigation bar content / map -->
         <mat-sidenav-content class="map-container">
             <mat-card class="map-card">
                 <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
-                    #AgmMap [latitude]="lat" [longitude]="lng" [streetViewControl]="false" (mapClick)="mapInteractionClick($event)">
+                    #AgmMap [streetViewControl]="false">
                 </agm-map>
                 <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
 
-                <div class="controls" *ngIf="selected !== -1 && courses.length !== 0">
+                <!-- Floating controls -->
+                <div class="controls" *ngIf="courseManager.activeCourse != null">
                     <smd-fab-speed-dial [(open)]="open" [direction]="direction" [animationMode]="animationMode" [fixed]="true">
                         <smd-fab-trigger [spin]="spin">
                             <button mat-fab (click)="onSaveCourse()">
@@ -94,16 +124,16 @@
                         </smd-fab-trigger>
 
                         <smd-fab-actions>
-                            <button mat-mini-fab color="accent" *ngIf="selected !== -1" (click)="onLoadCourse(selected)">
+                            <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0" (click)="onSelectCourse(courseIndex)">
                                 <mat-icon>refresh</mat-icon>
                             </button>
-                            <button mat-mini-fab color="primary" (click)="fabAddPolygon('action1')">
+                            <button mat-mini-fab *ngIf="!viewMode" color="primary" (click)="onFabAdd(1)">
                                 <mat-icon>timeline</mat-icon>
                             </button>
-                            <button mat-mini-fab color="primary" (click)="fabAddPoint('action2')">
+                            <button mat-mini-fab *ngIf="!viewMode" color="primary" (click)="onFabAdd(0)">
                                 <mat-icon>flag</mat-icon>
                             </button>
-                            <button mat-mini-fab color="warn" *ngIf="selectedFeature !== null" (click)="onDeleteElement()">
+                            <button mat-mini-fab *ngIf="!viewMode && selectedFeature != null" color="warn" (click)="onDeleteElement()">
                                 <mat-icon>delete</mat-icon>
                             </button>
                         </smd-fab-actions>

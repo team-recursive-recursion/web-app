@@ -17,6 +17,13 @@ export class EmptyClass {
     str: string;
 }
 
+export enum ModelState {
+    CREATED = 0,
+    UPDATED,
+    DELETED,
+    UNCHANGED
+}
+
 export enum Call_t {
     C_COURSES_LOAD = 0,
 
@@ -34,22 +41,11 @@ export enum Call_t {
     C_ELEMENT_DELETE
 }
 
-export enum State_t {
-    S_NEW = 0,
-    S_UPDATE,
-    S_DELETE,
-    S_NONE
-}
-
-export enum Element_t {
-    E_POLY = 0,
-    E_POINT
-}
-
 export enum Point_t {
     P_PIN =0,
     P_HOLE,
-    P_TEE
+    P_TEE,
+    P_LOCATION
 }
 
 export enum Polygon_t {

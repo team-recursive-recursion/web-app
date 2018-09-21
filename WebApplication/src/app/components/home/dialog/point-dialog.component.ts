@@ -1,12 +1,12 @@
 /***
- * Filename: home.component.ts
+ * Filename: point-dialog.component.ts
  * Author  : Duncan Tilley
  * Class   : PointDialog / <point-dialog>
  ***/
 
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Point_t } from '../../interfaces/enum.interface';
+import { Point_t } from '../../../interfaces/enum.interface';
 
 @Component({
     selector: 'point-dialog',

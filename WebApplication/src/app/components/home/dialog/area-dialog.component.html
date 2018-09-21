@@ -1,16 +1,16 @@
 <!--
-    Filename: polygon-dialog.component.html
+    Filename: area-dialog.component.html
     Author  : Duncan Tilley
 
         The template for the polygon element dialog.
 -->
 
 <div role="dialog">
-    <h2 mat-dialog-title>Polygon Properties</h2>
+    <h2 mat-dialog-title>Area Properties</h2>
     <mat-dialog-content>
         <mat-select [(value)]="polyType">
             <mat-option [value]="-1">
-                Polygon Type
+                Area Type
             </mat-option>
             <mat-option *ngFor="let t of terrainTypes; let i = index" [value]="i">
                 {{t.typeName}}
