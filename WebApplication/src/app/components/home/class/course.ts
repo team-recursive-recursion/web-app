@@ -94,6 +94,24 @@ export class Course {
     }
 
     /***
+     * removeElement(Element) : void
+     *
+     *     Removes the given element from the hole.
+     ***/
+    public removeElement(e: Element) {
+        // find the element to remove from the list
+        var i = 0;
+        var done = false;
+        while (!done && i < this.elements.length) {
+            if (this.elements[i] == e) {
+                this.elements.splice(i, 1);
+                done = true;
+            }
+            ++i;
+        }
+    }
+
+    /***
      * getHole(number) : Hole
      *
      *     Returns the hole at the given index.
@@ -123,6 +141,24 @@ export class Course {
         hole.setInfo(info);
         this.holes.push(hole);
         return this.holes.length - 1;
+    }
+
+    /***
+     * removeHole(Hole) : void
+     *
+     *     Removes the given hole from the course.
+     ***/
+    public removeHole(h: Hole) {
+        // find the hole to remove from the list
+        var i = 0;
+        var done = false;
+        while (!done && i < this.holes.length) {
+            if (this.holes[i] == h) {
+                this.holes.splice(i, 1);
+                done = true;
+            }
+            ++i;
+        }
     }
 
     /***

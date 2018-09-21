@@ -79,10 +79,11 @@
                                 <mat-radio-button class="hole-radio-button" [value]="-1">
                                     Course
                                 </mat-radio-button>
-                                <mat-radio-button class="hole-radio-button"
-                                        *ngFor="let h of courseManager.activeCourse.holes; let i = index" [value]="i">
-                                    {{h.name}}
-                                </mat-radio-button>
+                                <ng-container *ngFor="let h of courseManager.activeCourse.holes; let i = index">
+                                    <mat-radio-button *ngIf="h.isVisible()" class="hole-radio-button" [value]="i">
+                                        {{h.name}}
+                                    </mat-radio-button>
+                                </ng-container>
                             </mat-radio-group>
                         </div>
 
@@ -92,12 +93,12 @@
                                 <button mat-icon-button (click)="onCreateHole()">
                                     <mat-icon>add_circle</mat-icon>
                                 </button>
-                                <button mat-icon-button [disabled]="holeIndex == -1" (click)="onEditHole()">
+                                <!--button mat-icon-button [disabled]="holeIndex == -1" (click)="onEditHole()">
                                     <mat-icon>edit</mat-icon>
                                 </button>
                                 <button mat-icon-button [disabled]="holeIndex == -1" (click)="onDeleteHole()">
                                     <mat-icon>delete</mat-icon>
-                                </button>
+                                </button-->
                             </mat-list-item>
                         </mat-list>
                     </mat-card>

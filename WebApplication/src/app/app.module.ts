@@ -18,7 +18,6 @@ import { CourseDialog } from './components/home/dialog/course-dialog.component';
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
 import { SocketService } from './services/socket/socket.service';
-import { LocationService } from './services/location/location.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
@@ -140,8 +139,7 @@ import {
         GoogleMapsAPIWrapper,
         ApiService,
         GlobalsService,
-        SocketService,
-        LocationService
+        SocketService
     ],
     entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog],
     bootstrap: [AppComponent]

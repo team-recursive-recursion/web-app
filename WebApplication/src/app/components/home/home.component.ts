@@ -18,7 +18,6 @@ import { element } from 'protractor';
 
 import { ApiService } from '../../services/api/api.service';
 import { GlobalsService } from '../../services/globals/globals.service';
-import { LocationService } from '../../services/location/location.service';
 import { LIVE_ANNOUNCER_ELEMENT_TOKEN } from '@angular/cdk/a11y';
 import { AreaDialog } from './dialog/area-dialog.component';
 import { PointDialog } from './dialog/point-dialog.component';
@@ -202,25 +201,6 @@ export class HomeComponent {
                 console.log(body);
             }
         );
-        // delete removed elements
-        /*this.removedFeatures.forEach(feature => {
-            var http;
-            if (feature.getProperty("elementType") == Element_t.E_POLY) {
-                // delete the polygon
-                http = this.api.polygonDelete(feature.getProperty("elementId"));
-            } else {
-                // delete the point
-                http = this.api.pointDelete(feature.getProperty("elementId"));
-            }
-            http.subscribe(
-                result => this.onResult(result.headers,
-                    result.json(),
-                    Call_t.C_ELEMENT_DELETE, feature),
-                error => this.onFail(error.status,
-                    error.headers, error.text(),
-                    Call_t.C_ELEMENT_DELETE),
-                () => console.log("Element deleted successfully")
-            );*/
     }
 
     /***
@@ -352,12 +332,13 @@ export class HomeComponent {
     /***
      * onDeleteHole(): void
      *
-     *     Function that removes an existing hole using the API.
-     *     On success, call onResult.
-     *     On failure, call onFail.
+     *     Event listener for deleting the current hole.
      ***/
     public onDeleteHole() {
-        // TODO
+        if (this.holeIndex >= 0) {
+            var h = this.courseManager.activeCourse.getHole(this.holeIndex);
+            h.delete();
+        }
     }
 
     /***
@@ -376,6 +357,20 @@ export class HomeComponent {
     }
 
     /***
+     * onDeleteElement(): void
+     *
+     *     Event listener for deleting the selected feature.
+     */
+    public onDeleteElement() {
+        if (this.selectedFeature != null) {
+            this.map.removeFeature(this.selectedFeature);
+            var el: Element = this.selectedFeature.getProperty('element');
+            el.delete();
+            this.unselectFeature();
+        }
+    }
+
+    /***
      * onViewModeSwitch(): void
      *
      *     Event handler for switching between editing mode and live view mode.
@@ -383,23 +378,6 @@ export class HomeComponent {
     public onViewModeSwitch() {
         this.updateViewMode();
     }
-
-    /***
-     * onDeleteElement(): void
-     *
-     *     Deletes the currently selected feature and adds it to the remove
-     *     list.
-     */
-    /*public onDeleteElement() {
-        if (this.selectedFeature != null) {
-            this.googleMap.data.remove(this.selectedFeature);
-            if (this.selectedFeature.getProperty("state") != State_t.S_NEW) {
-                this.removedFeatures.push(this.selectedFeature);
-                this.selectedFeature.setProperty("state", State_t.S_DELETE);
-            }
-            this.removeSelectedFeature();
-        }
-    }*/
 
     /***************************************************************************
      * Map event handlers

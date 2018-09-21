@@ -112,6 +112,20 @@ export abstract class Element {
     }
 
     /***
+     * delete() : void
+     *
+     *     Flags the element for deletion and clears it from the coures/hole.
+     ***/
+    public delete() {
+        if (this.state != ModelState.CREATED) {
+            this.state = ModelState.DELETED;
+        } else {
+            // new element, remove it from the parent
+            this.removeFromParent();
+        }
+    }
+
+    /***
      * getElementType() : ElementType
      *
      *     Returns the type of the element to determine the specific subclass.
@@ -128,6 +142,21 @@ export abstract class Element {
      ***/
     public abstract sync(api: ApiService, callDone: Function,
             callFail: Function);
+
+    /***
+     * removeFromParent()
+     *
+     *     Removes the current element from it's parent hole or course.
+     ***/
+    protected removeFromParent() {
+        if (this.hole != null) {
+            // remove from the hole
+            this.hole.removeElement(this);
+        } else {
+            // remove from the course
+            this.course.removeElement(this);
+        }
+    }
 
 }
 
@@ -222,9 +251,22 @@ export class Point extends Element {
                     );
                 break;
 
-            case ModelState.DELETED:
-                // TODO
-                break;
+                case ModelState.DELETED:
+                    api.pointDelete(this.getId())
+                        .subscribe(
+
+                        result => {
+                            this.removeFromParent();
+                        },
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Area deleted successfully")
+
+                    );
+                    break;
 
             default:
                 callDone();
@@ -312,8 +354,22 @@ export class Area extends Element {
 
                     );
                 break;
+
             case ModelState.DELETED:
-                // TODO
+                api.polygonDelete(this.getId())
+                    .subscribe(
+
+                    result => {
+                        this.removeFromParent();
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Area deleted successfully")
+
+                );
                 break;
 
             default:

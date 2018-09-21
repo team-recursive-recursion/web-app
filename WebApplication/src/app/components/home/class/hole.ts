@@ -80,13 +80,35 @@ export class Hole {
         return this.elements;
     }
 
+    public isVisible() : boolean {
+        return this.state != ModelState.DELETED;
+    }
+
     /***
      * addElement(Element) : void
      *
-     *     Adds a element to the course.
+     *     Adds a element to the hole.
      ***/
     public addElement(e: Element) {
         this.elements.push(e);
+    }
+
+    /***
+     * removeElement(Element) : void
+     *
+     *     Removes the given element from the hole.
+     ***/
+    public removeElement(e: Element) {
+        // find the element to remove from the list
+        var i = 0;
+        var done = false;
+        while (!done && i < this.elements.length) {
+            if (this.elements[i] == e) {
+                this.elements.splice(i, 1);
+                done = true;
+            }
+            ++i;
+        }
     }
 
     /***
@@ -96,6 +118,20 @@ export class Hole {
      ***/
     public asFeatures() : Array<any> {
         return ElementFactory.createFeatures(this.elements);
+    }
+
+    /***
+     * delete() : void
+     *
+     *     Flags the hole for deletion and clears it from the coures.
+     ***/
+    public delete() {
+        if (this.state != ModelState.CREATED) {
+            this.state = ModelState.DELETED;
+        } else {
+            // new hole, remove it from the course
+            this.course.removeHole(this);
+        }
     }
 
     /***
@@ -125,12 +161,35 @@ export class Hole {
                         () => console.log("Hole created successfully")
                     );
                 break;
+
             case ModelState.UPDATED:
                 // TODO
                 break;
+
             case ModelState.DELETED:
-                // TODO
+                // delete all children
+                this.elements.forEach(e => {
+                    e.delete();
+                });
+                this.syncElements(api, () => {
+                    // delete hole
+                    api.holeDelete(this.getId())
+                        .subscribe(
+
+                        result => {
+                            this.course.removeHole(this);
+                        },
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Hole deleted successfully")
+
+                    );
+                });
                 break;
+
             default:
                 this.syncElements(api, callDone);
         }
