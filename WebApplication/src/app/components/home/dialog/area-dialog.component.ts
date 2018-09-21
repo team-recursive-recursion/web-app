@@ -1,30 +1,30 @@
 /***
- * Filename: polygon-dialog.component.ts
+ * Filename: area-dialog.component.ts
  * Author  : Duncan Tilley
- * Class   : PolygonDialog / <polygon-dialog>
+ * Class   : AreaDialog / <polygon-dialog>
  ***/
 
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Polygon_t } from '../../../interfaces/enum.interface';
+import { AreaType } from '../class/element';
 
 @Component({
-    selector: 'polygon-dialog',
-    templateUrl: './polygon-dialog.component.html'
+    selector: 'area-dialog',
+    templateUrl: './area-dialog.component.html'
 })
-export class PolygonDialog {
+export class AreaDialog {
 
     terrainTypes = [
-        { "typeName": 'Rough', "ttype": Polygon_t.P_ROUGH },
-        { "typeName": 'Fairway', "ttype": Polygon_t.P_FAIR },
-        { "typeName": 'Green', "ttype": Polygon_t.P_GREEN },
-        { "typeName": 'Bunker', "ttype": Polygon_t.P_BUNKER },
-        { "typeName": 'Water Hazard', "ttype": Polygon_t.P_WATER }
+        { "typeName": 'Rough', "ttype": AreaType.ROUGH },
+        { "typeName": 'Fairway', "ttype": AreaType.FAIR },
+        { "typeName": 'Green', "ttype": AreaType.GREEN },
+        { "typeName": 'Bunker', "ttype": AreaType.BUNKER },
+        { "typeName": 'Water Hazard', "ttype": AreaType.WATER }
     ];
 
     public polyType: number = -1;
 
-    constructor(public dialogRef: MatDialogRef<PolygonDialog>,
+    constructor(public dialogRef: MatDialogRef<AreaDialog>,
             @Inject(MAT_DIALOG_DATA) public data: any)
     {}
 

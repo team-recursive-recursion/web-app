@@ -10,7 +10,7 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegisterComponent } from './components/register/register.component';
-import { PolygonDialog } from './components/home/dialog/polygon-dialog.component';
+import { AreaDialog } from './components/home/dialog/area-dialog.component';
 import { PointDialog } from './components/home/dialog/point-dialog.component';
 import { HoleDialog } from './components/home/dialog/hole-dialog.component';
 import { CourseDialog } from './components/home/dialog/course-dialog.component';
@@ -18,7 +18,6 @@ import { CourseDialog } from './components/home/dialog/course-dialog.component';
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
 import { SocketService } from './services/socket/socket.service';
-import { LocationService } from './services/location/location.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
@@ -74,7 +73,7 @@ import {
         LoginComponent,
         RegisterComponent,
         HomeComponent,
-        PolygonDialog,
+        AreaDialog,
         PointDialog,
         HoleDialog,
         CourseDialog,
@@ -140,10 +139,9 @@ import {
         GoogleMapsAPIWrapper,
         ApiService,
         GlobalsService,
-        SocketService,
-        LocationService
+        SocketService
     ],
-    entryComponents: [PolygonDialog, PointDialog, HoleDialog, CourseDialog],
+    entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

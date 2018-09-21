@@ -45,6 +45,7 @@ export class LoginComponent {
 
     onRequestReceive(headers: any, body: any) {
         this.globals.setUid(body.userID);
+        this.api.setBearerToken(body.token);
         this.router.navigateByUrl("/mapper");
     }
 

@@ -8,15 +8,18 @@
  ***/
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Headers, RequestOptions } from '@angular/http';
+import { AreaType, PointType, ElementType } from '../../components/home/class/element';
 
 @Injectable()
 export class ApiService {
 
     url: string;
+    token: string;
 
     constructor(private http: Http) {
         this.url = "http://localhost:5001";
+        this.token = "";
     }
 
     /***
@@ -33,10 +36,32 @@ export class ApiService {
     }
 
     /***
+     * setBearerToken(string)
+     *
+     *     Sets the bearer token for authorization.
+     ***/
+    public setBearerToken(token: string) {
+        this.token = token;
+    }
+
+    /***
+     * createHeaders(): RequestOptions
+     *
+     *     Creates request headers for authorization.
+     ***/
+    private createHeaders() : RequestOptions {
+        let headers = new Headers();
+        headers.append('Authorization', 'Bearer ' + this.token);
+        let opts = new RequestOptions();
+        opts.headers = headers;
+        return opts;
+    }
+
+    /***
      * API calls: users
      ***/
 
-    usersMatch(email: string, password: string) {
+    public usersMatch(email: string, password: string) {
         var url = this.url + "/api/users/match";
         var SHA256 = require("crypto-js/sha256");
         password = SHA256(password).toString();
@@ -45,7 +70,7 @@ export class ApiService {
         );
     }
 
-    usersCreate(email: string, firstname: string, lastname: string,
+    public usersCreate(email: string, firstname: string, lastname: string,
             password: string) {
         var url = this.url + "/api/users";
         var SHA256 = require("crypto-js/sha256");
@@ -65,65 +90,67 @@ export class ApiService {
         return this.http.get(url);
     }
 
-    coursesCreate(uid: string, name: string, info: string) {
+    public coursesCreate(uid: string, name: string, info: string) {
         var url = this.url + "/api/users/" + uid + "/courses";
         return this.http.post(url,
             {
                 "CourseName": name,
                 "Info": info
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    courseGet(cid: string) {
+    public courseGet(cid: string) {
         var url = this.url + "/api/courses/" + cid;
         return this.http.get(url);
     }
 
-    courseDelete(cid: string) {
+    public courseDelete(cid: string) {
         var url = this.url + "/api/courses/" + cid;
-        return this.http.delete(url);
+        return this.http.delete(url, this.createHeaders());
     }
 
     /***
      * API calls: holes
      ***/
 
-    holesGet(cid: string) {
+    public holesGet(cid: string) {
         var url = this.url + "/api/courses/" + cid + "/holes";
         return this.http.get(url);
     }
 
-    holesCreate(cid: string, name: string, info: string) {
+    public holesCreate(cid: string, name: string, info: string) {
         var url = this.url + "/api/courses/" + cid + "/holes";
         return this.http.post(url,
             {
                 "Name": name,
                 "Info": info
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    holeGet(hid: string) {
+    public holeGet(hid: string) {
         var url = this.url + "/api/holes/" + hid;
-        return this.http.get(url);
+        return this.http.get(url, this.createHeaders());
     }
 
-    holeDelete(hid: string) {
+    public holeDelete(hid: string) {
         var url = this.url + "/api/holes/" + hid;
-        return this.http.delete(url);
+        return this.http.delete(url, this.createHeaders());
     }
 
     /***
      * API calls: elements
      ***/
 
-    courseGetElements(cid: string) {
+    public courseGetElements(cid: string) {
         var url = this.url + "/api/courses/" + cid + "/elements";
         return this.http.get(url);
     }
 
-    holeGetElements(hid: string) {
+    public holeGetElements(hid: string) {
         var url = this.url + "/api/holes/" + hid + "/elements";
         return this.http.get(url);
     }
@@ -132,12 +159,12 @@ export class ApiService {
      * API calls: points
      ***/
 
-    courseGetPoints(cid: string) {
+    public courseGetPoints(cid: string) {
         var url = this.url + "/api/courses/" + cid + "/points";
         return this.http.get(url);
     }
 
-    courseCreatePoint(cid: string, type: number, info: string,
+    public courseCreatePoint(cid: string, type: number, info: string,
             geoJson: string) {
         var url = this.url + "/api/courses/" + cid + "/points";
         return this.http.post(url,
@@ -145,47 +172,52 @@ export class ApiService {
                 "PointType": type,
                 "Info": info,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    holeGetPoints(hid: string) {
+    public holeGetPoints(hid: string) {
         var url = this.url + "/api/holes/" + hid + "/points";
         return this.http.get(url);
     }
 
-    holeCreatePoint(hid: string, type: number, info: string, geoJson: string) {
+    public holeCreatePoint(hid: string, type: number, info: string, geoJson: string) {
         var url = this.url + "/api/holes/" + hid + "/points";
         return this.http.post(url,
             {
                 "PointType": type,
                 "Info": info,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    pointGet(eid: string) {
+    public pointGet(eid: string) {
         var url = this.url + "/api/points/" + eid;
         return this.http.get(url);
     }
 
-    pointDelete(eid: string) {
+    public pointDelete(eid: string) {
         var url = this.url + "/api/points/" + eid;
-        return this.http.delete(url);
+        return this.http.delete(url, this.createHeaders());
     }
 
-    pointUpdate(eid: string, geoJson: string, properties: any) {
+    public pointUpdate(eid: string, geoJson: string, holeId: string,
+            courseId: string, type: PointType, info: string) {
         var url = this.url + "/api/points/" + eid;
         return this.http.put(url,
             {
+                "ElementType": ElementType.POINT,
                 "ElementId": eid,
-                "HoleId": properties.holeId,
-                "CourseId": properties.courseId,
-                "PointType": properties.pointType,
-                "Info": properties.info,
+                "HoleId": holeId,
+                "CourseId": courseId,
+                "PointType": type,
+                "Info": info,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
     }
 
@@ -193,57 +225,71 @@ export class ApiService {
      * API calls: polygons
      ***/
 
-    courseGetPolygons(cid: string) {
+    public courseGetPolygons(cid: string) {
         var url = this.url + "/api/courses/" + cid + "/polygons";
         return this.http.get(url);
     }
 
-    courseCreatePolygon(cid: string, type: number, geoJson: string) {
+    public courseCreatePolygon(cid: string, type: number, geoJson: string) {
         var url = this.url + "/api/courses/" + cid + "/polygons";
         return this.http.post(url,
             {
                 "PolygonType": type,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    holeGetPolygons(hid: string) {
+    public holeGetPolygons(hid: string) {
         var url = this.url + "/api/holes/" + hid + "/polygons";
         return this.http.get(url);
     }
 
-    holeCreatePolygon(hid: string, type: number, geoJson: string) {
+    public holeCreatePolygon(hid: string, type: number, geoJson: string) {
         var url = this.url + "/api/holes/" + hid + "/polygons";
         return this.http.post(url,
             {
                 "PolygonType": type,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
     }
 
-    polygonGet(eid: string) {
+    public polygonGet(eid: string) {
         var url = this.url + "/api/polygons/" + eid;
         return this.http.get(url);
     }
 
-    polygonDelete(eid: string) {
+    public polygonDelete(eid: string) {
         var url = this.url + "/api/polygons/" + eid;
-        return this.http.delete(url);
+        return this.http.delete(url, this.createHeaders());
     }
 
-    polygonUpdate(eid: string, geoJson: string, properties: any) {
+    public polygonUpdate(eid: string, geoJson: string, holeId: string,
+            courseId: string, type: AreaType) {
         var url = this.url + "/api/polygons/" + eid;
         return this.http.put(url,
             {
+                "ElementType": ElementType.AREA,
                 "ElementId": eid,
-                "HoleId": properties.holeId,
-                "CourseId": properties.courseId,
-                "PolygonType": properties.polygonType,
+                "HoleId": holeId,
+                "CourseId": courseId,
+                "PolygonType": type,
                 "GeoJson": geoJson
-            }
+            },
+            this.createHeaders()
         );
+    }
+
+    /***
+     * API calls: live location
+     ***/
+
+    public liveLocationsGet(cid: string) {
+        var url = this.url + "/api/courses/test/" + cid;
+        return this.http.get(url);
     }
 
 }
