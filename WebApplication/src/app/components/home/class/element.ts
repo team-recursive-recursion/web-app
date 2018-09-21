@@ -10,6 +10,8 @@
 
 import { ApiService } from '../../../services/api/api.service';
 import { ModelState } from '../../../interfaces/enum.interface';
+import { Course } from './course';
+import { Hole } from './hole';
 
 export enum ElementType {
     AREA = 0,
@@ -40,22 +42,26 @@ export abstract class Element {
     private state: ModelState;
     private id: string;
 
+    private course: Course;
+    private hole: Hole;
+
     public selected: boolean;
     public enabled: boolean;
     public editable: boolean;
 
     public geometry: any;
-    public courseId: string = null;
-    public holeId: string = null;
 
     /***
      * constructor(boolean, boolean)
      *
      *     Creates the element as new.
      ***/
-    constructor(state: ModelState, enabled: boolean, editable: boolean) {
+    constructor(state: ModelState, course: Course, hole: Hole,
+                enabled: boolean, editable: boolean) {
         this.state = state;
         this.id = "";
+        this.course = course;
+        this.hole = hole;
         this.enabled = enabled;
         this.editable = editable;
         this.selected = false;
@@ -82,6 +88,26 @@ export abstract class Element {
             this.id = id;
         } else {
             console.log("Cannot change existing element ID");
+        }
+    }
+
+    public getCourse() : Course {
+        return this.course;
+    }
+
+    public getHole() : Hole {
+        return this.hole;
+    }
+
+    public getCourseId() : string {
+        return this.course.getId();
+    }
+
+    public getHoleId() : string {
+        if (this.hole != null) {
+            return this.hole.getId();
+        } else {
+            return null;
         }
     }
 
@@ -114,9 +140,9 @@ export class Point extends Element {
     private type: PointType;
     private info: string;
 
-    public constructor(state: ModelState, enabled: boolean, editable: boolean,
-            type: PointType) {
-        super(state, enabled, editable);
+    public constructor(state: ModelState, course: Course, hole: Hole,
+            enabled: boolean, editable: boolean, type: PointType) {
+        super(state, course, hole, enabled, editable);
         this.type = type;
         this.info = "";
     }
@@ -154,12 +180,13 @@ export class Point extends Element {
         switch (this.getState()) {
             case ModelState.CREATED:
                 var call;
-                if (this.holeId != null) {
-                    call = api.holeCreatePoint(this.holeId, this.type,
+                if (this.getHole() != null) {
+                    call = api.holeCreatePoint(this.getHoleId(), this.type,
                             this.info, JSON.stringify(this.geometry));
                 } else {
-                    call = api.courseCreatePoint(this.courseId, this.type,
-                            this.info, JSON.stringify(this.geometry));
+                    call = api.courseCreatePoint(this.getCourseId(),
+                            this.type, this.info,
+                            JSON.stringify(this.geometry));
                 }
                 call.subscribe(
 
@@ -180,7 +207,8 @@ export class Point extends Element {
 
             case ModelState.UPDATED:
                 api.pointUpdate(this.getId(), JSON.stringify(this.geometry),
-                        this.holeId, this.courseId, this.type, this.info)
+                        this.getHoleId(), this.getCourseId(),
+                        this.type, this.info)
                     .subscribe(
 
                         result => {},
@@ -214,9 +242,9 @@ export class Area extends Element {
 
     private type: AreaType;
 
-    public constructor(state: ModelState, enabled: boolean, editable: boolean,
-            type: AreaType) {
-        super(state, enabled, editable);
+    public constructor(state: ModelState, course: Course, hole: Hole,
+            enabled: boolean, editable: boolean, type: AreaType) {
+        super(state, course, hole, enabled, editable);
         this.type = type;
     }
 
@@ -245,12 +273,12 @@ export class Area extends Element {
         switch (this.getState()) {
             case ModelState.CREATED:
                 var call;
-                if (this.holeId != null) {
-                    call = api.holeCreatePolygon(this.holeId, this.type,
-                            JSON.stringify(this.geometry));
+                if (this.getHole() != null) {
+                    call = api.holeCreatePolygon(this.getHoleId(),
+                            this.type, JSON.stringify(this.geometry));
                 } else {
-                    call = api.courseCreatePolygon(this.courseId, this.type,
-                            JSON.stringify(this.geometry));
+                    call = api.courseCreatePolygon(this.getCourseId(),
+                            this.type, JSON.stringify(this.geometry));
                 }
                 call.subscribe(
 
@@ -271,7 +299,7 @@ export class Area extends Element {
                 break;
             case ModelState.UPDATED:
                 api.polygonUpdate(this.getId(), JSON.stringify(this.geometry),
-                    this.holeId, this.courseId, this.type)
+                    this.getHoleId(), this.getCourseId(), this.type)
                     .subscribe(
 
                         result => {},

@@ -20,8 +20,8 @@ export class ElementFactory {
      *     Produces an array of elements from raw JSON received from the Mapper
      *     API.
      ***/
-    public static parseElementArray(json: Array<any>, enabled: boolean,
-            editable: boolean) : Array<Element> {
+    public static parseElementArray(json: Array<any>, course: Course,
+            hole: Hole, enabled: boolean, editable: boolean) : Array<Element> {
         var elements: Array<Element> = [];
 
         if (json !== undefined && json !== null) {
@@ -29,18 +29,16 @@ export class ElementFactory {
                 var element: Element;
                 if (e.elementType == ElementType.POINT) {
                     // create the point element
-                    element = new Point(ModelState.UNCHANGED, enabled, editable,
-                            e.pointType);
+                    element = new Point(ModelState.UNCHANGED, course,hole,
+                            enabled, editable, e.pointType);
                     (<Point> element).setInfo(e.info);
                 } else if (e.elementType == ElementType.AREA) {
                     // create the area element
-                    element = new Area(ModelState.UNCHANGED, enabled, editable,
-                            e.polygonType);
+                    element = new Area(ModelState.UNCHANGED, course, hole,
+                            enabled, editable, e.polygonType);
                 }
                 // add element properties
                 element.setId(e.elementId);
-                element.courseId = e.courseId;
-                element.holeId = e.holeId;
                 element.geometry = JSON.parse(e.geoJson);
                 elements.push(element);
             });
@@ -84,16 +82,11 @@ export class ElementFactory {
     public static parsePoint(feature: any, enabled: boolean, editable: boolean,
             type: PointType, info: string, course: Course, hole: Hole) {
         // create element
-        var point = new Point(ModelState.CREATED, enabled, editable, type);
+        var point = new Point(ModelState.CREATED, course, hole, enabled,
+                editable, type);
         point.setInfo(info);
         point.geometry = ElementFactory.toGeoJson(ElementType.POINT,
                 feature.getGeometry());
-        point.courseId = course.getId();
-        if (hole != null) {
-            point.holeId = hole.getId();
-        } else {
-            point.holeId = null;
-        }
         // set feature properties
         feature.setProperty("elementType", ElementType.POINT);
         feature.setProperty("element", point);
@@ -109,15 +102,10 @@ export class ElementFactory {
     public static parseArea(feature: any, enabled: boolean, editable: boolean,
             type: AreaType, course: Course, hole: Hole) {
         // create element
-        var area = new Area(ModelState.CREATED, enabled, editable, type);
+        var area = new Area(ModelState.CREATED, course, hole, enabled, editable,
+                type);
         area.geometry = ElementFactory.toGeoJson(ElementType.AREA,
                 feature.getGeometry());
-        area.courseId = course.getId();
-        if (hole != null) {
-            area.holeId = hole.getId();
-        } else {
-            area.holeId = null;
-        }
         // set feature properties
         feature.setProperty("elementType", ElementType.AREA);
         feature.setProperty("element", area);

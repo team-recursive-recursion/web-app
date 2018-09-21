@@ -72,8 +72,8 @@ export class LiveLocation {
                 // create point elements
                 var locations = [];
                 positions.forEach(p => {
-                    var point = new Point(ModelState.UNCHANGED, true, false,
-                            PointType.LIVE);
+                    var point = new Point(ModelState.UNCHANGED, null, null,
+                            true, false, PointType.LIVE);
                     point.geometry = JSON.parse(p.geoJson);
                     locations.push(point);
                 });

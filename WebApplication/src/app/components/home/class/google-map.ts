@@ -87,8 +87,8 @@ export class GoogleMap {
     public displayHole(h: Hole) {
         var id = (h != null) ? h.getId() : null;
         this.map.data.forEach(feature => {
-            var el = feature.getProperty('element');
-            el.enabled = (el.holeId == id);
+            var el: Element = feature.getProperty('element');
+            el.enabled = (el.getHole() == h);
             // force feature update
             feature.setProperty("update", false);
         });

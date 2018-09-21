@@ -80,6 +80,10 @@ export class Course {
         return this.elements;
     }
 
+    public getHoles() : Array<Hole> {
+        return this.holes;
+    }
+
     /***
      * addElement(Element) : void
      *
@@ -210,7 +214,7 @@ export class Course {
 
                         // parse the elements
                         this.elements = ElementFactory.parseElementArray(
-                                body.elements, true, false);
+                                body.elements, this, null, true, false);
 
                         // load holes
                         var numH = 0;

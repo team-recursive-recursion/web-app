@@ -114,9 +114,6 @@ export class Hole {
                             // save the new ID
                             var id = result.json().holeId;
                             this.setId(id);
-                            this.elements.forEach(e => {
-                                e.holeId = id;
-                            });
                             this.setState(ModelState.UNCHANGED);
                             this.syncElements(api, callDone);
                         },
@@ -173,7 +170,8 @@ export class Hole {
                     result => {
                             // parse elements
                             this.elements = ElementFactory.parseElementArray(
-                                result.json().elements, false, false);
+                                result.json().elements, this.course, this,
+                                false, false);
                             callDone();
                     },
 

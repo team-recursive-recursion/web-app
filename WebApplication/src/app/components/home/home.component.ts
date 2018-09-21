@@ -140,9 +140,9 @@ export class HomeComponent {
         this.mobileQuery.removeListener(this._mobileQueryListener);
     }
 
-    /***
+    /***************************************************************************
      * UI EVENT HANDLERS
-     ***/
+     **************************************************************************/
 
     /***
      * onSelectCourse(number) : void
@@ -317,7 +317,9 @@ export class HomeComponent {
      ***/
     public onCreateHole() {
         // bring up the hole dialog
-        const dialogRef = this.dialog.open(HoleDialog);
+        const dialogRef = this.dialog.open(HoleDialog, {
+            data : this.courseManager.activeCourse.getHoles()
+        });
         dialogRef.afterClosed().subscribe(result => {
             if (result.done) {
                 // create hole
@@ -573,122 +575,5 @@ export class HomeComponent {
             this.map.setEditable(true);
         }
     }
-
-    /***************************************************************************
-     * Display and data updating
-     **************************************************************************/
-
-    /*private addDummyPoints(){
-        this.locationPoints[1]={
-            "type": "Feature",
-            "geometry": {
-                "type":"Point",
-                "coordinates":[-25.658712, 28.140347]
-            },
-            "properties": {
-                "state": State_t.S_NONE,
-                "pointType": Point_t.P_LOCATION,
-                "elementType": null,
-                "elementId": null,
-                "courseId": null,
-                "holeId": null,
-                "enabled": true,
-                "editable": !this.viewMode,
-                "selected": false
-            }
-        };
-
-    }*/
-    /***
-     * displayCourse(): void
-     *
-     *     Reset the map to display all the elements
-     ***/
-    /*private displayCourse() {
-        //this.addDummyPoints();
-
-        // add the course elements
-        let features: any = [...this.generateFeature(this.currentCourse
-            .elements)];
-        // add all the holes' elements
-        this.holes.forEach(hole => {
-            features = [
-                ...features,
-                ...this.generateFeature(hole.elements, false)
-            ]
-        });
-        // display the elements
-        this.activeElements = {
-            "type": "FeatureCollection",
-            "features": [
-                ...features
-            ]
-        }
-        //this.updateDataLayer(this.showLocationPoints(this.locationPoints));
-        this.updateDataLayer(this.activeElements);
-    }*/
-
-    /***************************************************************************
-     * API response handlers.
-     **************************************************************************/
-
-    /***
-     * onResult(any, any, Call_t, any): void
-     *
-     *     Function to be called after each successful API call.
-     ***/
-    /*private onResult(headers: any, body: any, callType: Call_t,
-        feature: any = null) {
-        switch (callType) {
-            case Call_t.C_HOLE_LOAD:
-                this.holes.push(body);
-                if (this.holes.length === this.currentCourse.holes.length) {
-                    this.displayCourse();
-                }
-                break;
-            case Call_t.C_ELEMENT_CREATE:
-            case Call_t.C_ELEMENT_UPDATE:
-                if (body != null) {
-                    this.onElementSaved(body, feature);
-                }
-                break;
-        }
-        }*/
-
-    /**
-     *
-     * @param {Array<any>} collection
-     * @param {boolean} enabled
-     * @returns {Array<any>}
-     */
-    /*private showLocationPoints(collection: Array<any>, enabled: boolean = true){
-        let elements: Array<any> = [];
-        if (collection !== undefined && collection !== null) {
-            collection.forEach(
-                element =>{
-                let value;
-                value = {
-                    "type": "Feature",
-                    "geometry": {
-                        ...JSON.parse(element.geoJson)
-                    },
-                    "properties": {
-                        "state": State_t.S_NONE,
-                        "pointType": element['pointType'],
-                        "elementType": null,
-                        "elementId": null,
-                        "courseId": null,
-                        "holeId": null,
-                        "enabled": enabled,
-                        "editable": !this.viewMode,
-                        "selected": false
-                    }
-                };
-                    elements.push(value);
-                }
-            );
-        }
-        return elements;
-    }*/
 
 }
