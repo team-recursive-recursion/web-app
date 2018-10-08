@@ -239,11 +239,13 @@ export class Course {
                     result => {
                         let body = result.json();
                         // parse the holes
-                        let holes = body.holes;
+                        console.log("COURSE");
+                        console.log(body);
+                        let holes = body.innerZones;
                         for (var i = 0; i < holes.length; ++i) {
                             var hole = new Hole(this, ModelState.UNCHANGED);
-                            hole.setId(holes[i].holeId);
-                            hole.setName(holes[i].name);
+                            hole.setId(holes[i].zoneID);
+                            hole.setName(holes[i].zoneName);
                             hole.setInfo(holes[i].info);
                             this.holes.push(hole);
                         }

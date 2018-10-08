@@ -98,7 +98,7 @@ export class HomeComponent {
         this.mobileQuery = media.matchMedia('(max-width: 600px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
         this.mobileQuery.addListener(this._mobileQueryListener);
-        this.courseManager = new CourseManager(this.api, this.globals.getUid());
+        this.courseManager = new CourseManager(this.api);
     }
 
     /***
@@ -542,6 +542,7 @@ export class HomeComponent {
             // TODO ask to save first
             // disable editing of elements
             this.map.setEditable(false);
+            this.map.displayAll();
             // start live view
             this.liveLoc.start(this.courseManager.activeCourse, 10000);
         } else {
@@ -551,6 +552,7 @@ export class HomeComponent {
             this.map.clearLiveData();
             // enable editing of elements
             this.map.setEditable(true);
+            this.onSelectHole(this.holeIndex);
         }
     }
 

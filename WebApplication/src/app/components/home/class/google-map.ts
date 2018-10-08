@@ -95,6 +95,20 @@ export class GoogleMap {
     }
 
     /***
+     * displayAll(): void
+     *
+     *     Filters all elements to be shown.
+     ***/
+    public displayAll() {
+        this.map.data.forEach(feature => {
+            var el: Element = feature.getProperty('element');
+            el.enabled = true;
+            // force feature update
+            feature.setProperty("update", false);
+        });
+    }
+
+    /***
      * getDrawingMode() : DrawMode
      ***/
     public getDrawingMode() : DrawMode {
@@ -233,6 +247,9 @@ export class GoogleMap {
                             break;
                         case PointType.TEE:
                             icon = "./assets/tee.png";
+                            break;
+                        case PointType.LIVE:
+                            icon = "./assets/live.png";
                             break;
                         default:
                             icon = "";

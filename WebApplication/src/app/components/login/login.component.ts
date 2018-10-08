@@ -33,7 +33,6 @@ export class LoginComponent {
 
     onSubmit() {
         // verify the user login details
-        // TODO hash and possibly salt password
         this.api.usersMatch(this.email, this.password)
             .subscribe(
                 result => this.onRequestReceive(result.headers, result.json()),
@@ -51,7 +50,7 @@ export class LoginComponent {
 
     onRequestFail(status: number, headers: any, body: any) {
         // TODO nice message
-        window.alert(body);
+        window.alert(JSON.parse(body).message);
     }
 
 }

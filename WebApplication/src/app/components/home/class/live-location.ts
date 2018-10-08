@@ -61,13 +61,8 @@ export class LiveLocation {
         this.api.liveLocationsGet(cid).subscribe(
 
             result => {
-                // TODO real data
-                //var positions: Array<any> = result.json();
-                var positions = [
-                    {geoJson: "{\"type\":\"Point\",\"coordinates\":[28.13893321439582,-25.659578813076532]}"},
-                    {geoJson: "{\"type\":\"Point\",\"coordinates\":[28.1368947355445,-25.660323461397265]}"},
-                    {geoJson: "{\"type\":\"Point\",\"coordinates\":[28.13696983739692,-25.660845679523906]}"}
-                ];
+                console.log(result.json());
+                var positions: Array<any> = result.json();
 
                 // create point elements
                 var locations = [];

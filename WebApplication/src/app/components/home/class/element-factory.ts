@@ -29,13 +29,13 @@ export class ElementFactory {
                 var element: Element;
                 if (e.elementType == ElementType.POINT) {
                     // create the point element
-                    element = new Point(ModelState.UNCHANGED, course,hole,
-                            enabled, editable, e.pointType);
+                    element = new Point(ModelState.UNCHANGED, course, hole,
+                            enabled, editable, e.classType);
                     (<Point> element).setInfo(e.info);
                 } else if (e.elementType == ElementType.AREA) {
                     // create the area element
                     element = new Area(ModelState.UNCHANGED, course, hole,
-                            enabled, editable, e.polygonType);
+                            enabled, editable, e.classType);
                 }
                 // add element properties
                 element.setId(e.elementId);

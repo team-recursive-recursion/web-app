@@ -99,15 +99,11 @@ export abstract class Element {
         return this.hole;
     }
 
-    public getCourseId() : string {
-        return this.course.getId();
-    }
-
-    public getHoleId() : string {
+    public getParentId() : string {
         if (this.hole != null) {
             return this.hole.getId();
         } else {
-            return null;
+            return this.course.getId();
         }
     }
 
@@ -208,36 +204,28 @@ export class Point extends Element {
         // sync point
         switch (this.getState()) {
             case ModelState.CREATED:
-                var call;
-                if (this.getHole() != null) {
-                    call = api.holeCreatePoint(this.getHoleId(), this.type,
-                            this.info, JSON.stringify(this.geometry));
-                } else {
-                    call = api.courseCreatePoint(this.getCourseId(),
-                            this.type, this.info,
-                            JSON.stringify(this.geometry));
-                }
-                call.subscribe(
+                api.createPoint(this.getParentId(), this.type, this.info,
+                        JSON.stringify(this.geometry))
+                    .subscribe(
 
-                    result => {
-                        this.setId(result.json().elementId);
-                        this.setState(ModelState.UNCHANGED);
-                        callDone();
-                    },
+                        result => {
+                            this.setId(result.json().elementId);
+                            this.setState(ModelState.UNCHANGED);
+                            callDone();
+                        },
 
-                    error => {
-                        callFail(error.status, error.headers, error.text());
-                    },
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
 
-                    () => console.log("Point created successfully")
+                        () => console.log("Point created successfully")
 
-                );
+                    );
                 break;
 
             case ModelState.UPDATED:
                 api.pointUpdate(this.getId(), JSON.stringify(this.geometry),
-                        this.getHoleId(), this.getCourseId(),
-                        this.type, this.info)
+                        this.getParentId(), this.type, this.info)
                     .subscribe(
 
                         result => {},
@@ -314,34 +302,30 @@ export class Area extends Element {
         // sync area
         switch (this.getState()) {
             case ModelState.CREATED:
-                var call;
-                if (this.getHole() != null) {
-                    call = api.holeCreatePolygon(this.getHoleId(),
-                            this.type, JSON.stringify(this.geometry));
-                } else {
-                    call = api.courseCreatePolygon(this.getCourseId(),
-                            this.type, JSON.stringify(this.geometry));
-                }
-                call.subscribe(
+                api.createPolygon(this.getParentId(), this.type,
+                        JSON.stringify(this.geometry))
+                    .subscribe(
 
-                    result => {
-                        this.setId(result.json().elementId);
-                        this.setState(ModelState.UNCHANGED);
-                        callDone();
-                    },
+                        result => {
+                            this.setId(result.json().elementId);
+                            this.setState(ModelState.UNCHANGED);
+                            callDone();
+                        },
 
-                    error => {
-                        callFail(error.status, error.headers, error.text());
-                    },
+                        error => {
+                            console.log("ERROR");
+                            console.log(error);
+                            callFail(error.status, error.headers, error.text());
+                        },
 
-                    () => console.log("Area created successfully")
+                        () => console.log("Area created successfully")
 
-                );
+                    );
 
                 break;
             case ModelState.UPDATED:
                 api.polygonUpdate(this.getId(), JSON.stringify(this.geometry),
-                    this.getHoleId(), this.getCourseId(), this.type)
+                    this.getParentId(), this.type)
                     .subscribe(
 
                         result => {},
