@@ -5,9 +5,10 @@
  ***/
 
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ApiService } from 'src/app/services/api/api.service';
 import { GlobalsService } from 'src/app/services/globals/globals.service';
+import { InfoDialog, InfoType } from '../../info/info-dialog.component';
 
 @Component({
     selector: 'login-dialog',
@@ -21,6 +22,7 @@ export class LoginDialog {
     constructor(
         private api: ApiService,
         private globals: GlobalsService,
+        public dialog: MatDialog,
         public dialogRef: MatDialogRef<LoginDialog>,
         @Inject(MAT_DIALOG_DATA) public data: any)
     {}
@@ -41,7 +43,13 @@ export class LoginDialog {
 
                 error => {
                     var body = error.json();
-                    window.alert(body.message);
+                    if (body.message != undefined) {
+                        this.dialog.open(InfoDialog, {data: {
+                            message:body.message
+                        }});
+                    } else {
+                        this.dialog.open(InfoDialog);
+                    }
                 },
 
                 () => console.log("Login successful")

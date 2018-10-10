@@ -5,8 +5,9 @@
  ***/
 
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ApiService } from 'src/app/services/api/api.service';
+import { InfoDialog, InfoType } from '../../info/info-dialog.component';
 
 @Component({
     selector: 'register-dialog',
@@ -23,6 +24,7 @@ export class RegisterDialog {
     constructor(
         public dialogRef: MatDialogRef<RegisterDialog>,
         private api: ApiService,
+        public dialog: MatDialog,
         @Inject(MAT_DIALOG_DATA) public data: any)
     {}
 
@@ -37,21 +39,31 @@ export class RegisterDialog {
                 .subscribe(
 
                     result => {
-                        window.alert("Registration completed successfully!");
+                        this.dialog.open(InfoDialog, {data: {
+                            message: "Registration completed successfully",
+                            type: InfoType.SUCCESS
+                        }});
                         this.dialogRef.close({done: true});
                     },
 
                     error => {
                         var body = error.json();
-                        window.alert(body.message);
+                        if (body.message != undefined) {
+                            this.dialog.open(InfoDialog, {data: {
+                                message:body.message
+                            }});
+                        } else {
+                            this.dialog.open(InfoDialog);
+                        }
                     },
 
                     () => console.log("Registration successful")
 
                 );
         } else {
-            // TODO nice message or something
-            window.alert("Verification Failed");
+            this.dialog.open(InfoDialog, {data: {
+                message: "Verification failed"
+            }});
         }
     }
 

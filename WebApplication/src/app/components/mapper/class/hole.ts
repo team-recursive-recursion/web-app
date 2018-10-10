@@ -148,7 +148,7 @@ export class Hole {
                     .subscribe(
                         result => {
                             // save the new ID
-                            var id = result.json().holeId;
+                            var id = result.json().zoneID;
                             this.setId(id);
                             this.setState(ModelState.UNCHANGED);
                             this.syncElements(api, callDone);

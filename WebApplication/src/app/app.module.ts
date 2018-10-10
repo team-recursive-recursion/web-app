@@ -15,6 +15,7 @@ import { HoleDialog } from './components/mapper/dialog/hole-dialog.component';
 import { CourseDialog } from './components/mapper/dialog/course-dialog.component';
 import { LoginDialog } from './components/home/dialog/login-dialog.component';
 import { RegisterDialog } from './components/home/dialog/register-dialog.component';
+import { InfoDialog } from './components/info/info-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
@@ -79,6 +80,7 @@ import {
         CourseDialog,
         LoginDialog,
         RegisterDialog,
+        InfoDialog,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialActions,
         SmdFabSpeedDialTrigger
@@ -143,7 +145,7 @@ import {
         SocketService
     ],
     entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog,
-            LoginDialog, RegisterDialog],
+            LoginDialog, RegisterDialog, InfoDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,0 +1,21 @@
+<!--
+    Filename: info-dialog.component.html
+    Author  : Duncan Tilley
+
+        The template for the info dialog.
+-->
+
+<div role="dialog">
+
+    <h3 mat-dialog-title><mat-icon [style.color]="color">{{icon}}</mat-icon></h3>
+
+    <mat-list role="list">
+        <mat-list-item>
+            <span>{{message}}</span>
+        </mat-list-item>
+    </mat-list>
+
+    <mat-dialog-actions>
+        <button mat-button (click)="onOkClick()">OK</button>
+    </mat-dialog-actions>
+</div>
