@@ -163,7 +163,22 @@ export class Hole {
                 break;
 
             case ModelState.UPDATED:
-                // TODO
+                // update the info
+                api.holeUpdate(this.getId(), this.getName(), this.getInfo())
+                    .subscribe(
+
+                        result => {
+                            this.setState(ModelState.UNCHANGED);
+                        },
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Hole updated successfully")
+
+                    );
+                this.syncElements(api, callDone);
                 break;
 
             case ModelState.DELETED:
