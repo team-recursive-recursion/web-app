@@ -11,7 +11,7 @@ import { AgmMap, LatLngBounds } from '@agm/core';
 import { Course } from './course';
 import { Element, PointType, AreaType, ElementType, Area, Point } from './element';
 import { Hole } from './hole';
-import { HomeComponent } from '../home.component';
+import { MapperComponent } from '../mapper.component';
 
 export enum DrawMode {
     POINT, AREA, NONE
@@ -23,14 +23,14 @@ export class GoogleMap {
     private agmMap: AgmMap;
     private map: any;
     private mode: DrawMode = DrawMode.NONE;
-    private comp: HomeComponent;
+    private comp: MapperComponent;
 
     /***
      * constructor()
      *
      *     Sets up the Google map.
      ***/
-    public constructor(agmMap: AgmMap, comp: HomeComponent) {
+    public constructor(agmMap: AgmMap, comp: MapperComponent) {
         this.agmMap = agmMap;
         this.comp = comp;
         this.agmMap.mapReady.subscribe(map => {

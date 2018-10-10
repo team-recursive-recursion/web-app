@@ -7,13 +7,14 @@ import { AgmCoreModule, GoogleMapsAPIWrapper } from '@agm/core'
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
-import { LoginComponent } from './components/login/login.component';
+import { MapperComponent } from './components/mapper/mapper.component';
 import { HomeComponent } from './components/home/home.component';
-import { RegisterComponent } from './components/register/register.component';
-import { AreaDialog } from './components/home/dialog/area-dialog.component';
-import { PointDialog } from './components/home/dialog/point-dialog.component';
-import { HoleDialog } from './components/home/dialog/hole-dialog.component';
-import { CourseDialog } from './components/home/dialog/course-dialog.component';
+import { AreaDialog } from './components/mapper/dialog/area-dialog.component';
+import { PointDialog } from './components/mapper/dialog/point-dialog.component';
+import { HoleDialog } from './components/mapper/dialog/hole-dialog.component';
+import { CourseDialog } from './components/mapper/dialog/course-dialog.component';
+import { LoginDialog } from './components/home/dialog/login-dialog.component';
+import { RegisterDialog } from './components/home/dialog/register-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
@@ -70,13 +71,14 @@ import {
         NavComponent,
         ContentComponent,
         NavMenuComponent,
-        LoginComponent,
-        RegisterComponent,
         HomeComponent,
+        MapperComponent,
         AreaDialog,
         PointDialog,
         HoleDialog,
         CourseDialog,
+        LoginDialog,
+        RegisterDialog,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialActions,
         SmdFabSpeedDialTrigger
@@ -87,11 +89,10 @@ import {
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forRoot([
-            { path: '', redirectTo: 'login', pathMatch: 'full' },
-            { path: 'login', component: LoginComponent },
-            { path: 'mapper', component: HomeComponent },
-            { path: 'register', component: RegisterComponent },
-            { path: '**', redirectTo: 'login' }
+            { path: '', redirectTo: 'home', pathMatch: 'full' },
+            { path: 'home', component: HomeComponent },
+            { path: 'mapper', component: MapperComponent },
+            { path: '**', redirectTo: 'home' }
         ]),
         MatAutocompleteModule,
         MatBadgeModule,
@@ -141,7 +142,8 @@ import {
         GlobalsService,
         SocketService
     ],
-    entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog],
+    entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog,
+            LoginDialog, RegisterDialog],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

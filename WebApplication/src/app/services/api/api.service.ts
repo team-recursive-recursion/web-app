@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
-import { AreaType, PointType, ElementType } from '../../components/home/class/element';
+import { AreaType, PointType, ElementType } from '../../components/mapper/class/element';
 import { GlobalsService } from '../globals/globals.service';
 
 @Injectable()
