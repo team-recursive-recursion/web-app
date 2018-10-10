@@ -236,8 +236,7 @@ export class ApiService {
      ***/
 
     public liveLocationsGet(cid: string) {
-        // TODO new endpoint
-        var url = this.url + "/api/courses/test/" + cid;
+        var url = this.url + "/api/liveloc/" + cid;
         return this.http.get(url);
     }
 
