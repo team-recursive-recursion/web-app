@@ -285,6 +285,40 @@ export class MapperComponent {
     }
 
     /***
+     * onEditCourse(number) : void
+     *
+     *     Event listener for the course edit button. Opens the dialog to edit
+     *     the selected course.
+     ***/
+    public onEditCourse(index: number) {
+        var t = this;
+        // bring up the confirm dialog
+        const dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.choice) {
+                // delete course
+                // delete the course
+                this.courseManager.deleteActiveCourse(this.api,
+                    // success
+                    function() {
+                        t.unselectFeature();
+                        t.map.clearMap();
+                        t.navbar.close();
+                        t.courseIndex = -1;
+                    },
+                    // fail
+                    function(status, header, body) {
+                        this.dialog.open(InfoDialog, {data: {
+                            message: "Failed to delete the selected course",
+                            type: InfoType.ERROR
+                        }});
+                    }
+                );
+            }
+        });
+    }
+
+    /***
      * onSelectHole(number) : void
      *
      *     Event listener for selecting a hole radio button. Changes the active

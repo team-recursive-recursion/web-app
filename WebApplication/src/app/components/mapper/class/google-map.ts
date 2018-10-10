@@ -35,7 +35,6 @@ export class GoogleMap {
         this.comp = comp;
         this.agmMap.mapReady.subscribe(map => {
             this.map = map;
-            this.map.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
