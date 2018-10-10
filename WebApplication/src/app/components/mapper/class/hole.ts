@@ -183,10 +183,26 @@ export class Hole {
 
             case ModelState.DELETED:
                 // delete all children
-                this.elements.forEach(e => {
+                /*this.elements.forEach(e => {
                     e.delete();
-                });
-                this.syncElements(api, () => {
+                });*/
+                // delete hole
+                api.holeDelete(this.getId())
+                    .subscribe(
+
+                    result => {
+                        this.course.removeHole(this);
+                        callDone();
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Hole deleted successfully")
+
+                );
+                /*this.syncElements(api, () => {
                     // delete hole
                     api.holeDelete(this.getId())
                         .subscribe(
@@ -202,7 +218,7 @@ export class Hole {
                         () => console.log("Hole deleted successfully")
 
                     );
-                });
+                });*/
                 break;
 
             default:

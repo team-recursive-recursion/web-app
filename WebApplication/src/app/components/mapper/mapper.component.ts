@@ -32,6 +32,7 @@ import { ElementFactory } from './class/element-factory';
 import { LiveLocation } from './class/live-location';
 import { InfoDialog, InfoType } from '../dialog/info-dialog.component';
 import { ConfirmDialog } from '../dialog/confirm-dialog.component';
+import { toTypeScript } from '@angular/compiler';
 
 @Component({
     selector: 'mapper',
@@ -363,11 +364,21 @@ export class MapperComponent {
      *     Event listener for deleting the current hole.
      ***/
     public onDeleteHole() {
-        // TODO confirm
-        if (this.holeIndex >= 0) {
-            var h = this.courseManager.activeCourse.getHole(this.holeIndex);
-            h.delete();
+        if (this.holeIndex < 0) {
+            return;
         }
+        var t = this;
+        // bring up the confirm dialog
+        const dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.choice) {
+                // delete the hole
+                var h = t.courseManager.activeCourse.getHole(t.holeIndex);
+                h.delete();
+                // remove elements from the map
+                t.map.removeElements(h.getElements());
+            }
+        });
     }
 
     /***
