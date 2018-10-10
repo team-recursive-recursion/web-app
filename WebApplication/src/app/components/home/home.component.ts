@@ -46,13 +46,7 @@ export class HomeComponent {
 
     public onRegister() {
         // bring up the register dialog
-        const dialogRef = this.dialog.open(RegisterDialog);
-        dialogRef.afterClosed().subscribe(result => {
-            if (result != undefined && result.done) {
-                // log in
-                // TODO
-            }
-        });
+        this.dialog.open(RegisterDialog);
     }
 
 }

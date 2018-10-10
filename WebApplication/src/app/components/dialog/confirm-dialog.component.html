@@ -1,0 +1,22 @@
+<!--
+    Filename: confirm-dialog.component.html
+    Author  : Duncan Tilley
+
+        The template for the confirm dialog.
+-->
+
+<div role="dialog">
+
+    <mat-icon style="color:#4a5bc3">help</mat-icon>
+
+    <mat-list role="list">
+        <mat-list-item>
+            <span>Are you sure you wish to delete the selected item?</span>
+        </mat-list-item>
+    </mat-list>
+
+    <mat-dialog-actions>
+        <button mat-button (click)="onCancelClick()">Cancel</button>
+        <button mat-button (click)="onYesClick()">Yes</button>
+    </mat-dialog-actions>
+</div>

@@ -1,5 +1,5 @@
 /***
- * Filename: error-dialog.component.ts
+ * Filename: info-dialog.component.ts
  * Author  : Duncan Tilley
  * Class   : InfoDialog / <info-dialog>
  ***/

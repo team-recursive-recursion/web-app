@@ -5,8 +5,9 @@
  ***/
 
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Hole } from '../class/hole';
+import { InfoDialog, InfoType } from '../../dialog/info-dialog.component';
 
 @Component({
     selector: 'hole-dialog',
@@ -18,7 +19,9 @@ export class HoleDialog {
     par: number = 3;
     holes: Array<Hole>;
 
-    constructor(public dialogRef: MatDialogRef<HoleDialog>,
+    constructor(
+            public dialog: MatDialog,
+            public dialogRef: MatDialogRef<HoleDialog>,
             @Inject(MAT_DIALOG_DATA) public data: any) {
         this.holes = data;
         this.name = "Hole " + (this.holes.length + 1);
@@ -30,8 +33,10 @@ export class HoleDialog {
 
     onDoneClick(): void {
         if (this.isUsed(this.name)) {
-            // TODO nice message
-            window.alert("Name '" + this.name + "' is already used.");
+            this.dialog.open(InfoDialog, {data: {
+                message: "Name '" + this.name + "' is already used",
+                type: InfoType.ERROR
+            }});
         } else {
             if (this.par != -1 && this.name !== undefined &&
                 this.name != "Hole Name" && this.name != "") {
@@ -42,8 +47,6 @@ export class HoleDialog {
                         par: "" + this.par
                     }
                 );
-            } else {
-                // TODO ?
             }
         }
     }

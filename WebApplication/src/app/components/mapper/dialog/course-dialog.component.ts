@@ -38,8 +38,6 @@ export class CourseDialog {
                     info: info
                 }
             );
-        } else {
-            // TODO ?
         }
     }
 

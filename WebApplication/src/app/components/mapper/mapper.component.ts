@@ -30,6 +30,8 @@ import { CourseManager } from './class/course-manager';
 import { Element } from './class/element';
 import { ElementFactory } from './class/element-factory';
 import { LiveLocation } from './class/live-location';
+import { InfoDialog, InfoType } from '../dialog/info-dialog.component';
+import { ConfirmDialog } from '../dialog/confirm-dialog.component';
 
 @Component({
     selector: 'mapper',
@@ -119,10 +121,11 @@ export class MapperComponent {
                 function() {},
                 // fail
                 function (status, headers, body) {
-                    // TODO nice message
-                    window.alert("Error " + status +
-                            ": failed to load user course list");
-                    console.log(body);
+                    this.dialog.open(InfoDialog, {data: {
+                        message: "Failed to load your course list. " +
+                                "Try refreshing the page.",
+                        type: InfoType.ERROR
+                    }});
                 }
             );
         }
@@ -168,9 +171,11 @@ export class MapperComponent {
                 },
                 // fail
                 function(status, header, body) {
-                    // TODO nice message
-                    window.alert("Error " + status +
-                            ": failed to load selected course");
+                    this.dialog.open(InfoDialog, {data: {
+                        message: "Failed to load the selected course. " +
+                                "Try refreshing the page.",
+                        type: InfoType.ERROR
+                    }});
                     console.log(body);
                 }
             );
@@ -188,15 +193,21 @@ export class MapperComponent {
      *     updated elements are put and removed elements are deleted.
      ***/
     public onSaveCourse() {
+        var p = this;
         this.courseManager.activeCourse.sync(this.api,
             // success
-            function() {},
+            function() {
+                p.dialog.open(InfoDialog, {data: {
+                    message: "Save successful",
+                    type: InfoType.SUCCESS
+                }});
+            },
             // fail
             function(status, header, body) {
-                // TODO nice message
-                window.alert("Error " + status +
-                        ": failed to save current course");
-                console.log(body);
+                p.dialog.open(InfoDialog, {data: {
+                    message: "Failed to save the current course",
+                    type: InfoType.ERROR
+                }});
             }
         );
     }
@@ -212,7 +223,7 @@ export class MapperComponent {
         // bring up the course dialog
         const dialogRef = this.dialog.open(CourseDialog);
         dialogRef.afterClosed().subscribe(result => {
-            if (result.done) {
+            if (result != undefined && result.done) {
                 // create course
                 this.courseManager.createActiveCourse(result.name, result.info,
                     this.api,
@@ -227,10 +238,10 @@ export class MapperComponent {
                     },
                     // fail
                     function (status, header, body) {
-                        // TODO nice message
-                        window.alert("Error " + status +
-                                ": failed to create new course");
-                        console.log(body);
+                        this.dialog.open(InfoDialog, {data: {
+                            message: "Failed to create a new course",
+                            type: InfoType.ERROR
+                        }});
                     }
                 );
 
@@ -246,26 +257,30 @@ export class MapperComponent {
      ***/
     public onDeleteCourse(index: number) {
         var t = this;
-        if (window.confirm("Are you sure you want to delete '" +
-            this.courseManager.activeCourse.getName() + "'?")) {
-            // delete the course
-            this.courseManager.deleteActiveCourse(this.api,
-                // success
-                function() {
-                    t.unselectFeature();
-                    t.map.clearMap();
-                    t.navbar.close();
-                    t.courseIndex = -1;
-                },
-                // fail
-                function(status, header, body) {
-                    // TODO nice message
-                    window.alert("Error " + status +
-                            ": failed to delete selected course");
-                    console.log(body);
-                }
-            );
-        }
+        // bring up the confirm dialog
+        const dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.choice) {
+                // delete course
+                // delete the course
+                this.courseManager.deleteActiveCourse(this.api,
+                    // success
+                    function() {
+                        t.unselectFeature();
+                        t.map.clearMap();
+                        t.navbar.close();
+                        t.courseIndex = -1;
+                    },
+                    // fail
+                    function(status, header, body) {
+                        this.dialog.open(InfoDialog, {data: {
+                            message: "Failed to delete the selected course",
+                            type: InfoType.ERROR
+                        }});
+                    }
+                );
+            }
+        });
     }
 
     /***
@@ -299,7 +314,7 @@ export class MapperComponent {
             data : this.courseManager.activeCourse.getHoles()
         });
         dialogRef.afterClosed().subscribe(result => {
-            if (result.done) {
+            if (result != undefined && result.done) {
                 // create hole
                 var index = this.courseManager.activeCourse.createHole(
                         result.name, result.par);
@@ -333,6 +348,7 @@ export class MapperComponent {
      *     Event listener for deleting the current hole.
      ***/
     public onDeleteHole() {
+        // TODO confirm
         if (this.holeIndex >= 0) {
             var h = this.courseManager.activeCourse.getHole(this.holeIndex);
             h.delete();
@@ -401,7 +417,7 @@ export class MapperComponent {
                         // bring up the area dialog
                         const dialogRef = this.dialog.open(AreaDialog);
                         dialogRef.afterClosed().subscribe(result => {
-                            if (result.done) {
+                            if (result != undefined && result.done) {
                                 // create the area element
                                 var el = ElementFactory.parseArea(
                                     feature, true, true, result.type,
@@ -423,7 +439,7 @@ export class MapperComponent {
                         // bring up the point dialog
                         const dialogRef = this.dialog.open(PointDialog);
                         dialogRef.afterClosed().subscribe(result => {
-                            if (result.done) {
+                            if (result != undefined && result.done) {
                                 // create the point element
                                 var el = ElementFactory.parsePoint(
                                     feature, true, true, result.type,
@@ -446,8 +462,10 @@ export class MapperComponent {
             } else {
                 // remove the invalid feature
                 this.map.removeFeature(feature);
-                // TODO nice message
-                window.alert("Please load or create a course first.");
+                this.dialog.open(InfoDialog, {data: {
+                    message: "Please load or create a course first",
+                    type: InfoType.WARNING
+                }});
             }
             // go to select mode
             this.map.setDrawingMode(DrawMode.NONE);

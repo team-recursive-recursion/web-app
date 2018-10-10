@@ -8,7 +8,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ApiService } from 'src/app/services/api/api.service';
 import { GlobalsService } from 'src/app/services/globals/globals.service';
-import { InfoDialog, InfoType } from '../../info/info-dialog.component';
+import { InfoDialog, InfoType } from '../../dialog/info-dialog.component';
 
 @Component({
     selector: 'login-dialog',

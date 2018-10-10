@@ -69,6 +69,8 @@ export class GoogleMap {
      ***/
     public displayCourse(course: Course) {
         var features = course.asFeatures();
+        console.log("FEATURES");
+        console.log(features);
         this.updateDataLayer(
             {
                 "type": "FeatureCollection",
