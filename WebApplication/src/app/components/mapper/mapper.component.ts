@@ -163,8 +163,8 @@ export class MapperComponent {
                 function () {
                     t.map.clearMap();
                     t.navbar.open();
-                    // go to editing mode
-                    t.viewMode = false;
+                    // go to viewing mode
+                    t.viewMode = true;
                     t.updateViewMode();
                     // select no hole
                     t.map.displayCourse(t.courseManager.activeCourse);
