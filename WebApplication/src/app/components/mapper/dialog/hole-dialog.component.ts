@@ -44,7 +44,6 @@ export class HoleDialog {
     }
 
     onDoneClick(): void {
-        var cont = false;
         if (this.update) {
             if (this.name != this.oldName && this.isUsed(this.name)) {
                 this.dialog.open(InfoDialog, {data: {

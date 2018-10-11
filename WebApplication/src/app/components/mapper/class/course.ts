@@ -30,7 +30,7 @@ export class Course {
     constructor(state: ModelState) {
         this.state = state;
         this.id = "";
-        this.name = "Test Name";
+        this.name = "";
         this.info = "";
         this.elements = [];
         this.holes = [];
@@ -196,7 +196,20 @@ export class Course {
     public sync(api: ApiService, callDone: Function, callFail: Function) {
         // update the course
         if (this.state == ModelState.UPDATED) {
-            // TODO
+            api.courseUpdate(this.getId(), this.getName(), this.getInfo())
+                .subscribe(
+
+                    result => {
+                        this.setState(ModelState.UNCHANGED);
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Course updated successfully")
+
+                );
         }
         // sync elements
         this.elements.forEach(e => {

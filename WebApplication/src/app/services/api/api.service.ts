@@ -114,6 +114,18 @@ export class ApiService {
         return this.http.delete(url, this.createHeaders());
     }
 
+    public courseUpdate(cid: string, name: string, info: string) {
+        var url = this.url + "/api/zones/" + cid;
+        return this.http.put(url,
+            {
+                "ZoneId": cid,
+                "ZoneName": name,
+                "Info": info
+            },
+            this.createHeaders()
+        );
+    }
+
     /***
      * API calls: holes
      ***/

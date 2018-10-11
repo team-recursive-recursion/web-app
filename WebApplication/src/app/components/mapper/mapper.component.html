@@ -44,7 +44,7 @@
             <mat-icon>delete_forever</mat-icon>
         </button>
         <span class="small-spacer"></span>
-        <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0 && courseManager.courses.length > 0" (click)="onEditCourse(courseIndex)">
+        <button mat-mini-fab color="accent" [disabled]="viewMode" *ngIf="courseIndex >= 0 && courseManager.courses.length > 0" (click)="onEditCourse(courseIndex)">
             <mat-icon>edit</mat-icon>
         </button>
         <span class="small-spacer"></span>
@@ -84,11 +84,11 @@
                         <!-- Hole list -->
                         <div>
                             <mat-radio-group [(ngModel)]="holeIndex" (change)="onSelectHole($event.value)" class="hole-radio-group">
-                                <mat-radio-button class="hole-radio-button" [value]="-1">
+                                <mat-radio-button [disabled]="viewMode" class="hole-radio-button" [value]="-1">
                                     Course
                                 </mat-radio-button>
                                 <ng-container *ngFor="let h of courseManager.activeCourse.holes; let i = index">
-                                    <mat-radio-button *ngIf="h.isVisible()" class="hole-radio-button" [value]="i">
+                                    <mat-radio-button [disabled]="viewMode" *ngIf="h.isVisible()" class="hole-radio-button" [value]="i">
                                         {{h.name}}
                                     </mat-radio-button>
                                 </ng-container>

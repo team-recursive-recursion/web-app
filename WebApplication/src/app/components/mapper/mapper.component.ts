@@ -163,8 +163,8 @@ export class MapperComponent {
                 function () {
                     t.map.clearMap();
                     t.navbar.open();
-                    // go to viewing mode
-                    t.viewMode = true;
+                    // go to editing mode
+                    t.viewMode = false;
                     t.updateViewMode();
                     // select no hole
                     t.map.displayCourse(t.courseManager.activeCourse);
@@ -222,7 +222,9 @@ export class MapperComponent {
     public onCreateCourse() {
         var t = this;
         // bring up the course dialog
-        const dialogRef = this.dialog.open(CourseDialog);
+        const dialogRef = this.dialog.open(CourseDialog, {
+            data: { update: false }
+        });
         dialogRef.afterClosed().subscribe(result => {
             if (result != undefined && result.done) {
                 // create course
@@ -291,29 +293,23 @@ export class MapperComponent {
      *     the selected course.
      ***/
     public onEditCourse(index: number) {
-        var t = this;
-        // bring up the confirm dialog
-        const dialogRef = this.dialog.open(ConfirmDialog);
+        var c = this.courseManager.activeCourse;
+        // bring up the course dialog
+        const dialogRef = this.dialog.open(CourseDialog, {
+            data : {
+                update: true,
+                name: c.getName(),
+                info: c.getInfo()
+            }
+        });
         dialogRef.afterClosed().subscribe(result => {
-            if (result != undefined && result.choice) {
-                // delete course
-                // delete the course
-                this.courseManager.deleteActiveCourse(this.api,
-                    // success
-                    function() {
-                        t.unselectFeature();
-                        t.map.clearMap();
-                        t.navbar.close();
-                        t.courseIndex = -1;
-                    },
-                    // fail
-                    function(status, header, body) {
-                        this.dialog.open(InfoDialog, {data: {
-                            message: "Failed to delete the selected course",
-                            type: InfoType.ERROR
-                        }});
-                    }
-                );
+            if (result != undefined && result.done) {
+                // update course
+                if (c.getState() != ModelState.CREATED) {
+                    c.setState(ModelState.UPDATED);
+                }
+                c.setName(result.name);
+                c.setInfo(result.info);
             }
         });
     }
