@@ -35,7 +35,6 @@ export class GoogleMap {
         this.comp = comp;
         this.agmMap.mapReady.subscribe(map => {
             this.map = map;
-            this.map.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
@@ -63,14 +62,29 @@ export class GoogleMap {
     }
 
     /***
+     * removeElements(Array<Element>) : void
+     *
+     *     Removes the given elements from the map.
+     ***/
+    public removeElements(elements: Array<Element>) {
+        elements.forEach(e => {
+            // find the element's feature
+            this.map.data.forEach(feature => {
+                var el: Element = feature.getProperty('element');
+                if (el.getId() == e.getId()) {
+                    this.map.data.remove(feature);
+                }
+            });
+        });
+    }
+
+    /***
      * displayCourse(Course): void
      *
      *    Displays all of the elements of the given course on the map.
      ***/
     public displayCourse(course: Course) {
         var features = course.asFeatures();
-        console.log("FEATURES");
-        console.log(features);
         this.updateDataLayer(
             {
                 "type": "FeatureCollection",

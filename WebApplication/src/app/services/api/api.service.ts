@@ -144,16 +144,29 @@ export class ApiService {
         return this.http.delete(url, this.createHeaders());
     }
 
+    public holeUpdate(hid: string, name: string, info: string) {
+        var url = this.url + "/api/zones/" + hid;
+        return this.http.put(url,
+            {
+                "ZoneId": hid,
+                "ZoneName": name,
+                "Info": info
+            },
+            this.createHeaders()
+        );
+    }
+
     /***
      * API calls: points
      ***/
 
-    public createPoint(cid: string, type: number, info: string,
+    public createPoint(zid: string, type: number, info: string,
             geoJson: string) {
-        var url = this.url + "/api/courses/" + cid + "/points";
+        var url = this.url + "/api/zones/" + zid + "/points";
         return this.http.post(url,
             {
                 "GeoJson": geoJson,
+                "ElementType": ElementType.POINT,
                 "ClassType": type,
                 "Info": info
             },
@@ -223,8 +236,7 @@ export class ApiService {
      ***/
 
     public liveLocationsGet(cid: string) {
-        // TODO new endpoint
-        var url = this.url + "/api/courses/test/" + cid;
+        var url = this.url + "/api/liveloc/" + cid;
         return this.http.get(url);
     }
 

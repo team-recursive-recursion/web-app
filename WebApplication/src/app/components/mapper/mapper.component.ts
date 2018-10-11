@@ -32,6 +32,7 @@ import { ElementFactory } from './class/element-factory';
 import { LiveLocation } from './class/live-location';
 import { InfoDialog, InfoType } from '../dialog/info-dialog.component';
 import { ConfirmDialog } from '../dialog/confirm-dialog.component';
+import { toTypeScript } from '@angular/compiler';
 
 @Component({
     selector: 'mapper',
@@ -284,6 +285,40 @@ export class MapperComponent {
     }
 
     /***
+     * onEditCourse(number) : void
+     *
+     *     Event listener for the course edit button. Opens the dialog to edit
+     *     the selected course.
+     ***/
+    public onEditCourse(index: number) {
+        var t = this;
+        // bring up the confirm dialog
+        const dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.choice) {
+                // delete course
+                // delete the course
+                this.courseManager.deleteActiveCourse(this.api,
+                    // success
+                    function() {
+                        t.unselectFeature();
+                        t.map.clearMap();
+                        t.navbar.close();
+                        t.courseIndex = -1;
+                    },
+                    // fail
+                    function(status, header, body) {
+                        this.dialog.open(InfoDialog, {data: {
+                            message: "Failed to delete the selected course",
+                            type: InfoType.ERROR
+                        }});
+                    }
+                );
+            }
+        });
+    }
+
+    /***
      * onSelectHole(number) : void
      *
      *     Event listener for selecting a hole radio button. Changes the active
@@ -311,7 +346,10 @@ export class MapperComponent {
     public onCreateHole() {
         // bring up the hole dialog
         const dialogRef = this.dialog.open(HoleDialog, {
-            data : this.courseManager.activeCourse.getHoles()
+            data : {
+                holes: this.courseManager.activeCourse.getHoles(),
+                update: false
+            }
         });
         dialogRef.afterClosed().subscribe(result => {
             if (result != undefined && result.done) {
@@ -333,13 +371,25 @@ export class MapperComponent {
      ***/
     public onEditHole() {
         // bring up the hole dialog
-        /*const dialogRef = this.dialog.open(HoleDialog);
-        dialogRef.afterClosed().subscribe(result => {
-            if (result.done) {
-                // update hole
-                // TODO
+        var h = this.courseManager.activeCourse.getHole(this.holeIndex);
+        const dialogRef = this.dialog.open(HoleDialog, {
+            data : {
+                holes: this.courseManager.activeCourse.getHoles(),
+                update: true,
+                name: h.getName(),
+                par: h.getInfo()
             }
-        });*/
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.done) {
+                // update hole
+                if (h.getState() != ModelState.CREATED) {
+                    h.setState(ModelState.UPDATED);
+                }
+                h.setName(result.name);
+                h.setInfo(result.par);
+            }
+        });
     }
 
     /***
@@ -348,11 +398,21 @@ export class MapperComponent {
      *     Event listener for deleting the current hole.
      ***/
     public onDeleteHole() {
-        // TODO confirm
-        if (this.holeIndex >= 0) {
-            var h = this.courseManager.activeCourse.getHole(this.holeIndex);
-            h.delete();
+        if (this.holeIndex < 0) {
+            return;
         }
+        var t = this;
+        // bring up the confirm dialog
+        const dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != undefined && result.choice) {
+                // delete the hole
+                var h = t.courseManager.activeCourse.getHole(t.holeIndex);
+                h.delete();
+                // remove elements from the map
+                t.map.removeElements(h.getElements());
+            }
+        });
     }
 
     /***
