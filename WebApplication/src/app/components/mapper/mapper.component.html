@@ -24,7 +24,7 @@
         </button>
 
         <!-- Course selection dropdown -->
-        <div *ngIf="courseManager.courses.length > 0">
+        <div>
             <mat-select [(value)]="courseIndex" #courseSelector id="course-selector">
                 <mat-option [value]="-1" (click)="onSelectCourse(-1)">
                     Select a course
