@@ -19,7 +19,7 @@ export class ApiService {
     token: string;
 
     constructor(private http: Http, private globals: GlobalsService) {
-        this.url = "http://localhost:5001";
+        this.url = "http://ec2-18-191-152-232.us-east-2.compute.amazonaws.com";
         this.token = "";
     }
 
