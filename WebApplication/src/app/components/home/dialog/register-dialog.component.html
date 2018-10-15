@@ -26,12 +26,12 @@
     </mat-list-item>
     <mat-list-item role="listitem">
         <mat-form-field>
-            <input matInput type="password" class="form-control" id="password" required [(ngModel)]="password" name="password" placeholder="Password">
+            <input matInput type="password" minlength=8 class="form-control" id="password" required [(ngModel)]="password" name="password" placeholder="Password">
         </mat-form-field>
     </mat-list-item>
     <mat-list-item role="listitem">
         <mat-form-field>
-            <input matInput type="password" class="form-control" placeholder="Confirm Password">
+            <input matInput type="password" minlength=8 class="form-control" [(ngModel)]="passwordConf" placeholder="Confirm Password">
         </mat-form-field>
     </mat-list-item>
 

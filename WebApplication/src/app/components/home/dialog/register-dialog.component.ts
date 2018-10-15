@@ -33,7 +33,7 @@ export class RegisterDialog {
     }
 
     onDoneClick(): void {
-        if (this.verifyDetails()) {
+        if (this.validateDetails()) {
             this.api.usersCreate(this.email, this.firstname, this.lastname,
                     this.password)
                 .subscribe(
@@ -60,16 +60,83 @@ export class RegisterDialog {
                     () => console.log("Registration successful")
 
                 );
-        } else {
-            this.dialog.open(InfoDialog, {data: {
-                message: "Verification failed"
-            }});
         }
     }
 
-    private verifyDetails(): boolean {
-        // TODO
-        return true;
+    /***
+     * validateDetails() : boolean
+     *
+     *     Returns true if all of the user information is valid.
+     ***/
+    public validateDetails(): boolean {
+        return (this.nameValid() && this.emailValid() && this.passwordValid() &&
+                this.passwordMatch());
+    }
+
+    /***
+     * nameValid() : boolean
+     *
+     *     Returns true if the names are longer
+     ***/
+    public nameValid(): boolean {
+        if (this.firstname.length > 0 && this.lastname.length > 0) {
+            return true;
+        } else {
+            this.dialog.open(InfoDialog, {data: {
+                message: "First and last name can not be empty"
+            }});
+            return false;
+        }
+    }
+
+    /***
+     * emailValid() : boolean
+     *
+     *     Returns true if the email is in a valid format.
+     ***/
+    public emailValid(): boolean {
+        var at = this.email.indexOf("@");
+        var dot = this.email.lastIndexOf(".");
+        if (at > 0 && dot > at + 1) {
+            return true;
+        } else {
+            this.dialog.open(InfoDialog, {data: {
+                message: "Email must be a valid address"
+            }});
+            return false;
+        }
+    }
+
+    /***
+     * passwordValid() : boolean
+     *
+     *     Returns true if the password is at least 8 characters long.
+     ***/
+    public passwordValid(): boolean {
+        if (this.password.length >= 8) {
+            return true;
+        } else {
+            this.dialog.open(InfoDialog, {data: {
+                message: "Password must contain at least 8 characters"
+            }});
+            return false;
+        }
+    }
+
+    /***
+     * passwordMatch() : boolean
+     *
+     *     Returns true if the confirmed password and password are the same.
+     ***/
+    public passwordMatch(): boolean {
+        if (this.password == this.passwordConf) {
+            return true;
+        } else {
+            this.dialog.open(InfoDialog, {data: {
+                message: "Your confirmed password does not match the original"
+            }});
+            return false;
+        }
     }
 
 }

@@ -20,7 +20,6 @@ import { ConfirmDialog } from './components/dialog/confirm-dialog.component';
 
 import { ApiService } from './services/api/api.service';
 import { GlobalsService } from './services/globals/globals.service';
-import { SocketService } from './services/socket/socket.service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
@@ -142,8 +141,7 @@ import {
     providers: [
         GoogleMapsAPIWrapper,
         ApiService,
-        GlobalsService,
-        SocketService
+        GlobalsService
     ],
     entryComponents: [AreaDialog, PointDialog, HoleDialog, CourseDialog,
             LoginDialog, RegisterDialog, InfoDialog, ConfirmDialog],
