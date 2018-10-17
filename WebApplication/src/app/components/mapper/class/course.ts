@@ -30,7 +30,7 @@ export class Course {
     constructor(state: ModelState) {
         this.state = state;
         this.id = "";
-        this.name = "Test Name";
+        this.name = "";
         this.info = "";
         this.elements = [];
         this.holes = [];
@@ -196,7 +196,20 @@ export class Course {
     public sync(api: ApiService, callDone: Function, callFail: Function) {
         // update the course
         if (this.state == ModelState.UPDATED) {
-            // TODO
+            api.courseUpdate(this.getId(), this.getName(), this.getInfo())
+                .subscribe(
+
+                    result => {
+                        this.setState(ModelState.UNCHANGED);
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Course updated successfully")
+
+                );
         }
         // sync elements
         this.elements.forEach(e => {
@@ -239,11 +252,13 @@ export class Course {
                     result => {
                         let body = result.json();
                         // parse the holes
-                        let holes = body.holes;
+                        console.log("COURSE");
+                        console.log(body);
+                        let holes = body.innerZones;
                         for (var i = 0; i < holes.length; ++i) {
                             var hole = new Hole(this, ModelState.UNCHANGED);
-                            hole.setId(holes[i].holeId);
-                            hole.setName(holes[i].name);
+                            hole.setId(holes[i].zoneID);
+                            hole.setName(holes[i].zoneName);
                             hole.setInfo(holes[i].info);
                             this.holes.push(hole);
                         }
@@ -252,28 +267,35 @@ export class Course {
                         this.elements = ElementFactory.parseElementArray(
                                 body.elements, this, null, true, false);
 
+                        console.log("ELEMENTS");
+                        console.log(this.elements);
+
                         // load holes
                         var numH = 0;
                         var t = this;
-                        // synchronize by counting each finished hole and
-                        // calling callDone once the last hole is done.
-                        this.holes.forEach(h => {
-                            h.reload(api,
-                                // finish
-                                function() {
-                                    ++numH;
-                                    if (numH >= t.holes.length) {
-                                        callDone();
+                        if (this.holes.length > 0) {
+                            // synchronize by counting each finished hole and
+                            // calling callDone once the last hole is done.
+                            this.holes.forEach(h => {
+                                h.reload(api,
+                                    // finish
+                                    function() {
+                                        ++numH;
+                                        if (numH >= t.holes.length) {
+                                            callDone();
+                                        }
+                                    },
+                                    // fail
+                                    function(status, header, body) {
+                                        ++numH;
+                                        console.log("Non-fatal error " + status +
+                                                ": failed to load hole");
                                     }
-                                },
-                                // fail
-                                function(status, header, body) {
-                                    ++numH;
-                                    console.log("Non-fatal error " + status +
-                                            ": failed to load hole");
-                                }
-                            );
-                        });
+                                );
+                            });
+                        } else {
+                            callDone();
+                        }
                     },
 
                     error => {

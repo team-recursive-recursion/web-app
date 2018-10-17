@@ -40,8 +40,6 @@ export class AreaDialog {
                     type: this.polyType
                 }
             );
-        } else {
-            // TODO ?
         }
     }
 

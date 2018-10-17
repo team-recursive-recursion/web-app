@@ -11,7 +11,7 @@ import { AgmMap, LatLngBounds } from '@agm/core';
 import { Course } from './course';
 import { Element, PointType, AreaType, ElementType, Area, Point } from './element';
 import { Hole } from './hole';
-import { HomeComponent } from '../home.component';
+import { MapperComponent } from '../mapper.component';
 
 export enum DrawMode {
     POINT, AREA, NONE
@@ -23,19 +23,18 @@ export class GoogleMap {
     private agmMap: AgmMap;
     private map: any;
     private mode: DrawMode = DrawMode.NONE;
-    private comp: HomeComponent;
+    private comp: MapperComponent;
 
     /***
      * constructor()
      *
      *     Sets up the Google map.
      ***/
-    public constructor(agmMap: AgmMap, comp: HomeComponent) {
+    public constructor(agmMap: AgmMap, comp: MapperComponent) {
         this.agmMap = agmMap;
         this.comp = comp;
         this.agmMap.mapReady.subscribe(map => {
             this.map = map;
-            this.map.data.setControls(['Point', 'Polygon']);
             this.setUpMapEvents();
             this.setUpStyling();
             this.setUpSearch();
@@ -60,6 +59,23 @@ export class GoogleMap {
      ***/
     public removeFeature(feature: any) {
         this.map.data.remove(feature);
+    }
+
+    /***
+     * removeElements(Array<Element>) : void
+     *
+     *     Removes the given elements from the map.
+     ***/
+    public removeElements(elements: Array<Element>) {
+        elements.forEach(e => {
+            // find the element's feature
+            this.map.data.forEach(feature => {
+                var el: Element = feature.getProperty('element');
+                if (el.getId() == e.getId()) {
+                    this.map.data.remove(feature);
+                }
+            });
+        });
     }
 
     /***
@@ -89,6 +105,20 @@ export class GoogleMap {
         this.map.data.forEach(feature => {
             var el: Element = feature.getProperty('element');
             el.enabled = (el.getHole() == h);
+            // force feature update
+            feature.setProperty("update", false);
+        });
+    }
+
+    /***
+     * displayAll(): void
+     *
+     *     Filters all elements to be shown.
+     ***/
+    public displayAll() {
+        this.map.data.forEach(feature => {
+            var el: Element = feature.getProperty('element');
+            el.enabled = true;
             // force feature update
             feature.setProperty("update", false);
         });
@@ -233,6 +263,9 @@ export class GoogleMap {
                             break;
                         case PointType.TEE:
                             icon = "./assets/tee.png";
+                            break;
+                        case PointType.LIVE:
+                            icon = "./assets/live.png";
                             break;
                         default:
                             icon = "";

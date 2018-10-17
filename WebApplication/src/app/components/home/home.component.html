@@ -1,145 +1,69 @@
 <!--
     Filename: home.component.html
-    Author  : Christiaan H Nel, Stephan Roos, Duncan Tilley
+    Author  : Duncan Tilley
 
-        The template for the controls and map for mapping.
+        The template for the homepage.
 -->
-
-<!-- Search bar -->
-<div id="search-div">
-    <mat-form-field class="fill">
-        <input matInput type="text" placeholder="Search" id="search-input">
-    </mat-form-field>
-</div>
 
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
 
     <!-- Tool bar -->
     <mat-toolbar color="primary" class="example-toolbar">
 
-        <!-- Hole sidebar toggle button -->
-        <button *ngIf="courseManager.activeCourse != null"
-                mat-icon-button (click)="snav.toggle()">
-            <mat-icon>golf_course</mat-icon>
-        </button>
-
-        <!-- Course selection dropdown -->
-        <div *ngIf="courseManager.courses.length > 0">
-            <mat-select [(value)]="courseIndex" #courseSelector id="course-selector">
-                <mat-option [value]="-1" (click)="onSelectCourse(-1)">
-                    Select a course
-                </mat-option>
-                <mat-option *ngFor="let c of courseManager.courses; let i = index" [value]="i" (click)="onSelectCourse(i)">
-                    {{c.name}}
-                </mat-option>
-            </mat-select>
-        </div>
-
-        <!-- Course edit buttons -->
-        <span class="small-spacer"></span>
-        <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0 && courseManager.courses.length > 0" (click)="onDeleteCourse(courseIndex)">
-            <mat-icon>delete_forever</mat-icon>
-        </button>
-        <span class="small-spacer"></span>
-        <button mat-mini-fab color="accent" (click)="onCreateCourse()">
-            <mat-icon>add</mat-icon>
-        </button>
+        <!-- Title -->
+        <span>Golf Course Mapper</span>
 
         <span style="flex: 1 1 auto"></span>
 
-        <!-- View mode toggle -->
-        <div *ngIf="courseManager.activeCourse != null">
-            <mat-icon>edit</mat-icon>
-            <mat-slide-toggle style="margin:0.3em" [color]="primary" [(ngModel)]="viewMode"
-                    (change)="onViewModeSwitch()">
-            </mat-slide-toggle>
-            <mat-icon>visibility</mat-icon>
-        </div>
+        <!-- Login button -->
+        <button mat-button (click)="onLogin()">
+            Sign In
+        </button>
+        <!-- Register button -->
+        <button mat-button (click)="onRegister()">
+            Register
+        </button>
 
     </mat-toolbar>
 
-    <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+    <div class="outer">
 
-        <!-- Navigation bar -->
-        <mat-sidenav #snav opened="false" [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
-            <mat-list>
-                <mat-accordion>
+        <mat-card class="content">
+            <img src="../../../assets/logo.png" width="256">
+            <h1>Golf Course Mapper</h1>
+        </mat-card>
 
-                    <!-- Hole selection -->
-                    <mat-card *ngIf="courseManager.activeCourse !== null">
-                        <mat-card-header>
-                            <mat-card-title>
-                                Course Holes
-                            </mat-card-title>
-                        </mat-card-header>
+        <mat-card class="content">
+            <h2>About</h2>
+            <img mat-card-image src="../../../assets/mapping.png">
+            <p>
+                Bring your golf course to the world by mapping it out with the
+                Golf Course Mapper! Create your holes and draw your fairway,
+                green and hazards. Mark your teeing location, hole and any other
+                points of interest for players, such as the good ol' 19th hole!
+            </p>
+            <p>
+                Players using our Golfer's Guide mobile app will find your
+                course and look at the map as they are playing. This will help
+                your players to truly improve their swing!
+            </p>
+        </mat-card>
 
-                        <!-- Hole list -->
-                        <div>
-                            <mat-radio-group [(ngModel)]="holeIndex" (change)="onSelectHole($event.value)" class="hole-radio-group">
-                                <mat-radio-button class="hole-radio-button" [value]="-1">
-                                    Course
-                                </mat-radio-button>
-                                <ng-container *ngFor="let h of courseManager.activeCourse.holes; let i = index">
-                                    <mat-radio-button *ngIf="h.isVisible()" class="hole-radio-button" [value]="i">
-                                        {{h.name}}
-                                    </mat-radio-button>
-                                </ng-container>
-                            </mat-radio-group>
-                        </div>
+        <!--mat-card class="content">
+            <h2>Tutorial</h2>
+            <p>
+                Youtube...
+            </p>
+        </mat-card-->
 
-                        <!-- Hole management buttons -->
-                        <mat-list role="list" *ngIf="!viewMode">
-                            <mat-list-item role="listitem">
-                                <button mat-icon-button (click)="onCreateHole()">
-                                    <mat-icon>add_circle</mat-icon>
-                                </button>
-                                <!--button mat-icon-button [disabled]="holeIndex == -1" (click)="onEditHole()">
-                                    <mat-icon>edit</mat-icon>
-                                </button>
-                                <button mat-icon-button [disabled]="holeIndex == -1" (click)="onDeleteHole()">
-                                    <mat-icon>delete</mat-icon>
-                                </button-->
-                            </mat-list-item>
-                        </mat-list>
-                    </mat-card>
-                </mat-accordion>
-            </mat-list>
-        </mat-sidenav>
+        <mat-card class="content">
+            <h2>Golfer's Guide</h2>
+            <p>
+                Get the Golfer's Guide Android app, now available on the
+                Google Play Store!
+            </p>
+            <img mat-card-image src="../../../assets/mobile.png">
+        </mat-card>
 
-        <!-- Navigation bar content / map -->
-        <mat-sidenav-content class="map-container">
-            <mat-card class="map-card">
-                <agm-map [mapDraggable]="mapDraggable" [latitude]="lat" [longitude]="lng" [zoom]="zoom" [mapTypeId]="mapType" class="mapper"
-                    #AgmMap [streetViewControl]="false">
-                </agm-map>
-                <!-- <demo-fab-speed-dial class="controls"></demo-fab-speed-dial> -->
-
-                <!-- Floating controls -->
-                <div class="controls" *ngIf="courseManager.activeCourse != null">
-                    <smd-fab-speed-dial [(open)]="open" [direction]="direction" [animationMode]="animationMode" [fixed]="true">
-                        <smd-fab-trigger [spin]="spin">
-                            <button mat-fab (click)="onSaveCourse()">
-                                <mat-icon>save</mat-icon>
-                            </button>
-                        </smd-fab-trigger>
-
-                        <smd-fab-actions>
-                            <button mat-mini-fab color="accent" *ngIf="courseIndex >= 0" (click)="onSelectCourse(courseIndex)">
-                                <mat-icon>refresh</mat-icon>
-                            </button>
-                            <button mat-mini-fab *ngIf="!viewMode" color="primary" (click)="onFabAdd(1)">
-                                <mat-icon>timeline</mat-icon>
-                            </button>
-                            <button mat-mini-fab *ngIf="!viewMode" color="primary" (click)="onFabAdd(0)">
-                                <mat-icon>flag</mat-icon>
-                            </button>
-                            <button mat-mini-fab *ngIf="!viewMode && selectedFeature != null" color="warn" (click)="onDeleteElement()">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </smd-fab-actions>
-                    </smd-fab-speed-dial>
-                </div>
-            </mat-card>
-        </mat-sidenav-content>
-    </mat-sidenav-container>
+    </div>
 </div>

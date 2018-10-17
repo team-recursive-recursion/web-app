@@ -16,7 +16,6 @@ export class CourseManager {
     public courses: Array<Course>;
     public activeCourse: Course;
 
-    private uid: string;
     private api: ApiService;
 
     /***
@@ -24,11 +23,10 @@ export class CourseManager {
      *
      *     Sets up the manager configurations.
      ***/
-    public constructor(api: ApiService, uid: string) {
+    public constructor(api: ApiService) {
         this.api = api;
         this.courses = [];
         this.activeCourse = null;
-        this.uid = uid;
     }
 
     /***
@@ -39,7 +37,7 @@ export class CourseManager {
      */
     public loadCourseList(callSucc: Function, callFail: Function) {
         // load user's courses
-        this.api.coursesGet(this.uid)
+        this.api.coursesGet()
             .subscribe(
 
                 result => {
@@ -47,8 +45,8 @@ export class CourseManager {
                     let body = result.json();
                     for (var i = 0; i < body.length; ++i) {
                         var course = new Course(ModelState.UNCHANGED);
-                        course.setId(body[i].courseId);
-                        course.setName(body[i].courseName);
+                        course.setId(body[i].zoneID);
+                        course.setName(body[i].zoneName);
                         course.setInfo(body[i].info);
                         this.courses.push(course);
                     }
@@ -117,12 +115,12 @@ export class CourseManager {
      ***/
     public createActiveCourse(name: string, info: string, api: ApiService,
             callSucc: Function, callFail: Function) {
-        api.coursesCreate(this.uid, name, info)
+        api.coursesCreate(name, info)
             .subscribe(
                 result => {
                     // create new course
                     var course = new Course(ModelState.UNCHANGED);
-                    course.setId(result.json().courseId);
+                    course.setId(result.json().zoneID);
                     course.setName(name);
                     course.setInfo(info);
                     this.courses.push(course);

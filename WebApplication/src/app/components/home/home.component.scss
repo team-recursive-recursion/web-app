@@ -1,60 +1,21 @@
-mat-sidenav  {
-    padding-left: 1%;
-    padding-right: 1%;
-}
-
-mat-accordion mat-card{
-    margin-bottom: 2%;
-}
-
-#search-div {
-    background-color: #FFFFFF;
-    padding: 0.5em;
-    padding-bottom: 0px;
-    margin: 0.5em;
-    border-radius: 3px;
-}
-
-.selected{
-    color: red;
-}
-.map-card {
-    position: relative;
-    flex: 1;
-    display: flex;
-    height: 97%;
-    padding: 0;
-}
-
-.controls{
-    position: absolute;
-    z-index: 2;
-    right: 80px;
-    bottom: 80px;
-}
-
-#course-selector{
-    width: 200px;
-    margin-left: 10px;
-}
-
-.course-Edit-Menu {
-    width: 300px;
-    margin-right: 30px;
-}
-
-#addCourseIconButton{
-    padding: 20px;
-}
-
-.mapper {
+div.outer {
+    text-align: center;
+    color: #000000;
+    background-color: #F4EFC9;
+    background-image: url(../../../assets/back-tile.png);
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
-.map-container{
-    position: relative;
-    padding: 10px;
+
+.content {
+    display: inline-block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    width: 80%;
+    max-width: 950px;
 }
+
 .example-container {
     display: flex;
     flex-direction: column;
@@ -69,55 +30,4 @@ mat-accordion mat-card{
     position: fixed;
     /* Make sure the toolbar will stay on top of the content as it scrolls past. */
     z-index: 2;
-}
-
-h1.example-app-name {
-    margin-left: 8px;
-}
-
-.example-sidenav-container {
-    /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
-       causes `<mat-sidenav-content>` to act as our scrolling element for desktop layouts. */
-    flex: 1;
-}
-
-.example-is-mobile .example-sidenav-container {
-    /* When the sidenav is fixed, don't constrain the height of the sidenav container. This allows the
-       `<body>` to be our scrolling element for mobile layouts. */
-    flex: 1 0 auto;
-}
-
-
-.fill {
-    width:100%;
-}
-
-.hole-radio-group {
-    display: block;
-    flex-direction: column;
-}
-
-.hole-radio-button {
-    display: block;
-    margin: 5px;
-}
-
-.hole-selected-value {
-    margin: 15px 0;
-}
-
-.addButton{
-    user-select: none;
-    cursor: pointer;
-}
-.example-spacer {
-    flex: 1 1 auto;
-}
-
-.small-spacer {
-    width: 20px;
-}
-
-.course-name-input{
-    width: 300px;
 }

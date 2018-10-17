@@ -148,7 +148,7 @@ export class Hole {
                     .subscribe(
                         result => {
                             // save the new ID
-                            var id = result.json().holeId;
+                            var id = result.json().zoneID;
                             this.setId(id);
                             this.setState(ModelState.UNCHANGED);
                             this.syncElements(api, callDone);
@@ -163,15 +163,46 @@ export class Hole {
                 break;
 
             case ModelState.UPDATED:
-                // TODO
+                // update the info
+                api.holeUpdate(this.getId(), this.getName(), this.getInfo())
+                    .subscribe(
+
+                        result => {
+                            this.setState(ModelState.UNCHANGED);
+                        },
+
+                        error => {
+                            callFail(error.status, error.headers, error.text());
+                        },
+
+                        () => console.log("Hole updated successfully")
+
+                    );
+                this.syncElements(api, callDone);
                 break;
 
             case ModelState.DELETED:
                 // delete all children
-                this.elements.forEach(e => {
+                /*this.elements.forEach(e => {
                     e.delete();
-                });
-                this.syncElements(api, () => {
+                });*/
+                // delete hole
+                api.holeDelete(this.getId())
+                    .subscribe(
+
+                    result => {
+                        this.course.removeHole(this);
+                        callDone();
+                    },
+
+                    error => {
+                        callFail(error.status, error.headers, error.text());
+                    },
+
+                    () => console.log("Hole deleted successfully")
+
+                );
+                /*this.syncElements(api, () => {
                     // delete hole
                     api.holeDelete(this.getId())
                         .subscribe(
@@ -187,7 +218,7 @@ export class Hole {
                         () => console.log("Hole deleted successfully")
 
                     );
-                });
+                });*/
                 break;
 
             default:
@@ -230,7 +261,7 @@ export class Hole {
                             // parse elements
                             this.elements = ElementFactory.parseElementArray(
                                 result.json().elements, this.course, this,
-                                false, false);
+                                true, false);
                             callDone();
                     },
 
